@@ -529,7 +529,7 @@ def main():
     )
     zapisz_json("schemat_zestawienia_tableschema.json", {
         "$comment": "Table Schema zasobu zbiorczego AED budowanego przez portal (docs/06). Pola wzorca bez wymagalności dostawcy.",
-        "name": "aed-zestawienie", "title": "Zestawienie AED – krajowy zasób zbiorczy", "version": WERSJA,
+        "name": "aed-zestawienie", "title": "Wykaz defibrylatorów AED – wykaz zbiorczy", "version": WERSJA,
         "fields": [dict(pole_schematu(n, opisy[n][0], opisy[n][2], wymagane=(n in MINIMUM_AGREGACJI or n in
                    ("id_aed", "status_urzadzenia", "poziom_weryfikacji", "dysponent_nazwa", "dysponent_z_wydawcy", "wydawca_zasobu",
                     "licencja_zasobu", "id_zasobu_zrodlowego", "url_zasobu_zrodlowego", "data_agregacji"))),
@@ -565,7 +565,7 @@ def main():
     zapisz_json("metadane_zbioru_dcat.json", {
         "@context": {"dcat": "http://www.w3.org/ns/dcat#", "dct": "http://purl.org/dc/terms/", "foaf": "http://xmlns.com/foaf/0.1/"},
         "@type": "dcat:Dataset",
-        "dct:title": [{"@language": "pl", "@value": "Zestawienie AED – krajowy zasób zbiorczy defibrylatorów"},
+        "dct:title": [{"@language": "pl", "@value": "Wykaz defibrylatorów AED – wykaz zbiorczy"},
                       {"@language": "en", "@value": "AED defibrillators in Poland – national aggregate"}],
         "dct:description": [
             {"@language": "pl", "@value": "Zasób zbiorczy budowany codziennie przez portal z zasobów dostawców, których zbiory deklarują zgodność ze wzorcem AED (Pola niestandardowe: standard = AED). Każdy wiersz ma atrybucję źródła (wydawca, licencja, link). Pominięte: wiersze z OpenStreetMap (ODbL), wiersze bez minimum danych, kontakty ze zbiorów deklarujących dane osobowe. Brak statusu oznacza 'nieznany', a nie 'sprawny'."},
@@ -576,7 +576,7 @@ def main():
         "dct:accrualPeriodicity": "http://publications.europa.eu/resource/authority/frequency/DAILY",
         "dct:spatial": "Polska",
         "dct:publisher": {"@type": "foaf:Agent", "foaf:name": "Ministerstwo Cyfryzacji (właściciel zbioru zbiorczego – ustawienie portalu)"},
-        "dcat:distribution": [{"@type": "dcat:Distribution", "dct:title": "Zestawienie AED (CSV)", "dcat:mediaType": "text/csv",
+        "dcat:distribution": [{"@type": "dcat:Distribution", "dct:title": "Wykaz defibrylatorów AED – wykaz zbiorczy (CSV)", "dcat:mediaType": "text/csv",
                                "dct:conformsTo": "format_danych/schemat/aed_zestawienie.tableschema.json",
                                "dcat:accessURL": "DO UZUPEŁNIENIA – zasób tworzy portal"}],
         "x-dane-gov-pl": {

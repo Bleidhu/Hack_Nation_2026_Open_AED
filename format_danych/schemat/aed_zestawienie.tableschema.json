@@ -1,7 +1,7 @@
 {
   "$comment": "Table Schema zasobu zbiorczego AED budowanego przez portal (docs/06). Pola wzorca bez wymagalności dostawcy.",
   "name": "aed-zestawienie",
-  "title": "Zestawienie AED – krajowy zasób zbiorczy",
+  "title": "Wykaz defibrylatorów AED – wykaz zbiorczy",
   "version": "2.0.0",
   "fields": [
     {

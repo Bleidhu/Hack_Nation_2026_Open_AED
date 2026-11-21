@@ -8,7 +8,7 @@
   "dct:title": [
     {
       "@language": "pl",
-      "@value": "Zestawienie AED – krajowy zasób zbiorczy defibrylatorów"
+      "@value": "Wykaz defibrylatorów AED – wykaz zbiorczy"
     },
     {
       "@language": "en",
@@ -44,7 +44,7 @@
   "dcat:distribution": [
     {
       "@type": "dcat:Distribution",
-      "dct:title": "Zestawienie AED (CSV)",
+      "dct:title": "Wykaz defibrylatorów AED – wykaz zbiorczy (CSV)",
       "dcat:mediaType": "text/csv",
       "dct:conformsTo": "format_danych/schemat/aed_zestawienie.tableschema.json",
       "dcat:accessURL": "DO UZUPEŁNIENIA – zasób tworzy portal"
