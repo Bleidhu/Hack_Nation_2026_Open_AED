@@ -18,6 +18,7 @@ ______________________________________________________________________
 - Dodano testy `test_main_aed_resource` - AED-06
 - Dodano zadanie Celery `create_main_aed_resource_task` budujące codziennie zasób zbiorczy Wykazu AED - AED-07
 - Dodano komendę `create_main_aed_resource` (opcje `--eager`, `--dry-run`) do ręcznego budowania Wykazu AED - AED-07
+- Dodano endpoint API `/aed-aggregated` zwracający identyfikatory zbioru i zasobu zbiorczego Wykazu AED wraz z dokumentacją OpenAPI - AED-08
 
 ### Changes
 
@@ -25,6 +26,8 @@ ______________________________________________________________________
 - Dodano trasę kolejki `resources` dla zadania `create_main_aed_resource_task` - AED-05
 - Dodano do harmonogramu Celery Beat wpis `aed_main_resource_creation` (codziennie 4:15, tylko gdy `AED_AGGREGATION_ENABLED`) - AED-07
 - Dodano zadanie `create_main_aed_resource_task` do eksportów `mcod.resources.tasks` - AED-07
+- Zarejestrowano schemat `AggregatedAEDInfo` i ścieżkę `/aed-aggregated` w specyfikacji OpenAPI - AED-08
+- Dodano serializer `AggregatedAEDInfoApiResponse`, widok `AggregatedAEDInfoView` i trasę `/aed-aggregated` - AED-08
 
 ### Fixes
 

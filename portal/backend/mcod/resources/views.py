@@ -36,6 +36,7 @@ from mcod.core.api.views import JsonAPIView, RDFView, VocabEntryRDFView, VocabRD
 from mcod.core.versioning import versioned
 from mcod.counters.lib import Counter
 from mcod.lib.encoders import DateTimeToISOEncoder
+from mcod.resources.aed_utils import get_main_aed_resource
 from mcod.resources.deserializers import (
     ChartApiRequest,
     CreateCommentRequest,
@@ -49,6 +50,7 @@ from mcod.resources.deserializers import (
 from mcod.resources.documents import ResourceDocument
 from mcod.resources.models import RESOURCE_TYPE_FILE, AggregatedDGAInfo, ResourceFile
 from mcod.resources.serializers import (
+    AggregatedAEDInfoApiResponse,
     AggregatedDGAInfoApiResponse,
     ChartApiResponse,
     CommentApiResponse,
@@ -769,6 +771,34 @@ class AggregatedDGAInfoView(JsonAPIView):
             if not data or data.resource is None or data.resource.is_removed or not data.resource.is_published:
                 raise falcon.HTTPNotFound
             return data
+
+        def serialize(self, *args, **kwargs):
+            self.prepare_context(*args, **kwargs)
+            return self.serializer.dump(self.response.context.data)
+
+
+class AggregatedAEDInfoView(JsonAPIView):
+
+    @falcon.before(login_optional)
+    @versioned
+    def on_get(self, request, response, *args, **kwargs):
+        """
+        ---
+        doc_template: docs/resources/aggregated_aed_info_view.yml
+        """
+        self.handle(request, response, self.GET, *args, **kwargs)
+
+    class GET(BaseHdlr):
+        database_model = apps.get_model("resources", "Resource")
+        serializer_schema = AggregatedAEDInfoApiResponse
+
+        def _get_data(self, cleaned, *args, **kwargs) -> Resource:
+            if not settings.AED_AGGREGATION_ENABLED:
+                raise falcon.HTTPNotFound
+            resource = get_main_aed_resource()
+            if resource is None:
+                raise falcon.HTTPNotFound
+            return resource
 
         def serialize(self, *args, **kwargs):
             self.prepare_context(*args, **kwargs)

@@ -694,3 +694,10 @@ class AggregatedDGAInfoApiResponse(ExtSchema):
     dataset_slug = fields.Str(attribute="resource.dataset.slug", data_key="dataset_slug")
     resource_id = fields.Int(attribute="resource.id", data_key="resource_id")
     resource_slug = fields.Str(attribute="resource.slug", data_key="resource_slug")
+
+
+class AggregatedAEDInfoApiResponse(ExtSchema):
+    dataset_id = fields.Int(attribute="dataset.id", data_key="dataset_id")
+    dataset_slug = fields.Str(attribute="dataset.slug", data_key="dataset_slug")
+    resource_id = fields.Int(attribute="id", data_key="resource_id")
+    resource_slug = fields.Str(attribute="slug", data_key="resource_slug")
