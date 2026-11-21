@@ -9,8 +9,13 @@ ______________________________________________________________________
 - Dodano moduł `aed_constants` ze stałymi Zestawienia AED (kolumny wzorca i zasobu zbiorczego, aliasy nagłówków, licencje, klucze pól niestandardowych) - AED-02
 - Dodano moduł `aed_aggregation` z regułami budowy zasobu zbiorczego AED (aliasy nagłówków, wartości jawne, dysponent z wydawcy, usuwanie kontaktów, id_aed, wymaga_przegladu, kody przetworzenia) - AED-03
 - Dodano testy `test_aed_aggregation` z testem zgodności z referencyjnym przykładem zasobu zbiorczego - AED-03
+- Dodano moduł `aed_utils` z wyborem zasobów źródłowych Wykazu AED (pole niestandardowe `standard` = `AED`, licencje CC0 i CC BY 4.0) i ich odczytem (pliki lokalne i zasoby z CKAN) - AED-04
+- Dodano funkcję `read_tabular_bytes` odczytującą pliki CSV, XLS i XLSX dostawców jako tekst, bez rzutowania typów - AED-04
+- Dodano fikstury testowe `aed` i testy `test_aed_sources` - AED-04
 
 ### Changes
+
+- Zarejestrowano fikstury testowe `aed` w `mcod/core/tests/fixtures/__init__.py` - AED-04
 
 ### Fixes
 

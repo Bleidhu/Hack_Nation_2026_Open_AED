@@ -38,6 +38,7 @@ from mcod.resources.aed_constants import (
 
 LAT = "szerokosc_geograficzna"
 LON = "dlugosc_geograficzna"
+TABULAR_EXTENSIONS: Tuple[str, ...] = ("csv", "xls", "xlsx")
 _COORDINATE_RE = re.compile(r"^-?\d+(\.\d+)?$")
 
 
@@ -97,6 +98,27 @@ def to_text(value: Any) -> str:
     if isinstance(value, float) and value != value:
         return ""
     return str(value).strip()
+
+
+def read_tabular_bytes(content: bytes, extension: str) -> pd.DataFrame:
+    """
+    Wczytuje plik CSV, XLS lub XLSX z wartościami jako tekst: bez rzutowania typów, żeby zachować
+    wartości literalne (np. zera wiodące w kodach SIMC i TERC). CSV: UTF-8 (z BOM lub bez), awaryjnie
+    CP1250; separator wykrywany spośród `,`, `;`, tabulatora i `|`.
+    """
+    if extension in ("xls", "xlsx"):
+        return pd.read_excel(io.BytesIO(content), dtype=object).applymap(to_text)
+    if extension != "csv":
+        raise ValueError(f"nieobsługiwany format: {extension}")
+    try:
+        text = content.decode("utf-8-sig")
+    except UnicodeDecodeError:
+        text = content.decode("cp1250")
+    try:
+        delimiter = csv.Sniffer().sniff(text[:65536], delimiters=",;\t|").delimiter
+    except csv.Error:
+        delimiter = ","
+    return pd.read_csv(io.StringIO(text), sep=delimiter, dtype=str, keep_default_na=False)
 
 
 def _parse_coordinate(value: str) -> Optional[float]:

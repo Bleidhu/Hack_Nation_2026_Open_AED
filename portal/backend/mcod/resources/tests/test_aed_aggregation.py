@@ -1,4 +1,5 @@
 import datetime
+import io
 from pathlib import Path
 
 import pandas as pd
@@ -12,6 +13,7 @@ from mcod.resources.aed_aggregation import (
     missing_minimum_columns,
     needs_inspection,
     normalize_header,
+    read_tabular_bytes,
     rename_with_aliases,
     skip_reason,
     to_csv_bytes,
@@ -314,6 +316,50 @@ def test_first_alias_from_left_wins():
     assert list(renamed.columns) == ["szerokosc_geograficzna"]
     assert renamed.loc[0, "szerokosc_geograficzna"] == "52.1"
     assert changed == {"lat"}
+
+
+@pytest.mark.feat_main_aed
+@pytest.mark.parametrize(
+    ("file_name", "shape", "first_column"),
+    [
+        ("legionowo_2625221.csv", (24, 11), "nazwa"),
+        ("krosno_54632.csv", (21, 6), "Długość geograficzna"),
+        ("przemysl_62095.csv", (21, 17), "id"),
+        ("marki_68353.csv", (8, 1), "Długość geograficzna,Szerokość geograficzna, Nazwa, Lokalizacja, Adres, Numer Id"),
+    ],
+)
+def test_read_tabular_bytes_real_csv(aed_samples, file_name, shape, first_column):
+    df = read_tabular_bytes((aed_samples / file_name).read_bytes(), "csv")
+    assert df.shape == shape
+    assert df.columns[0] == first_column
+
+
+@pytest.mark.feat_main_aed
+def test_read_tabular_bytes_keeps_literal_values(aed_samples):
+    df = read_tabular_bytes((aed_samples / "legionowo_2625221.csv").read_bytes(), "csv")
+    assert df.loc[0, "kod_simc"] == "0920806"
+    assert df.loc[0, "nr_lokalu"] == ""
+    assert df.loc[0, "szerokosc_geograficzna"] == "52.395198"
+
+
+@pytest.mark.feat_main_aed
+def test_read_tabular_bytes_cp1250_fallback():
+    df = read_tabular_bytes("nazwa;miasto\r\nŁódź;Łódź\r\n".encode("cp1250"), "csv")
+    assert df.to_dict("records") == [{"nazwa": "Łódź", "miasto": "Łódź"}]
+
+
+@pytest.mark.feat_main_aed
+def test_read_tabular_bytes_xlsx_as_text():
+    buffer = io.BytesIO()
+    pd.DataFrame({"kod_simc": ["0920806"], "lat": [52.39], "pusta": [None]}).to_excel(buffer, index=False)
+    df = read_tabular_bytes(buffer.getvalue(), "xlsx")
+    assert df.to_dict("records") == [{"kod_simc": "0920806", "lat": "52.39", "pusta": ""}]
+
+
+@pytest.mark.feat_main_aed
+def test_read_tabular_bytes_rejects_other_formats():
+    with pytest.raises(ValueError):
+        read_tabular_bytes(b"{}", "json")
 
 
 @pytest.mark.feat_main_aed
