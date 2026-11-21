@@ -6,6 +6,10 @@ ______________________________________________________________________
 
 ### New
 
+- Dodano moduł `aed_constants` ze stałymi Zestawienia AED (kolumny wzorca i zasobu zbiorczego, aliasy nagłówków, licencje, klucze pól niestandardowych) - AED-02
+- Dodano moduł `aed_aggregation` z regułami budowy zasobu zbiorczego AED (aliasy nagłówków, wartości jawne, dysponent z wydawcy, usuwanie kontaktów, id_aed, wymaga_przegladu, kody przetworzenia) - AED-03
+- Dodano testy `test_aed_aggregation` z testem zgodności z referencyjnym przykładem zasobu zbiorczego - AED-03
+
 ### Changes
 
 ### Fixes
