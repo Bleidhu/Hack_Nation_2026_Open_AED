@@ -12,10 +12,13 @@ ______________________________________________________________________
 - Dodano moduł `aed_utils` z wyborem zasobów źródłowych Wykazu AED (pole niestandardowe `standard` = `AED`, licencje CC0 i CC BY 4.0) i ich odczytem (pliki lokalne i zasoby z CKAN) - AED-04
 - Dodano funkcję `read_tabular_bytes` odczytującą pliki CSV, XLS i XLSX dostawców jako tekst, bez rzutowania typów - AED-04
 - Dodano fikstury testowe `aed` i testy `test_aed_sources` - AED-04
+- Wprowadzono zmienną środowiskową `AED_AGGREGATION_ENABLED` (domyślnie włączona) do włączania i wyłączania Wykazu AED - AED-05
+- Dodano ustawienia `MAIN_AED_*` (właściciel, tytuły i opisy zbioru oraz zasobu zbiorczego AED, katalog plików CSV) - AED-05
 
 ### Changes
 
 - Zarejestrowano fikstury testowe `aed` w `mcod/core/tests/fixtures/__init__.py` - AED-04
+- Dodano trasę kolejki `resources` dla zadania `create_main_aed_resource_task` - AED-05
 
 ### Fixes
 
