@@ -6,3 +6,19 @@
 /archive/scratch/
 _nieuzywane/
 
+# Oryginalne archiwa kodu portalu (trzymane lokalnie, rozpakowane w portal/)
+source_zips/
+# Binarna dystrybucja Fuseki (51 MB, limit ostrzeżeń GitHuba) – nie modyfikujemy jej
+portal/backend/docker/rdfdb/fuseki/dist/*.tar.gz
+
+# Lokalne ustawienia Claude Code
+.claude/settings.local.json
+
+# Python / Node / systemowe
+__pycache__/
+*.pyc
+.venv/
+venv/
+node_modules/
+.DS_Store
+Thumbs.db

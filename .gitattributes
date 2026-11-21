@@ -1,0 +1,2 @@
+# Bez konwersji końców linii: CSV wg RFC 4180 mają CRLF, a kod portalu ma zostać bajt w bajt jak w oryginale.
+* -text
