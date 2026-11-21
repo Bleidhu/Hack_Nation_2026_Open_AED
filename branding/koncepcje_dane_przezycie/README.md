@@ -5,7 +5,7 @@ Status: **szkice robocze** (22.11.2026). Księga znaku i pliki finalne powstaną
 ## Nazwa i hasło
 
 - **Nazwa:** *Dane (prze)życie*. Gra słów: „dane przeżycie”, „dane życie” i „dane” jak w dane.gov.pl. „(prze)” jest zapisane lżejszym krojem i innym kolorem, żeby było widać oba odczytania.
-- **Hasło (wezwanie dla dysponentów):** *Twoje dane – czyjeś przeżycie.*
+- **Hasło (wezwanie dla dysponentów):** *Twoje dane – czyjeś życie.*
 - **Hashtag:** `#DanePrzeżycie` / `#DanePrzezycie`. W mowie używamy pełnej frazy, bo nawiasu nie słychać.
 
 ## Znak
@@ -29,6 +29,7 @@ Chaotyczny sygnał wchodzi do pół-folderu z danymi (wykaz) i wychodzi jako **r
 | `porownanie.html`, `porownanie.png` | plansza porównawcza: warianty w 256, 64, 32 i 16 px, logo poziome jasne i negatyw, sygnet, układ pionowy, kontrasty |
 | `znak_{A,B,C}.svg` | sam znak |
 | `logo_poziome_{A,B,C}.svg`, `…_negatyw.svg` | znak, nazwa i hasło |
+| `logo_kwadrat_C.svg`, `…_negatyw.svg`, `naklejka_kwadrat_C.svg` | **układ kwadratowy (1:1) na naklejki**: znak u góry, nazwa w dwóch wierszach, hasło; wariant C |
 | `logo_pionowe_C.svg` | układ pionowy wariantu C |
 | `sygnet.svg`, `sygnet_negatyw.svg` | wersja do małych rozmiarów |
 | `build_koncepcje.py` | generator (geometria i kolory w jednym miejscu) |
@@ -38,10 +39,12 @@ Chaotyczny sygnał wchodzi do pół-folderu z danymi (wykaz) i wychodzi jako **r
 ```bash
 uv run --with fonttools python branding/koncepcje_dane_przezycie/build_koncepcje.py
 # render planszy (Windows, Edge):
-"/c/Program Files (x86)/Microsoft/Edge/Application/msedge.exe" --headless=new --hide-scrollbars --window-size=1240,1830 \
+"/c/Program Files (x86)/Microsoft/Edge/Application/msedge.exe" --headless=new --hide-scrollbars --window-size=1240,2380 \
   --screenshot="$(cygpath -w "$PWD/branding/koncepcje_dane_przezycie")\\porownanie.png" \
   "file:///$(cygpath -m "$PWD")/branding/koncepcje_dane_przezycie/porownanie.html"
 ```
+
+Analiza alternatywnych nazw kampanii: `../NAZWY_KAMPANII.md`.
 
 ## Następne kroki (po wyborze wariantu)
 

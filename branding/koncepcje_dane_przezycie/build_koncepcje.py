@@ -29,7 +29,7 @@ CZERWIEN_JASNA = "#FF7A85"
 ZIELEN_JASNA = "#4ADE9A"
 
 NAZWA_A, NAZWA_PRZE, NAZWA_B = "Dane ", "(prze)", "życie"
-HASLO = "Twoje dane – czyjeś przeżycie."
+HASLO = "Twoje dane – czyjeś życie."
 
 # ---------------------------------------------------------------- geometria znaku (układ 240 × 120, linia bazowa y=65)
 Y = 65
@@ -103,6 +103,39 @@ def lockup_pionowy(wejscie, wykaz):
     return body, (-10, 0, w + 20, 185)
 
 
+def szer(txt, font, size):
+    return tekst(txt, font, size, 0, 0, "#000")[1]
+
+
+def lockup_kwadrat(ciemny=False, naklejka=False, W=400.0, pad=28.0):
+    """Układ zbliżony do kwadratu (naklejki): znak u góry, nazwa w dwóch wierszach, hasło. Zwraca (svg, viewBox)."""
+    c_txt, c_prze, c_has = (BIALY, ZOLC, MIETA) if ciemny else (GRANAT, ZIELEN, GRANAT)
+    c = dict(c_folder=MIETA, c_we=CZERWIEN_JASNA, c_wy=ZIELEN_JASNA, c_front=ZIELEN_JASNA) if ciemny else {}
+    maxw = W - 2 * pad
+    s = maxw / ZNAK_VB[2]
+    zh = ZNAK_VB[3] * s
+    # wspólny rozmiar obu wierszy nazwy, dopasowany do szerokości dłuższego wiersza
+    w2_100 = szer(NAZWA_PRZE, REG, 100) + szer(NAZWA_B, BOLD, 100)
+    size = min(96.0, 100 * maxw / w2_100)
+    hs = min(size * 0.36, 100 * maxw / szer(HASLO, REG, 100))
+    y1 = pad + zh + 40 + size * 0.72
+    y2 = y1 + size * 1.04
+    y3 = y2 + hs * 2.1
+    H = y3 + pad * 1.25
+    l1, _ = tekst(NAZWA_A.strip(), BOLD, size, W / 2, y1, c_txt, anchor="middle")
+    wp, wz = szer(NAZWA_PRZE, REG, size), szer(NAZWA_B, BOLD, size)
+    x2 = W / 2 - (wp + wz) / 2
+    l2a, _ = tekst(NAZWA_PRZE, REG, size, x2, y2, c_prze)
+    l2b, _ = tekst(NAZWA_B, BOLD, size, x2 + wp, y2, c_txt)
+    l3, _ = tekst(HASLO, REG, hs, W / 2, y3, c_has, anchor="middle")
+    tlo = ""
+    if ciemny or naklejka:
+        tlo = (f'<rect x="3" y="3" width="{W - 6:.1f}" height="{H - 6:.1f}" rx="36" fill="{GRANAT if ciemny else BIALY}"'
+               + (f' stroke="{ZIELEN}" stroke-width="6"' if naklejka else "") + "/>")
+    zn = f'<g transform="translate({pad:.1f} {pad - ZNAK_VB[1] * s:.1f}) scale({s:.4f})">{znak(VF, True, **c)}</g>'
+    return tlo + zn + l1 + l2a + l2b + l3, (0, 0, W, H)
+
+
 WARIANTY = [
     ("A", "Linia płaska → rytm zatokowy, folder z wykazem", FLATLINE, True,
      "Wersja wyjściowa zespołu. Uwaga merytoryczna: linia płaska = asystolia, rytm niedefibrylacyjny – AED go nie leczy."),
@@ -128,6 +161,12 @@ def main():
         pliki += [f"znak_{kod}.svg", f"logo_poziome_{kod}.svg", f"logo_poziome_{kod}_negatyw.svg"]
     body, vb = lockup_pionowy(VF, True)
     zapisz("logo_pionowe_C.svg", body, vb, "Logo Dane (prze)życie – układ pionowy", "Wariant C nad nazwą i hasłem")
+    for nazwa, kw in (("logo_kwadrat_C.svg", {}), ("logo_kwadrat_C_negatyw.svg", {"ciemny": True}),
+                      ("naklejka_kwadrat_C.svg", {"naklejka": True})):
+        body, vb = lockup_kwadrat(**kw)
+        zapisz(nazwa, body, vb, "Logo Dane (prze)życie – układ kwadratowy", f"Wariant C, nazwa w dwóch wierszach; hasło: {HASLO}")
+        pliki.append(nazwa)
+        print(f"  {nazwa}: proporcje {vb[2]:.0f} × {vb[3]:.0f} ({vb[3] / vb[2]:.2f})")
     zapisz("sygnet.svg", sygnet(), SYG_VB, "Sygnet Dane (prze)życie", "Folder z jednym uderzeniem serca")
     zapisz("sygnet_negatyw.svg", f'<rect x="6" y="8" width="88" height="88" rx="16" fill="{GRANAT}"/>'
            + sygnet(MIETA, ZIELEN_JASNA), SYG_VB, "Sygnet – negatyw", "Folder z jednym uderzeniem serca na granacie")
@@ -170,6 +209,9 @@ h1{{margin:0 0 4px}}h2{{font-size:18px;margin:0 0 4px}}p{{margin:0 0 10px;font-s
 <p>Hasło: <b>{HASLO}</b> · Kolory z palety projektu (zieleń AED {ZIELEN}, granat {GRANAT}, czerwień {CZERWIEN}); na granacie jaśniejsze odpowiedniki dla kontrastu.
 Koncepcja: chaotyczny sygnał wchodzi do pół-folderu z danymi (wykaz) i wychodzi jako rytm zatokowy.</p>
 {wiersze}
+<section class="wariant rek"><h2>Układ kwadratowy (naklejki) – wariant C</h2><p>Nazwa w dwóch wierszach, hasło pod spodem; proporcje zbliżone do 1:1. Ostatni kafel: makieta naklejki z zieloną ramką.</p>
+<div class="rzad">{img("logo_kwadrat_C.svg", 300)}{img("logo_kwadrat_C_negatyw.svg", 300)}{img("naklejka_kwadrat_C.svg", 300, "#e9eef3")}</div>
+<div class="rzad">{img("logo_kwadrat_C.svg", 120)}{img("logo_kwadrat_C.svg", 64)}<div class="podpis">120 · 64 px</div></div></section>
 <section class="wariant"><h2>Sygnet do małych rozmiarów i układ pionowy</h2><p>Folder z jednym uderzeniem serca – favicon, awatar, naklejka. Układ pionowy dla wariantu C.</p>
 <div class="rzad">{img("sygnet.svg", 128)}{img("sygnet.svg", 64)}{img("sygnet.svg", 32)}{img("sygnet.svg", 16)}{img("sygnet_negatyw.svg", 64)}{img("sygnet_negatyw.svg", 32)}<div class="podpis">128 · 64 · 32 · 16 px · negatyw</div></div>
 <div class="rzad">{img("logo_pionowe_C.svg", 320)}</div></section>
