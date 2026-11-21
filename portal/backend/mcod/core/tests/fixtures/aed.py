@@ -7,6 +7,8 @@ from django.conf import settings
 
 from mcod.datasets.factories import DatasetFactory
 from mcod.datasets.models import Dataset
+from mcod.organizations.factories import OrganizationFactory
+from mcod.organizations.models import Organization
 from mcod.resources.factories import ResourceFactory
 from mcod.resources.models import Resource
 
@@ -38,3 +40,19 @@ def aed_resource_factory(aed_dataset: Dataset) -> Callable[..., Resource]:
         return ResourceFactory.create(**params)
 
     return create
+
+
+@pytest.fixture
+def main_aed_owner_organization() -> Organization:
+    return OrganizationFactory.create(pk=settings.MAIN_AED_DATASET_OWNER_ORGANIZATION_PK)
+
+
+@pytest.fixture
+def main_aed_dataset(main_aed_owner_organization: Organization) -> Dataset:
+    return DatasetFactory.create(
+        organization=main_aed_owner_organization,
+        title=settings.MAIN_AED_DATASET_DEFAULT_TITLE,
+        customfields={"standard": "AED", "zestawienie": "AED-krajowe"},
+        license_chosen=Dataset.LICENSE_CC_BY,
+        status="published",
+    )

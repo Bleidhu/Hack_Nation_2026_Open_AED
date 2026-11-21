@@ -14,6 +14,8 @@ ______________________________________________________________________
 - Dodano fikstury testowe `aed` i testy `test_aed_sources` - AED-04
 - Wprowadzono zmienną środowiskową `AED_AGGREGATION_ENABLED` (domyślnie włączona) do włączania i wyłączania Wykazu AED - AED-05
 - Dodano ustawienia `MAIN_AED_*` (właściciel, tytuły i opisy zbioru oraz zasobu zbiorczego AED, katalog plików CSV) - AED-05
+- Dodano tworzenie zbioru i zasobu zbiorczego Wykazu AED (CSV, licencja CC BY 4.0, schemat z mapowaniem mapy b/l/label, rozpoznawanie po polach niestandardowych bez nowego modelu) - AED-06
+- Dodano testy `test_main_aed_resource` - AED-06
 
 ### Changes
 
