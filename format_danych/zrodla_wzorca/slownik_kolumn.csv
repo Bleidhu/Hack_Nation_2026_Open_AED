@@ -1,45 +1,42 @@
-lp,kolumna,typ,wymagalnosc,grupa,opis,przyklad,slownik,regula_jakosci_dane_gov_pl,typ_kolumny_w_portalu
-1,id_aed,string,W,Identyfikacja,"Unikalny, trwały identyfikator AED w zbiorze krajowym (nadaje agregator; dysponent może zostawić puste)",PL-AED-0000123,,,tekst
-2,id_zrodlowe,string,Z,Identyfikacja,Identyfikator urządzenia w systemie dysponenta lub źródła,BYD-AED-045,,,tekst
-3,nazwa_lokalizacji,string,W,Identyfikacja,Nazwa obiektu; etykieta punktu na mapie portalu,Dworzec – hala główna,,,tekst
-4,wojewodztwo,string,Z,Adres i położenie,"Nazwa województwa wg TERYT, małymi literami",kujawsko-pomorskie,,,tekst
-5,powiat,string,Z,Adres i położenie,Nazwa powiatu wg TERYT,Bydgoszcz,,,tekst
-6,gmina,string,Z,Adres i położenie,Nazwa gminy wg TERYT,Bydgoszcz,,,tekst
-7,kod_terc,string,Z,Adres i położenie,"Kod TERC gminy (7 znaków, TEKST – zera wiodące)",0461011,,,tekst
-8,miejscowosc,string,W,Adres i położenie,Nazwa miejscowości wg TERYT (SIMC),Bydgoszcz,,,tekst
-9,kod_simc,string,Z,Adres i położenie,"Identyfikator SIMC miejscowości (7 cyfr, TEKST)",,,,tekst
-10,kod_pocztowy,string,W,Adres i położenie,Kod pocztowy PNA w formacie 00-000,85-001,,Kod PNA,tekst
-11,cecha_ulicy,enum,Z,Adres i położenie,Cecha ulicy ze słownika cecha_ulicy,ul.,cecha_ulicy,Cecha adresu,tekst
-12,nazwa_ulicy,string,Z,Adres i położenie,"Nazwa ulicy wg TERYT (ULIC); puste, gdy miejscowość bez ulic",Gdańska,,,tekst
-13,kod_ulic,string,O,Adres i położenie,"Identyfikator ULIC (5 cyfr, TEKST)",,,,tekst
-14,numer_budynku,string,W,Adres i położenie,Numer porządkowy budynku (tekst – bywają litery),187,,,tekst
-15,numer_lokalu,string,O,Adres i położenie,Numer lokalu,,,,tekst
-16,adres_uniwersalny,string,O,Adres i położenie,Adres uniwersalny wg Standardu technicznego 3.2 (kody rozdzielone |),,,Adres uniwersalny,tekst
-17,szerokosc_geograficzna,number,W,Adres i położenie,"Szerokość geograficzna WGS84, kropka dziesiętna, min. 6 miejsc po przecinku, zakres 49.0–54.9",53.123456,,Pole numeryczne,liczba zmiennoprzecinkowa
-18,dlugosc_geograficzna,number,W,Adres i położenie,"Długość geograficzna WGS84, kropka dziesiętna, min. 6 miejsc po przecinku, zakres 14.1–24.2",18.012345,,Pole numeryczne,liczba zmiennoprzecinkowa
-19,opis_lokalizacji,string,W,Adres i położenie,"Gdzie dokładnie wisi urządzenie (piętro, ściana, punkt orientacyjny)","Parter, przy wejściu głównym, zielona szafka",,,tekst
-20,wewnatrz_budynku,boolean,Z,Adres i położenie,true – wewnątrz budynku; false – na zewnątrz,true,,Pole wartości logicznych,wartość logiczna
-21,kondygnacja,integer,O,Adres i położenie,"0 = parter, liczby ujemne = poziomy podziemne",0,,Pole numeryczne,liczba całkowita
-22,typ_dostepu,enum,W,Dostępność,Kto może skorzystać – słownik typ_dostepu,publiczny,typ_dostepu,,tekst
-23,dostepny_24_7,boolean,W,Dostępność,"true – dostępny całą dobę, 7 dni w tygodniu",true,,Pole wartości logicznych,wartość logiczna
-24,godziny_dostepnosci,string,Z,Dostępność,"Godziny w składni opening_hours (OSM); puste, gdy 24/7",Mo-Fr 07:00-21:00; Sa 08:00-14:00,,,tekst
-25,zabezpieczenie,enum,Z,Dostępność,Sposób zabezpieczenia urządzenia – słownik zabezpieczenie,szafka_z_alarmem,zabezpieczenie,,tekst
-26,instrukcja_dostepu,string,O,Dostępność,Jak dostać się do urządzenia. NIE wpisujemy kodów do szafek – podaje je dyspozytor,Klucz w portierni (całodobowo),,,tekst
-27,status_urzadzenia,enum,W,Urządzenie i sprawność,Stan urządzenia – słownik status_urzadzenia,sprawny,status_urzadzenia,,tekst
-28,producent,string,O,Urządzenie i sprawność,Producent urządzenia,,,,tekst
-29,model,string,O,Urządzenie i sprawność,Model urządzenia,,,,tekst
-30,elektrody_pediatryczne,boolean,Z,Urządzenie i sprawność,Czy dostępne elektrody/tryb pediatryczny,true,,Pole wartości logicznych,wartość logiczna
-31,data_waznosci_elektrod,date,Z,Urządzenie i sprawność,Data ważności elektrod (yyyy-mm-dd),2027-05-31,,,data
-32,data_waznosci_baterii,date,Z,Urządzenie i sprawność,Data ważności baterii (yyyy-mm-dd),2029-01-31,,,data
-33,data_ostatniego_przegladu,date,Z,Urządzenie i sprawność,Data ostatniego przeglądu/autotestu potwierdzonego przez opiekuna,2026-10-02,,,data
-34,dysponent_nazwa,string,W,Dysponent i źródło,"Właściciel lub zarządca urządzenia (instytucja, nie osoba fizyczna)",Gmina Przykładowa,,,tekst
-35,dysponent_regon,string,Z,Dysponent i źródło,"REGON dysponenta: 9 lub 14 cyfr, TEKST",,,REGON,tekst
-36,telefon_kontaktowy,string,Z,Dysponent i źródło,Telefon INSTYTUCJONALNY: 9 cyfr lub +48 i 9 cyfr,,,Numer telefonu,tekst
-37,email_kontaktowy,string,O,Dysponent i źródło,E-mail INSTYTUCJONALNY (np. aed@…),,,,tekst
-38,zrodlo_danych,enum,W,Dysponent i źródło,Pochodzenie rekordu – słownik zrodlo_danych,dysponent,zrodlo_danych,,tekst
-39,zrodlo_url,string,Z,Dysponent i źródło,Link do zbioru źródłowego (np. zbioru dysponenta na dane.gov.pl),,,,tekst
-40,poziom_weryfikacji,enum,W,Dysponent i źródło,Jak potwierdzono dane – słownik poziom_weryfikacji,zweryfikowany_przez_dysponenta,poziom_weryfikacji,,tekst
-41,data_weryfikacji,date,W,Dysponent i źródło,Kiedy ostatnio potwierdzono obecność i sprawność AED (yyyy-mm-dd),2026-11-15,,,data
-42,data_aktualizacji,datetime,W,Dysponent i źródło,Ostatnia zmiana rekordu (yyyy-mm-ddThh:mm:ss),2026-11-21T10:15:00,,,data i czas
-43,zdjecie_url,string,O,Dysponent i źródło,"Zdjęcie miejsca (licencja CC0/CC BY, bez wizerunku osób)",,,,tekst
-44,uwagi,string,O,Dysponent i źródło,Uwagi; bez znaków nowej linii,,,,tekst
+lp,kolumna,typ,wymagalnosc,minimum_agregacji,grupa,opis,przyklad,slownik,regula_jakosci_dane_gov_pl,typ_kolumny_w_portalu
+1,id_zrodlowe,string,W,,Identyfikacja,Identyfikator urządzenia nadany przez dostawcę; unikalny w pliku i stały między wersjami pliku. Na jego podstawie portal nadaje id_aed,BYD-AED-045,,,tekst
+2,nazwa_lokalizacji,string,W,tak,Lokalizacja,Nazwa obiektu; etykieta punktu na mapie portalu,Dworzec – hala główna,,,tekst
+3,wojewodztwo,string,Z,,Lokalizacja,"Nazwa województwa wg TERYT, małymi literami",kujawsko-pomorskie,,,tekst
+4,powiat,string,Z,,Lokalizacja,Nazwa powiatu wg TERYT,Bydgoszcz,,,tekst
+5,gmina,string,Z,,Lokalizacja,Nazwa gminy wg TERYT,Bydgoszcz,,,tekst
+6,kod_terc,string,Z,,Lokalizacja,"Kod TERC gminy (7 cyfr, TEKST – zera wiodące)",0461011,,,tekst
+7,miejscowosc,string,W,tak,Lokalizacja,Nazwa miejscowości literalnie wg TERYT (SIMC),Bydgoszcz,,,tekst
+8,kod_simc,string,Z,,Lokalizacja,"Identyfikator SIMC miejscowości (7 cyfr, TEKST)",,,,tekst
+9,kod_pocztowy,string,Z,,Lokalizacja,Kod pocztowy PNA w formacie 00-000,85-001,,Kod PNA,tekst
+10,cecha_ulicy,enum,Z,,Lokalizacja,Cecha ulicy ze słownika cecha_ulicy,ul.,cecha_ulicy,Cecha adresu,tekst
+11,nazwa_ulicy,string,Z,,Lokalizacja,"Nazwa ulicy literalnie wg TERYT (ULIC); puste, gdy miejscowość bez ulic",Gdańska,,,tekst
+12,kod_ulic,string,O,,Lokalizacja,"Identyfikator ULIC (5 cyfr, TEKST)",,,,tekst
+13,numer_budynku,string,Z,,Lokalizacja,Numer porządkowy budynku (tekst – bywają litery),187,,,tekst
+14,numer_lokalu,string,O,,Lokalizacja,Numer lokalu,,,,tekst
+15,adres_uniwersalny,string,O,,Lokalizacja,"Adres uniwersalny wg Standardu technicznego (POD 2021–2027 zał. 2, pkt 3.3): kody rozdzielone |",,,Adres uniwersalny,tekst
+16,szerokosc_geograficzna,number,W,tak,Lokalizacja,"Szerokość geograficzna WGS84, kropka dziesiętna, min. 6 miejsc po przecinku, zakres 49.0–54.9",53.123456,,Pole numeryczne,liczba zmiennoprzecinkowa
+17,dlugosc_geograficzna,number,W,tak,Lokalizacja,"Długość geograficzna WGS84, kropka dziesiętna, min. 6 miejsc po przecinku, zakres 14.1–24.2",18.012345,,Pole numeryczne,liczba zmiennoprzecinkowa
+18,opis_lokalizacji,string,W,,Lokalizacja,"Gdzie dokładnie jest urządzenie (piętro, ściana, punkt orientacyjny). Bez kodów do szafek, bez informacji, gdzie leży klucz, bez imion i nazwisk","Parter, przy wejściu głównym, zielona szafka",,,tekst
+19,wewnatrz_budynku,boolean,Z,,Lokalizacja,true – wewnątrz budynku; false – na zewnątrz,true,,Pole wartości logicznych,wartość logiczna
+20,kondygnacja,integer,O,,Lokalizacja,"0 = parter, liczby ujemne = poziomy podziemne",0,,Pole numeryczne,liczba całkowita
+21,typ_dostepu,enum,W,,Dostęp,Kto może skorzystać – słownik typ_dostepu. AED w lokalu mieszkalnym osoby fizycznej nie jest publikowany,publiczny,typ_dostepu,,tekst
+22,dostepny_24_7,boolean,W,,Dostęp,"true – dostępny całą dobę, 7 dni w tygodniu",true,,Pole wartości logicznych,wartość logiczna
+23,godziny_dostepnosci,string,Z,,Dostęp,"Godziny w składni opening_hours (OSM); puste, gdy 24/7",Mo-Fr 07:00-21:00; Sa 08:00-14:00,,,tekst
+24,zabezpieczenie,enum,Z,,Dostęp,Sposób zabezpieczenia urządzenia – słownik zabezpieczenie,szafka_z_alarmem,zabezpieczenie,,tekst
+25,instrukcja_dostepu,string,O,,Dostęp,"Jak dostać się do urządzenia. Bez kodów do szafek (podaje je dyspozytor 112), bez imion i nazwisk",Klucz w portierni (całodobowo),,,tekst
+26,status_urzadzenia,enum,Z,,Urządzenie i stan,Stan urządzenia – słownik status_urzadzenia. Puste w pliku dostawcy = 'nieznany' w zasobie zbiorczym (nigdy domyślnie 'sprawny'),sprawny,status_urzadzenia,,tekst
+27,producent,string,O,,Urządzenie i stan,Producent urządzenia,,,,tekst
+28,model,string,O,,Urządzenie i stan,Model urządzenia,,,,tekst
+29,elektrody_pediatryczne,boolean,Z,,Urządzenie i stan,Czy dostępne elektrody lub tryb pediatryczny,true,,Pole wartości logicznych,wartość logiczna
+30,data_waznosci_elektrod,date,Z,,Urządzenie i stan,Data ważności elektrod (yyyy-mm-dd),2027-05-31,,,data
+31,data_waznosci_baterii,date,Z,,Urządzenie i stan,Data ważności baterii (yyyy-mm-dd),2029-01-31,,,data
+32,data_ostatniego_przegladu,date,Z,,Urządzenie i stan,Data ostatniego przeglądu lub autotestu potwierdzonego przez opiekuna (yyyy-mm-dd),2026-10-02,,,data
+33,poziom_weryfikacji,enum,Z,,Urządzenie i stan,Jak potwierdzono dane – słownik poziom_weryfikacji. Puste = 'niezweryfikowany' w zasobie zbiorczym,zweryfikowany_przez_dysponenta,poziom_weryfikacji,,tekst
+34,data_weryfikacji,date,Z,,Urządzenie i stan,"Kiedy ostatnio potwierdzono obecność i sprawność AED (yyyy-mm-dd). Puste, jeśli nikt nie weryfikował – data importu nie jest datą weryfikacji",2026-11-15,,,data
+35,dysponent_nazwa,string,Z,,Dysponent i kontakt,Właściciel lub opiekun AED. Osoba fizyczna (np. jednoosobowa działalność): wpisz rodzaj podmiotu (np. 'gabinet lekarski') albo zostaw puste. Puste = nazwa wydawcy zasobu w zasobie zbiorczym,Gmina Przykładowa,,,tekst
+36,dysponent_regon,string,Z,,Dysponent i kontakt,"REGON dysponenta: 9 lub 14 cyfr, TEKST; tylko dla osób prawnych i instytucji",,,REGON,tekst
+37,telefon_kontaktowy,string,Z,,Dysponent i kontakt,"Telefon WYŁĄCZNIE instytucjonalny lub funkcyjny (centrala, recepcja), nigdy imienny: 9 cyfr lub + i prefiks",,,Numer telefonu,tekst
+38,email_kontaktowy,string,O,,Dysponent i kontakt,"E-mail WYŁĄCZNIE instytucjonalny lub funkcyjny (np. aed@, sekretariat@), nigdy imienny",,,,tekst
+39,zrodlo_danych,enum,Z,,Źródło i aktualność,Pochodzenie rekordu – słownik zrodlo_danych. Wiersze 'openstreetmap' nie trafiają do zasobu zbiorczego (ODbL),dysponent,zrodlo_danych,,tekst
+40,zrodlo_url,string,Z,,Źródło i aktualność,Link do źródła rekordu u dostawcy (https),,,,tekst
+41,data_aktualizacji,datetime,W,,Źródło i aktualność,Ostatnia zmiana rekordu (yyyy-mm-ddThh:mm:ss),2026-11-21T10:15:00,,,data i czas

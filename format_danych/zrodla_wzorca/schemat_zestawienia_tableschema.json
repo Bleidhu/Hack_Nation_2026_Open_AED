@@ -1,0 +1,490 @@
+{
+  "$comment": "Table Schema zasobu zbiorczego AED budowanego przez portal (docs/06). Pola wzorca bez wymagalności dostawcy.",
+  "name": "aed-zestawienie",
+  "title": "Zestawienie AED – krajowy zasób zbiorczy",
+  "version": "2.0.0",
+  "fields": [
+    {
+      "name": "id_aed",
+      "type": "string",
+      "description": "Identyfikator AED nadany przez portal: 'PL-AED-' + 12 znaków hex SHA-1(id instytucji wydawcy | id_zrodlowe). Bez id_zrodlowe: SHA-1(id instytucji | nazwa_lokalizacji znormalizowana | szerokość | długość z 5 miejscami)",
+      "constraints": {
+        "required": true,
+        "pattern": "^PL-AED-[0-9a-f]{12}$",
+        "unique": true
+      },
+      "x-grupa": "Identyfikacja"
+    },
+    {
+      "name": "id_zrodlowe",
+      "type": "string",
+      "description": "Identyfikator urządzenia nadany przez dostawcę; unikalny w pliku i stały między wersjami pliku. Na jego podstawie portal nadaje id_aed",
+      "x-grupa": "Identyfikacja"
+    },
+    {
+      "name": "nazwa_lokalizacji",
+      "type": "string",
+      "description": "Nazwa obiektu; etykieta punktu na mapie portalu",
+      "constraints": {
+        "required": true
+      },
+      "x-grupa": "Lokalizacja"
+    },
+    {
+      "name": "wojewodztwo",
+      "type": "string",
+      "description": "Nazwa województwa wg TERYT, małymi literami",
+      "x-grupa": "Lokalizacja"
+    },
+    {
+      "name": "powiat",
+      "type": "string",
+      "description": "Nazwa powiatu wg TERYT",
+      "x-grupa": "Lokalizacja"
+    },
+    {
+      "name": "gmina",
+      "type": "string",
+      "description": "Nazwa gminy wg TERYT",
+      "x-grupa": "Lokalizacja"
+    },
+    {
+      "name": "kod_terc",
+      "type": "string",
+      "description": "Kod TERC gminy (7 cyfr, TEKST – zera wiodące)",
+      "constraints": {
+        "pattern": "^\\d{7}$"
+      },
+      "x-grupa": "Lokalizacja"
+    },
+    {
+      "name": "miejscowosc",
+      "type": "string",
+      "description": "Nazwa miejscowości literalnie wg TERYT (SIMC)",
+      "constraints": {
+        "required": true
+      },
+      "x-grupa": "Lokalizacja"
+    },
+    {
+      "name": "kod_simc",
+      "type": "string",
+      "description": "Identyfikator SIMC miejscowości (7 cyfr, TEKST)",
+      "constraints": {
+        "pattern": "^\\d{7}$"
+      },
+      "x-grupa": "Lokalizacja"
+    },
+    {
+      "name": "kod_pocztowy",
+      "type": "string",
+      "description": "Kod pocztowy PNA w formacie 00-000",
+      "constraints": {
+        "pattern": "^\\d{2}-\\d{3}$"
+      },
+      "x-grupa": "Lokalizacja"
+    },
+    {
+      "name": "cecha_ulicy",
+      "type": "string",
+      "description": "Cecha ulicy ze słownika cecha_ulicy",
+      "constraints": {
+        "enum": [
+          "ul.",
+          "al.",
+          "pl.",
+          "skwer",
+          "bulw.",
+          "rondo",
+          "park",
+          "rynek",
+          "szosa",
+          "droga",
+          "os.",
+          "ogród",
+          "wyspa",
+          "wyb.",
+          "inne"
+        ]
+      },
+      "x-grupa": "Lokalizacja"
+    },
+    {
+      "name": "nazwa_ulicy",
+      "type": "string",
+      "description": "Nazwa ulicy literalnie wg TERYT (ULIC); puste, gdy miejscowość bez ulic",
+      "x-grupa": "Lokalizacja"
+    },
+    {
+      "name": "kod_ulic",
+      "type": "string",
+      "description": "Identyfikator ULIC (5 cyfr, TEKST)",
+      "constraints": {
+        "pattern": "^\\d{5}$"
+      },
+      "x-grupa": "Lokalizacja"
+    },
+    {
+      "name": "numer_budynku",
+      "type": "string",
+      "description": "Numer porządkowy budynku (tekst – bywają litery)",
+      "x-grupa": "Lokalizacja"
+    },
+    {
+      "name": "numer_lokalu",
+      "type": "string",
+      "description": "Numer lokalu",
+      "x-grupa": "Lokalizacja"
+    },
+    {
+      "name": "adres_uniwersalny",
+      "type": "string",
+      "description": "Adres uniwersalny wg Standardu technicznego (POD 2021–2027 zał. 2, pkt 3.3): kody rozdzielone |",
+      "x-grupa": "Lokalizacja"
+    },
+    {
+      "name": "szerokosc_geograficzna",
+      "type": "number",
+      "description": "Szerokość geograficzna WGS84, kropka dziesiętna, min. 6 miejsc po przecinku, zakres 49.0–54.9",
+      "constraints": {
+        "required": true,
+        "minimum": 49.0,
+        "maximum": 54.9
+      },
+      "x-grupa": "Lokalizacja"
+    },
+    {
+      "name": "dlugosc_geograficzna",
+      "type": "number",
+      "description": "Długość geograficzna WGS84, kropka dziesiętna, min. 6 miejsc po przecinku, zakres 14.1–24.2",
+      "constraints": {
+        "required": true,
+        "minimum": 14.1,
+        "maximum": 24.2
+      },
+      "x-grupa": "Lokalizacja"
+    },
+    {
+      "name": "opis_lokalizacji",
+      "type": "string",
+      "description": "Gdzie dokładnie jest urządzenie (piętro, ściana, punkt orientacyjny). Bez kodów do szafek, bez informacji, gdzie leży klucz, bez imion i nazwisk",
+      "x-grupa": "Lokalizacja"
+    },
+    {
+      "name": "wewnatrz_budynku",
+      "type": "boolean",
+      "description": "true – wewnątrz budynku; false – na zewnątrz",
+      "trueValues": [
+        "true"
+      ],
+      "falseValues": [
+        "false"
+      ],
+      "x-grupa": "Lokalizacja"
+    },
+    {
+      "name": "kondygnacja",
+      "type": "integer",
+      "description": "0 = parter, liczby ujemne = poziomy podziemne",
+      "x-grupa": "Lokalizacja"
+    },
+    {
+      "name": "typ_dostepu",
+      "type": "string",
+      "description": "Kto może skorzystać – słownik typ_dostepu. AED w lokalu mieszkalnym osoby fizycznej nie jest publikowany",
+      "constraints": {
+        "enum": [
+          "publiczny",
+          "ograniczony",
+          "prywatny"
+        ]
+      },
+      "x-grupa": "Dostęp"
+    },
+    {
+      "name": "dostepny_24_7",
+      "type": "boolean",
+      "description": "true – dostępny całą dobę, 7 dni w tygodniu",
+      "trueValues": [
+        "true"
+      ],
+      "falseValues": [
+        "false"
+      ],
+      "x-grupa": "Dostęp"
+    },
+    {
+      "name": "godziny_dostepnosci",
+      "type": "string",
+      "description": "Godziny w składni opening_hours (OSM); puste, gdy 24/7",
+      "x-grupa": "Dostęp"
+    },
+    {
+      "name": "zabezpieczenie",
+      "type": "string",
+      "description": "Sposób zabezpieczenia urządzenia – słownik zabezpieczenie",
+      "constraints": {
+        "enum": [
+          "brak",
+          "szafka_otwarta",
+          "szafka_z_alarmem",
+          "szafka_na_kod",
+          "zamkniety_na_klucz"
+        ]
+      },
+      "x-grupa": "Dostęp"
+    },
+    {
+      "name": "instrukcja_dostepu",
+      "type": "string",
+      "description": "Jak dostać się do urządzenia. Bez kodów do szafek (podaje je dyspozytor 112), bez imion i nazwisk",
+      "x-grupa": "Dostęp"
+    },
+    {
+      "name": "status_urzadzenia",
+      "type": "string",
+      "description": "Stan urządzenia – słownik status_urzadzenia. Puste w pliku dostawcy = 'nieznany' w zasobie zbiorczym (nigdy domyślnie 'sprawny')",
+      "constraints": {
+        "required": true,
+        "enum": [
+          "sprawny",
+          "niesprawny",
+          "w_serwisie",
+          "wycofany",
+          "nieznany"
+        ]
+      },
+      "x-grupa": "Urządzenie i stan"
+    },
+    {
+      "name": "producent",
+      "type": "string",
+      "description": "Producent urządzenia",
+      "x-grupa": "Urządzenie i stan"
+    },
+    {
+      "name": "model",
+      "type": "string",
+      "description": "Model urządzenia",
+      "x-grupa": "Urządzenie i stan"
+    },
+    {
+      "name": "elektrody_pediatryczne",
+      "type": "boolean",
+      "description": "Czy dostępne elektrody lub tryb pediatryczny",
+      "trueValues": [
+        "true"
+      ],
+      "falseValues": [
+        "false"
+      ],
+      "x-grupa": "Urządzenie i stan"
+    },
+    {
+      "name": "data_waznosci_elektrod",
+      "type": "date",
+      "description": "Data ważności elektrod (yyyy-mm-dd)",
+      "format": "%Y-%m-%d",
+      "x-grupa": "Urządzenie i stan"
+    },
+    {
+      "name": "data_waznosci_baterii",
+      "type": "date",
+      "description": "Data ważności baterii (yyyy-mm-dd)",
+      "format": "%Y-%m-%d",
+      "x-grupa": "Urządzenie i stan"
+    },
+    {
+      "name": "data_ostatniego_przegladu",
+      "type": "date",
+      "description": "Data ostatniego przeglądu lub autotestu potwierdzonego przez opiekuna (yyyy-mm-dd)",
+      "format": "%Y-%m-%d",
+      "x-grupa": "Urządzenie i stan"
+    },
+    {
+      "name": "poziom_weryfikacji",
+      "type": "string",
+      "description": "Jak potwierdzono dane – słownik poziom_weryfikacji. Puste = 'niezweryfikowany' w zasobie zbiorczym",
+      "constraints": {
+        "required": true,
+        "enum": [
+          "zweryfikowany_w_terenie",
+          "zweryfikowany_przez_dysponenta",
+          "niezweryfikowany"
+        ]
+      },
+      "x-grupa": "Urządzenie i stan"
+    },
+    {
+      "name": "data_weryfikacji",
+      "type": "date",
+      "description": "Kiedy ostatnio potwierdzono obecność i sprawność AED (yyyy-mm-dd). Puste, jeśli nikt nie weryfikował – data importu nie jest datą weryfikacji",
+      "format": "%Y-%m-%d",
+      "x-grupa": "Urządzenie i stan"
+    },
+    {
+      "name": "dysponent_nazwa",
+      "type": "string",
+      "description": "Właściciel lub opiekun AED. Osoba fizyczna (np. jednoosobowa działalność): wpisz rodzaj podmiotu (np. 'gabinet lekarski') albo zostaw puste. Puste = nazwa wydawcy zasobu w zasobie zbiorczym",
+      "constraints": {
+        "required": true
+      },
+      "x-grupa": "Dysponent i kontakt"
+    },
+    {
+      "name": "dysponent_regon",
+      "type": "string",
+      "description": "REGON dysponenta: 9 lub 14 cyfr, TEKST; tylko dla osób prawnych i instytucji",
+      "constraints": {
+        "pattern": "^(\\d{9}|\\d{14})$"
+      },
+      "x-grupa": "Dysponent i kontakt"
+    },
+    {
+      "name": "telefon_kontaktowy",
+      "type": "string",
+      "description": "Telefon WYŁĄCZNIE instytucjonalny lub funkcyjny (centrala, recepcja), nigdy imienny: 9 cyfr lub + i prefiks",
+      "constraints": {
+        "pattern": "^(\\+\\d{2})?\\d{9}$"
+      },
+      "x-grupa": "Dysponent i kontakt"
+    },
+    {
+      "name": "email_kontaktowy",
+      "type": "string",
+      "description": "E-mail WYŁĄCZNIE instytucjonalny lub funkcyjny (np. aed@, sekretariat@), nigdy imienny",
+      "x-grupa": "Dysponent i kontakt"
+    },
+    {
+      "name": "zrodlo_danych",
+      "type": "string",
+      "description": "Pochodzenie rekordu – słownik zrodlo_danych. Wiersze 'openstreetmap' nie trafiają do zasobu zbiorczego (ODbL)",
+      "constraints": {
+        "enum": [
+          "dysponent",
+          "rejestr_publiczny",
+          "baza_zewnetrzna",
+          "openstreetmap",
+          "zgloszenie_obywatelskie"
+        ]
+      },
+      "x-grupa": "Źródło i aktualność"
+    },
+    {
+      "name": "zrodlo_url",
+      "type": "string",
+      "description": "Link do źródła rekordu u dostawcy (https)",
+      "x-grupa": "Źródło i aktualność"
+    },
+    {
+      "name": "data_aktualizacji",
+      "type": "datetime",
+      "description": "Ostatnia zmiana rekordu (yyyy-mm-ddThh:mm:ss)",
+      "format": "%Y-%m-%dT%H:%M:%S",
+      "x-grupa": "Źródło i aktualność"
+    },
+    {
+      "name": "wymaga_przegladu",
+      "type": "boolean",
+      "description": "true: minął termin elektrod lub baterii albo ostatni przegląd był ponad 12 miesięcy przed agregacją; false: znane daty są aktualne; puste: brak dat. Nie zmienia status_urzadzenia",
+      "trueValues": [
+        "true"
+      ],
+      "falseValues": [
+        "false"
+      ],
+      "x-grupa": "Wyliczane"
+    },
+    {
+      "name": "dysponent_z_wydawcy",
+      "type": "boolean",
+      "description": "true, gdy dostawca nie podał dysponenta i wpisano nazwę wydawcy zasobu",
+      "trueValues": [
+        "true"
+      ],
+      "falseValues": [
+        "false"
+      ],
+      "constraints": {
+        "required": true
+      },
+      "x-grupa": "Wyliczane"
+    },
+    {
+      "name": "przetworzenie",
+      "type": "string",
+      "description": "Kody przetworzenia wiersza oddzielone ';' (słownik przetworzenie); puste = wiersz bez zmian względem źródła",
+      "constraints": {
+        "pattern": "^(naglowki|osie|domyslne|dysponent_z_wydawcy|kontakt_usuniety)(;(naglowki|osie|domyslne|dysponent_z_wydawcy|kontakt_usuniety))*$"
+      },
+      "x-grupa": "Wyliczane"
+    },
+    {
+      "name": "wydawca_zasobu",
+      "type": "string",
+      "description": "Instytucja publikująca zasób źródłowy w portalu (atrybucja)",
+      "constraints": {
+        "required": true
+      },
+      "x-grupa": "Pochodzenie"
+    },
+    {
+      "name": "licencja_zasobu",
+      "type": "string",
+      "description": "Licencja zbioru źródłowego – słownik licencja_zasobu",
+      "constraints": {
+        "required": true,
+        "enum": [
+          "CC0 1.0",
+          "CC BY 4.0"
+        ]
+      },
+      "x-grupa": "Pochodzenie"
+    },
+    {
+      "name": "id_zasobu_zrodlowego",
+      "type": "integer",
+      "description": "Identyfikator zasobu źródłowego w portalu",
+      "constraints": {
+        "required": true
+      },
+      "x-grupa": "Pochodzenie"
+    },
+    {
+      "name": "url_zasobu_zrodlowego",
+      "type": "string",
+      "description": "Link do zasobu źródłowego w portalu",
+      "constraints": {
+        "required": true
+      },
+      "x-grupa": "Pochodzenie"
+    },
+    {
+      "name": "data_danych_zasobu",
+      "type": "date",
+      "description": "„Dane na dzień” zasobu źródłowego; dla zasobu dodanego linkiem – data kopii w portalu",
+      "format": "%Y-%m-%d",
+      "x-grupa": "Pochodzenie"
+    },
+    {
+      "name": "data_agregacji",
+      "type": "datetime",
+      "description": "Data i czas zbudowania zasobu zbiorczego (yyyy-mm-ddThh:mm:ss)",
+      "format": "%Y-%m-%dT%H:%M:%S",
+      "constraints": {
+        "required": true
+      },
+      "x-grupa": "Pochodzenie"
+    }
+  ],
+  "primaryKey": "id_aed",
+  "missingValues": [
+    ""
+  ],
+  "x-mapa-portalu": {
+    "b": "szerokosc_geograficzna",
+    "l": "dlugosc_geograficzna",
+    "label": "nazwa_lokalizacji"
+  },
+  "x-licencja": "CC BY 4.0"
+}

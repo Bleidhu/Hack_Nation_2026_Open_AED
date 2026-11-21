@@ -17,6 +17,7 @@
     "miejscowosc": "schema:addressLocality",
     "kod_pocztowy": "schema:postalCode",
     "nazwa_ulicy": "schema:streetAddress",
+    "kondygnacja": "schema:floorLevel",
     "godziny_dostepnosci": "schema:openingHours",
     "dysponent_nazwa": "schema:provider",
     "telefon_kontaktowy": "schema:telephone",
@@ -27,28 +28,33 @@
       "@id": "schema:dateModified",
       "@type": "xsd:dateTime"
     },
-    "zdjecie_url": {
-      "@id": "schema:image",
-      "@type": "@id"
+    "data_weryfikacji": {
+      "@id": "aed:dataWeryfikacji",
+      "@type": "xsd:date"
     },
     "typ_dostepu": "aed:typDostepu",
     "dostepny_24_7": {
       "@id": "aed:dostepny247",
       "@type": "xsd:boolean"
     },
-    "status_urzadzenia": "aed:status",
+    "zabezpieczenie": "aed:zabezpieczenie",
+    "status_urzadzenia": "aed:statusUrzadzenia",
     "poziom_weryfikacji": "aed:poziomWeryfikacji",
-    "data_weryfikacji": {
-      "@id": "aed:dataWeryfikacji",
-      "@type": "xsd:date"
+    "zrodlo_danych": "aed:zrodloDanych",
+    "kod_terc": "aed:kodTERC",
+    "wymaga_przegladu": {
+      "@id": "aed:wymagaPrzegladu",
+      "@type": "xsd:boolean"
     },
-    "organizacja_id": {
-      "@id": "schema:brand",
+    "wydawca_zasobu": "schema:publisher",
+    "licencja_zasobu": "schema:license",
+    "url_zasobu_zrodlowego": {
+      "@id": "schema:isBasedOn",
       "@type": "@id"
     },
-    "id_obszaru": {
-      "@id": "aed:obszar",
-      "@type": "@id"
+    "data_agregacji": {
+      "@id": "schema:dateCreated",
+      "@type": "xsd:dateTime"
     }
   }
 }

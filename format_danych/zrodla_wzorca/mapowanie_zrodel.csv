@@ -1,16 +1,14 @@
-kolumna_wzorca,openaedmap_osm_tag,danegovpl_krosno_marki,danegovpl_przemysl,warszawa_api,przeksztalcenie
-nazwa_lokalizacji,name / description,Nazwa (w Krośnie zawsze 'Defibrylator') + Lokalizacja,name,nazwa obiektu,gdy nazwa = 'Defibrylator' → użyj pola Lokalizacja
-szerokosc_geograficzna,geometry.coordinates[1],Szerokość geograficzna (Marki: zamienione z długością!),geometry (GeoJSON w komórce),wsp. y,"kontrola zakresu 49.0–54.9; zamiana lat/lon, gdy poza zakresem"
-dlugosc_geograficzna,geometry.coordinates[0],Długość geograficzna,geometry (GeoJSON w komórce),wsp. x,kontrola zakresu 14.1–24.2
-nazwa_ulicy / numer_budynku / kod_pocztowy / miejscowosc,addr:street / addr:housenumber / addr:postcode / addr:city,"Adres (jedno pole: 'ul. Jasna, 38-400 Krosno')","street, home_number, postcode, city",adres,parser adresu + dopasowanie do TERYT/PRG
-opis_lokalizacji,defibrillator:location,Lokalizacja,brak (description = tekst ogólny o AED),?,puste → flaga 'brak_opisu_lokalizacji'
-wewnatrz_budynku,indoor=yes/no,brak,brak,?,"yes→true, no→false"
-kondygnacja,level,brak,brak,?,liczba całkowita
-typ_dostepu,access,brak,brak,?,yes→publiczny; customers/permit→ograniczony; private→prywatny (odfiltrować)
-dostepny_24_7 / godziny_dostepnosci,opening_hours,brak,brak,?,'24/7' → dostepny_24_7=true; inne → godziny_dostepnosci
-dysponent_nazwa,operator,dostawca zbioru,dostawca zbioru,Urząd m.st. Warszawy,"z metadanych zbioru, gdy brak w rekordzie"
-telefon_kontaktowy,phone / emergency:phone,brak,phone,?,normalizacja do 9 cyfr; odrzucić numery prywatne
-data_weryfikacji,check_date (formaty mieszane),brak,brak,?,parsowanie dd.mm.yyyy / yyyy-mm-dd → ISO
-status_urzadzenia,brak tagu,brak,brak,brak,domyślnie 'nieznany'
-zabezpieczenie / daty ważności,brak tagu,brak,brak,brak,puste – do uzupełnienia przez dysponenta
-zrodlo_danych,(stała) openstreetmap,(stała) dysponent,(stała) dysponent,(stała) dysponent,OSM: tylko porównanie (ODbL ≠ CC0)
+kolumna_wzorca,openaedmap_osm_tag,danegovpl_krosno_marki,danegovpl_legionowo,danegovpl_przemysl,warszawa_api,przeksztalcenie
+id_zrodlowe,@id (node/…),Numer Id,brak,id,defibrillator_id,brak → id_aed liczone z nazwy i współrzędnych
+nazwa_lokalizacji,name / description,Nazwa (często 'Defibrylator') + Lokalizacja,nazwa,name,nazwa obiektu,gdy nazwa = 'Defibrylator' → użyj pola Lokalizacja
+szerokosc_geograficzna,geometry.coordinates[1],Szerokość geograficzna (Marki: zamienione z długością!),szerokosc_geograficzna,geometry (WKT w komórce),geometry.coordinates[1],kontrola zakresu 49.0–54.9; zamiana osi → przetworzenie=osie
+dlugosc_geograficzna,geometry.coordinates[0],Długość geograficzna,dlugosc_geograficzna,geometry (WKT w komórce),geometry.coordinates[0],kontrola zakresu 14.1–24.2
+miejscowosc / nazwa_ulicy / numer_budynku / kod_pocztowy,addr:city / addr:street / addr:housenumber / addr:postcode,"Adres (jedno pole: 'ul. Jasna, 38-400 Krosno')",miejscowosc / nazwa_ulicy / nr_budynku / kod_pocztowy,city / street / home_number / postcode,adres,nr_budynku → numer_budynku (alias); jedno pole adresu → parser (krok 2)
+opis_lokalizacji,defibrillator:location,Lokalizacja,brak,brak (description = tekst ogólny),device_access_description,puste → wiersz niezgodny ze wzorcem (nie blokuje agregacji)
+typ_dostepu,access,brak,brak,brak,?,yes→publiczny; customers/permit→ograniczony; private→prywatny (teren niepubliczny)
+dostepny_24_7 / godziny_dostepnosci,opening_hours,brak,brak,brak,?,'24/7' → dostepny_24_7=true; inne → godziny_dostepnosci
+dysponent_nazwa,operator,brak,brak,brak,?,"puste → nazwa wydawcy zasobu, dysponent_z_wydawcy=true"
+telefon_kontaktowy / email_kontaktowy,phone / email,brak,brak,phone / email,?,tylko instytucjonalne; zbiór z warunkiem dla danych osobowych → usunięte (kontakt_usuniety)
+status_urzadzenia,brak tagu,brak,brak,brak,?,puste → 'nieznany' (domyslne)
+poziom_weryfikacji / data_weryfikacji,check_date,brak,brak,brak,?,puste → 'niezweryfikowany'; data_weryfikacji zostaje pusta
+zrodlo_danych,(stała) openstreetmap,(stała) dysponent,(stała) dysponent,(stała) dysponent,(stała) dysponent,openstreetmap → wiersz wykluczony (ODbL)

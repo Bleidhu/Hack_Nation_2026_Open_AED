@@ -1,10 +1,7 @@
 {
   "@context": "http://www.w3.org/ns/csvw",
   "url": "aed_punkty.csv",
-  "dc:title": "Defibrylatory AED w Polsce – zbiór krajowy",
-  "dc:license": {
-    "@id": "https://creativecommons.org/publicdomain/zero/1.0/"
-  },
+  "dc:title": "Defibrylatory AED – plik dostawcy wg wzorcowego zakresu danych v2",
   "dialect": {
     "delimiter": ",",
     "encoding": "utf-8",
@@ -14,22 +11,14 @@
     "header": true
   },
   "tableSchema": {
-    "primaryKey": "id_aed",
-    "aboutUrl": "https://dane.gov.pl/aed/{id_aed}",
+    "primaryKey": "id_zrodlowe",
     "columns": [
-      {
-        "name": "id_aed",
-        "titles": "id_aed",
-        "datatype": "string",
-        "dc:description": "Unikalny, trwały identyfikator AED w zbiorze krajowym (nadaje agregator; dysponent może zostawić puste)",
-        "required": false
-      },
       {
         "name": "id_zrodlowe",
         "titles": "id_zrodlowe",
         "datatype": "string",
-        "dc:description": "Identyfikator urządzenia w systemie dysponenta lub źródła",
-        "required": false
+        "dc:description": "Identyfikator urządzenia nadany przez dostawcę; unikalny w pliku i stały między wersjami pliku. Na jego podstawie portal nadaje id_aed",
+        "required": true
       },
       {
         "name": "nazwa_lokalizacji",
@@ -63,14 +52,14 @@
         "name": "kod_terc",
         "titles": "kod_terc",
         "datatype": "string",
-        "dc:description": "Kod TERC gminy (7 znaków, TEKST – zera wiodące)",
+        "dc:description": "Kod TERC gminy (7 cyfr, TEKST – zera wiodące)",
         "required": false
       },
       {
         "name": "miejscowosc",
         "titles": "miejscowosc",
         "datatype": "string",
-        "dc:description": "Nazwa miejscowości wg TERYT (SIMC)",
+        "dc:description": "Nazwa miejscowości literalnie wg TERYT (SIMC)",
         "required": true
       },
       {
@@ -85,7 +74,7 @@
         "titles": "kod_pocztowy",
         "datatype": "string",
         "dc:description": "Kod pocztowy PNA w formacie 00-000",
-        "required": true
+        "required": false
       },
       {
         "name": "cecha_ulicy",
@@ -98,7 +87,7 @@
         "name": "nazwa_ulicy",
         "titles": "nazwa_ulicy",
         "datatype": "string",
-        "dc:description": "Nazwa ulicy wg TERYT (ULIC); puste, gdy miejscowość bez ulic",
+        "dc:description": "Nazwa ulicy literalnie wg TERYT (ULIC); puste, gdy miejscowość bez ulic",
         "required": false
       },
       {
@@ -113,7 +102,7 @@
         "titles": "numer_budynku",
         "datatype": "string",
         "dc:description": "Numer porządkowy budynku (tekst – bywają litery)",
-        "required": true
+        "required": false
       },
       {
         "name": "numer_lokalu",
@@ -126,7 +115,7 @@
         "name": "adres_uniwersalny",
         "titles": "adres_uniwersalny",
         "datatype": "string",
-        "dc:description": "Adres uniwersalny wg Standardu technicznego 3.2 (kody rozdzielone |)",
+        "dc:description": "Adres uniwersalny wg Standardu technicznego (POD 2021–2027 zał. 2, pkt 3.3): kody rozdzielone |",
         "required": false
       },
       {
@@ -147,7 +136,7 @@
         "name": "opis_lokalizacji",
         "titles": "opis_lokalizacji",
         "datatype": "string",
-        "dc:description": "Gdzie dokładnie wisi urządzenie (piętro, ściana, punkt orientacyjny)",
+        "dc:description": "Gdzie dokładnie jest urządzenie (piętro, ściana, punkt orientacyjny). Bez kodów do szafek, bez informacji, gdzie leży klucz, bez imion i nazwisk",
         "required": true
       },
       {
@@ -168,7 +157,7 @@
         "name": "typ_dostepu",
         "titles": "typ_dostepu",
         "datatype": "string",
-        "dc:description": "Kto może skorzystać – słownik typ_dostepu",
+        "dc:description": "Kto może skorzystać – słownik typ_dostepu. AED w lokalu mieszkalnym osoby fizycznej nie jest publikowany",
         "required": true
       },
       {
@@ -196,15 +185,15 @@
         "name": "instrukcja_dostepu",
         "titles": "instrukcja_dostepu",
         "datatype": "string",
-        "dc:description": "Jak dostać się do urządzenia. NIE wpisujemy kodów do szafek – podaje je dyspozytor",
+        "dc:description": "Jak dostać się do urządzenia. Bez kodów do szafek (podaje je dyspozytor 112), bez imion i nazwisk",
         "required": false
       },
       {
         "name": "status_urzadzenia",
         "titles": "status_urzadzenia",
         "datatype": "string",
-        "dc:description": "Stan urządzenia – słownik status_urzadzenia",
-        "required": true
+        "dc:description": "Stan urządzenia – słownik status_urzadzenia. Puste w pliku dostawcy = 'nieznany' w zasobie zbiorczym (nigdy domyślnie 'sprawny')",
+        "required": false
       },
       {
         "name": "producent",
@@ -224,7 +213,7 @@
         "name": "elektrody_pediatryczne",
         "titles": "elektrody_pediatryczne",
         "datatype": "boolean",
-        "dc:description": "Czy dostępne elektrody/tryb pediatryczny",
+        "dc:description": "Czy dostępne elektrody lub tryb pediatryczny",
         "required": false
       },
       {
@@ -245,64 +234,64 @@
         "name": "data_ostatniego_przegladu",
         "titles": "data_ostatniego_przegladu",
         "datatype": "date",
-        "dc:description": "Data ostatniego przeglądu/autotestu potwierdzonego przez opiekuna",
-        "required": false
-      },
-      {
-        "name": "dysponent_nazwa",
-        "titles": "dysponent_nazwa",
-        "datatype": "string",
-        "dc:description": "Właściciel lub zarządca urządzenia (instytucja, nie osoba fizyczna)",
-        "required": true
-      },
-      {
-        "name": "dysponent_regon",
-        "titles": "dysponent_regon",
-        "datatype": "string",
-        "dc:description": "REGON dysponenta: 9 lub 14 cyfr, TEKST",
-        "required": false
-      },
-      {
-        "name": "telefon_kontaktowy",
-        "titles": "telefon_kontaktowy",
-        "datatype": "string",
-        "dc:description": "Telefon INSTYTUCJONALNY: 9 cyfr lub +48 i 9 cyfr",
-        "required": false
-      },
-      {
-        "name": "email_kontaktowy",
-        "titles": "email_kontaktowy",
-        "datatype": "string",
-        "dc:description": "E-mail INSTYTUCJONALNY (np. aed@…)",
-        "required": false
-      },
-      {
-        "name": "zrodlo_danych",
-        "titles": "zrodlo_danych",
-        "datatype": "string",
-        "dc:description": "Pochodzenie rekordu – słownik zrodlo_danych",
-        "required": true
-      },
-      {
-        "name": "zrodlo_url",
-        "titles": "zrodlo_url",
-        "datatype": "string",
-        "dc:description": "Link do zbioru źródłowego (np. zbioru dysponenta na dane.gov.pl)",
+        "dc:description": "Data ostatniego przeglądu lub autotestu potwierdzonego przez opiekuna (yyyy-mm-dd)",
         "required": false
       },
       {
         "name": "poziom_weryfikacji",
         "titles": "poziom_weryfikacji",
         "datatype": "string",
-        "dc:description": "Jak potwierdzono dane – słownik poziom_weryfikacji",
-        "required": true
+        "dc:description": "Jak potwierdzono dane – słownik poziom_weryfikacji. Puste = 'niezweryfikowany' w zasobie zbiorczym",
+        "required": false
       },
       {
         "name": "data_weryfikacji",
         "titles": "data_weryfikacji",
         "datatype": "date",
-        "dc:description": "Kiedy ostatnio potwierdzono obecność i sprawność AED (yyyy-mm-dd)",
-        "required": true
+        "dc:description": "Kiedy ostatnio potwierdzono obecność i sprawność AED (yyyy-mm-dd). Puste, jeśli nikt nie weryfikował – data importu nie jest datą weryfikacji",
+        "required": false
+      },
+      {
+        "name": "dysponent_nazwa",
+        "titles": "dysponent_nazwa",
+        "datatype": "string",
+        "dc:description": "Właściciel lub opiekun AED. Osoba fizyczna (np. jednoosobowa działalność): wpisz rodzaj podmiotu (np. 'gabinet lekarski') albo zostaw puste. Puste = nazwa wydawcy zasobu w zasobie zbiorczym",
+        "required": false
+      },
+      {
+        "name": "dysponent_regon",
+        "titles": "dysponent_regon",
+        "datatype": "string",
+        "dc:description": "REGON dysponenta: 9 lub 14 cyfr, TEKST; tylko dla osób prawnych i instytucji",
+        "required": false
+      },
+      {
+        "name": "telefon_kontaktowy",
+        "titles": "telefon_kontaktowy",
+        "datatype": "string",
+        "dc:description": "Telefon WYŁĄCZNIE instytucjonalny lub funkcyjny (centrala, recepcja), nigdy imienny: 9 cyfr lub + i prefiks",
+        "required": false
+      },
+      {
+        "name": "email_kontaktowy",
+        "titles": "email_kontaktowy",
+        "datatype": "string",
+        "dc:description": "E-mail WYŁĄCZNIE instytucjonalny lub funkcyjny (np. aed@, sekretariat@), nigdy imienny",
+        "required": false
+      },
+      {
+        "name": "zrodlo_danych",
+        "titles": "zrodlo_danych",
+        "datatype": "string",
+        "dc:description": "Pochodzenie rekordu – słownik zrodlo_danych. Wiersze 'openstreetmap' nie trafiają do zasobu zbiorczego (ODbL)",
+        "required": false
+      },
+      {
+        "name": "zrodlo_url",
+        "titles": "zrodlo_url",
+        "datatype": "string",
+        "dc:description": "Link do źródła rekordu u dostawcy (https)",
+        "required": false
       },
       {
         "name": "data_aktualizacji",
@@ -310,41 +299,6 @@
         "datatype": "dateTime",
         "dc:description": "Ostatnia zmiana rekordu (yyyy-mm-ddThh:mm:ss)",
         "required": true
-      },
-      {
-        "name": "zdjecie_url",
-        "titles": "zdjecie_url",
-        "datatype": "string",
-        "dc:description": "Zdjęcie miejsca (licencja CC0/CC BY, bez wizerunku osób)",
-        "required": false
-      },
-      {
-        "name": "uwagi",
-        "titles": "uwagi",
-        "datatype": "string",
-        "dc:description": "Uwagi; bez znaków nowej linii",
-        "required": false
-      },
-      {
-        "name": "organizacja_id",
-        "titles": "organizacja_id",
-        "datatype": "string",
-        "dc:description": "Identyfikator organizacji z tabeli organizacji (logo, strona www) – np. sieć placówek firmy",
-        "required": false
-      },
-      {
-        "name": "id_obszaru",
-        "titles": "id_obszaru",
-        "datatype": "string",
-        "dc:description": "Powiązanie z AED obszarowym/mobilnym (tabela aed_obszarowe), np. flota tramwajów",
-        "required": false
-      },
-      {
-        "name": "id_pojazdu",
-        "titles": "id_pojazdu",
-        "datatype": "string",
-        "dc:description": "Numer taborowy pojazdu, w którym zamontowano AED (AED mobilne)",
-        "required": false
       }
     ]
   }

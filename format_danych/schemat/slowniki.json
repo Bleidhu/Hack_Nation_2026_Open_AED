@@ -14,7 +14,7 @@
       },
       {
         "kod": "prywatny",
-        "etykieta": "Prywatny – nie publikujemy w widoku publicznym",
+        "etykieta": "Teren niepubliczny instytucji lub firmy (np. tylko dla pracowników); nie lokal mieszkalny",
         "osm": "access=private"
       }
     ]
@@ -36,7 +36,7 @@
       },
       {
         "kod": "szafka_na_kod",
-        "etykieta": "Szafka na kod (kod podaje dyspozytor 112)"
+        "etykieta": "Szafka na kod (kod podaje dyspozytor 112; kodu nie publikujemy)"
       },
       {
         "kod": "zamkniety_na_klucz",
@@ -65,37 +65,32 @@
       },
       {
         "kod": "nieznany",
-        "etykieta": "Nieznany – brak potwierdzenia"
+        "etykieta": "Nieznany – brak potwierdzenia (wartość domyślna dla pustego pola)"
       }
     ]
   },
   "zrodlo_danych": {
-    "opis": "Pochodzenie rekordu; kolejność = priorytet referencyjności (1 najwyższy)",
+    "opis": "Pochodzenie rekordu",
     "wartosci": [
       {
         "kod": "dysponent",
-        "etykieta": "Dane własne dysponenta (zbiór na dane.gov.pl, plik, formularz)",
-        "priorytet": 1
+        "etykieta": "Dane własne dysponenta"
       },
       {
         "kod": "rejestr_publiczny",
-        "etykieta": "Rejestr publiczny / dane JST",
-        "priorytet": 2
+        "etykieta": "Rejestr publiczny / dane JST"
       },
       {
         "kod": "baza_zewnetrzna",
-        "etykieta": "Baza zewnętrzna o zgodnej licencji",
-        "priorytet": 3
+        "etykieta": "Baza zewnętrzna o licencji CC0 lub CC BY 4.0"
       },
       {
         "kod": "openstreetmap",
-        "etykieta": "OpenStreetMap / OpenAEDMap (ODbL) – tylko porównanie, nie trafia do zbioru CC0",
-        "priorytet": 4
+        "etykieta": "OpenStreetMap / OpenAEDMap (ODbL) – wykluczony z zasobu zbiorczego"
       },
       {
         "kod": "zgloszenie_obywatelskie",
-        "etykieta": "Zgłoszenie obywatela – wymaga potwierdzenia",
-        "priorytet": 5
+        "etykieta": "Zgłoszenie obywatela – wymaga potwierdzenia"
       }
     ]
   },
@@ -104,7 +99,7 @@
     "wartosci": [
       {
         "kod": "zweryfikowany_w_terenie",
-        "etykieta": "Sprawdzony na miejscu (np. zdjęcie + data)"
+        "etykieta": "Sprawdzony na miejscu"
       },
       {
         "kod": "zweryfikowany_przez_dysponenta",
@@ -112,7 +107,7 @@
       },
       {
         "kod": "niezweryfikowany",
-        "etykieta": "Niezweryfikowany"
+        "etykieta": "Niezweryfikowany (wartość domyślna dla pustego pola)"
       }
     ]
   },
@@ -166,164 +161,39 @@
       }
     ]
   },
-  "typ_obszaru": {
-    "opis": "Rodzaj AED obszarowego/mobilnego",
+  "licencja_zasobu": {
+    "opis": "Licencje źródeł dopuszczone do zasobu zbiorczego",
     "wartosci": [
       {
-        "wartosc": "flota_pojazdow",
-        "opis": "AED w pojazdach (tramwaje, autobusy, taksówki) – zasięg tras"
+        "kod": "CC0 1.0"
       },
       {
-        "wartosc": "patrol_mobilny",
-        "opis": "Patrol z AED (WOPR, straż miejska, ochrona) – obszar patrolowania"
-      },
-      {
-        "wartosc": "wydarzenie",
-        "opis": "Wydarzenie masowe – AED na czas wydarzenia (aktywny_od/do)"
-      },
-      {
-        "wartosc": "teren_obiektu",
-        "opis": "Duży teren (kampus, park, stok, plaża) z kilkoma AED / punktem informacji"
-      },
-      {
-        "wartosc": "trasa",
-        "opis": "Trasa (szlak, pociąg, prom) – geometria liniowa + bufor"
-      },
-      {
-        "wartosc": "inne",
-        "opis": "Inny rodzaj zasięgu"
+        "kod": "CC BY 4.0"
       }
     ]
   },
-  "status_programu": {
-    "opis": "Status programu AED obszarowego",
+  "przetworzenie": {
+    "opis": "Kody przetworzenia wiersza przez portal (art. 15 ust. 1 pkt 2 ustawy), oddzielone ';'",
     "wartosci": [
       {
-        "wartosc": "aktywny"
+        "kod": "naglowki",
+        "etykieta": "Nagłówek źródła dopasowany do kolumny wzorca (alias)"
       },
       {
-        "wartosc": "w_realizacji"
+        "kod": "osie",
+        "etykieta": "Zamienione szerokość i długość geograficzna"
       },
       {
-        "wartosc": "planowany"
+        "kod": "domyslne",
+        "etykieta": "Wpisane wartości jawne dla pustych pól (nieznany, niezweryfikowany)"
       },
       {
-        "wartosc": "zakonczony"
-      }
-    ]
-  },
-  "typ_organizacji": {
-    "opis": "Rodzaj organizacji w tabeli organizacji",
-    "wartosci": [
-      {
-        "wartosc": "jst"
+        "kod": "dysponent_z_wydawcy",
+        "etykieta": "Pusty dysponent zastąpiony nazwą wydawcy zasobu"
       },
       {
-        "wartosc": "administracja"
-      },
-      {
-        "wartosc": "firma"
-      },
-      {
-        "wartosc": "przewoznik"
-      },
-      {
-        "wartosc": "uczelnia"
-      },
-      {
-        "wartosc": "szkola"
-      },
-      {
-        "wartosc": "ngo"
-      },
-      {
-        "wartosc": "sluzby"
-      },
-      {
-        "wartosc": "inne"
-      }
-    ]
-  },
-  "typ_zdarzenia": {
-    "opis": "Aktualizacja stanu AED (tabela aktualizacji)",
-    "wartosci": [
-      {
-        "wartosc": "uzycie",
-        "opis": "AED użyty – niedostępny do potwierdzenia sprawności"
-      },
-      {
-        "wartosc": "wymaga_serwisu",
-        "opis": "Usterka (np. niski poziom baterii, brak elektrod)"
-      },
-      {
-        "wartosc": "w_serwisie",
-        "opis": "Urządzenie zabrane do serwisu – niedostępne"
-      },
-      {
-        "wartosc": "po_serwisie",
-        "opis": "Serwis zakończony – sprawny (tylko dysponent / firma serwisująca)"
-      },
-      {
-        "wartosc": "sprawny",
-        "opis": "Potwierdzenie sprawności bez serwisu (tylko dysponent / serwis)"
-      }
-    ]
-  },
-  "rola": {
-    "opis": "Rola zgłaszającego aktualizację",
-    "wartosci": [
-      {
-        "wartosc": "obywatel",
-        "opis": "Osoba postronna – rola deklarowana"
-      },
-      {
-        "wartosc": "dysponent",
-        "opis": "Właściciel / opiekun AED"
-      },
-      {
-        "wartosc": "serwis",
-        "opis": "Firma serwisująca AED"
-      },
-      {
-        "wartosc": "zrm",
-        "opis": "Zespół Ratownictwa Medycznego"
-      },
-      {
-        "wartosc": "dyspozytor",
-        "opis": "Dyspozytor 112 / dyspozytor medyczny"
-      },
-      {
-        "wartosc": "sluzby",
-        "opis": "PSP, OSP, Policja, Straż Miejska, WOPR, GOPR/TOPR"
-      }
-    ]
-  },
-  "problemy": {
-    "opis": "Rodzaje usterek (lista oddzielona |)",
-    "wartosci": [
-      {
-        "wartosc": "niski_poziom_baterii"
-      },
-      {
-        "wartosc": "kontrolka_bledu"
-      },
-      {
-        "wartosc": "brak_lub_przeterminowane_elektrody"
-      },
-      {
-        "wartosc": "brak_urzadzenia"
-      },
-      {
-        "wartosc": "uszkodzona_szafka_lub_alarm"
-      },
-      {
-        "wartosc": "brak_dostepu_zamkniete"
-      },
-      {
-        "wartosc": "uszkodzone_urzadzenie"
-      },
-      {
-        "wartosc": "inne"
+        "kod": "kontakt_usuniety",
+        "etykieta": "Usunięte telefon i e-mail, bo zbiór źródłowy deklaruje dane osobowe"
       }
     ]
   }

@@ -1,0 +1,474 @@
+{
+  "$comment": "Frictionless Table Schema dla wzorca AED. Pola x-* to rozszerzenia projektu.",
+  "name": "aed-wzorzec",
+  "title": "Wzorcowy zakres danych o defibrylatorach AED",
+  "version": "0.1.0",
+  "fields": [
+    {
+      "name": "id_aed",
+      "type": "string",
+      "description": "Unikalny, trwały identyfikator AED w zbiorze krajowym (nadaje agregator; dysponent może zostawić puste)",
+      "constraints": {
+        "pattern": "^PL-AED-\\d{7}$",
+        "unique": true
+      },
+      "x-wymagalnosc": "W",
+      "x-grupa": "Identyfikacja"
+    },
+    {
+      "name": "id_zrodlowe",
+      "type": "string",
+      "description": "Identyfikator urządzenia w systemie dysponenta lub źródła",
+      "x-wymagalnosc": "Z",
+      "x-grupa": "Identyfikacja"
+    },
+    {
+      "name": "nazwa_lokalizacji",
+      "type": "string",
+      "description": "Nazwa obiektu; etykieta punktu na mapie portalu",
+      "constraints": {
+        "required": true
+      },
+      "x-wymagalnosc": "W",
+      "x-grupa": "Identyfikacja"
+    },
+    {
+      "name": "wojewodztwo",
+      "type": "string",
+      "description": "Nazwa województwa wg TERYT, małymi literami",
+      "x-wymagalnosc": "Z",
+      "x-grupa": "Adres i położenie"
+    },
+    {
+      "name": "powiat",
+      "type": "string",
+      "description": "Nazwa powiatu wg TERYT",
+      "x-wymagalnosc": "Z",
+      "x-grupa": "Adres i położenie"
+    },
+    {
+      "name": "gmina",
+      "type": "string",
+      "description": "Nazwa gminy wg TERYT",
+      "x-wymagalnosc": "Z",
+      "x-grupa": "Adres i położenie"
+    },
+    {
+      "name": "kod_terc",
+      "type": "string",
+      "description": "Kod TERC gminy (7 znaków, TEKST – zera wiodące)",
+      "constraints": {
+        "pattern": "^\\d{7}$"
+      },
+      "x-wymagalnosc": "Z",
+      "x-grupa": "Adres i położenie"
+    },
+    {
+      "name": "miejscowosc",
+      "type": "string",
+      "description": "Nazwa miejscowości wg TERYT (SIMC)",
+      "constraints": {
+        "required": true
+      },
+      "x-wymagalnosc": "W",
+      "x-grupa": "Adres i położenie"
+    },
+    {
+      "name": "kod_simc",
+      "type": "string",
+      "description": "Identyfikator SIMC miejscowości (7 cyfr, TEKST)",
+      "constraints": {
+        "pattern": "^\\d{7}$"
+      },
+      "x-wymagalnosc": "Z",
+      "x-grupa": "Adres i położenie"
+    },
+    {
+      "name": "kod_pocztowy",
+      "type": "string",
+      "description": "Kod pocztowy PNA w formacie 00-000",
+      "constraints": {
+        "required": true,
+        "pattern": "^\\d{2}-\\d{3}$"
+      },
+      "x-wymagalnosc": "W",
+      "x-grupa": "Adres i położenie"
+    },
+    {
+      "name": "cecha_ulicy",
+      "type": "string",
+      "description": "Cecha ulicy ze słownika cecha_ulicy",
+      "constraints": {
+        "enum": [
+          "ul.",
+          "al.",
+          "pl.",
+          "skwer",
+          "bulw.",
+          "rondo",
+          "park",
+          "rynek",
+          "szosa",
+          "droga",
+          "os.",
+          "ogród",
+          "wyspa",
+          "wyb.",
+          "inne"
+        ]
+      },
+      "x-wymagalnosc": "Z",
+      "x-grupa": "Adres i położenie"
+    },
+    {
+      "name": "nazwa_ulicy",
+      "type": "string",
+      "description": "Nazwa ulicy wg TERYT (ULIC); puste, gdy miejscowość bez ulic",
+      "x-wymagalnosc": "Z",
+      "x-grupa": "Adres i położenie"
+    },
+    {
+      "name": "kod_ulic",
+      "type": "string",
+      "description": "Identyfikator ULIC (5 cyfr, TEKST)",
+      "constraints": {
+        "pattern": "^\\d{5}$"
+      },
+      "x-wymagalnosc": "O",
+      "x-grupa": "Adres i położenie"
+    },
+    {
+      "name": "numer_budynku",
+      "type": "string",
+      "description": "Numer porządkowy budynku (tekst – bywają litery)",
+      "constraints": {
+        "required": true
+      },
+      "x-wymagalnosc": "W",
+      "x-grupa": "Adres i położenie"
+    },
+    {
+      "name": "numer_lokalu",
+      "type": "string",
+      "description": "Numer lokalu",
+      "x-wymagalnosc": "O",
+      "x-grupa": "Adres i położenie"
+    },
+    {
+      "name": "adres_uniwersalny",
+      "type": "string",
+      "description": "Adres uniwersalny wg Standardu technicznego 3.2 (kody rozdzielone |)",
+      "x-wymagalnosc": "O",
+      "x-grupa": "Adres i położenie"
+    },
+    {
+      "name": "szerokosc_geograficzna",
+      "type": "number",
+      "description": "Szerokość geograficzna WGS84, kropka dziesiętna, min. 6 miejsc po przecinku, zakres 49.0–54.9",
+      "constraints": {
+        "required": true,
+        "minimum": 49.0,
+        "maximum": 54.9
+      },
+      "x-wymagalnosc": "W",
+      "x-grupa": "Adres i położenie"
+    },
+    {
+      "name": "dlugosc_geograficzna",
+      "type": "number",
+      "description": "Długość geograficzna WGS84, kropka dziesiętna, min. 6 miejsc po przecinku, zakres 14.1–24.2",
+      "constraints": {
+        "required": true,
+        "minimum": 14.1,
+        "maximum": 24.2
+      },
+      "x-wymagalnosc": "W",
+      "x-grupa": "Adres i położenie"
+    },
+    {
+      "name": "opis_lokalizacji",
+      "type": "string",
+      "description": "Gdzie dokładnie wisi urządzenie (piętro, ściana, punkt orientacyjny)",
+      "constraints": {
+        "required": true
+      },
+      "x-wymagalnosc": "W",
+      "x-grupa": "Adres i położenie"
+    },
+    {
+      "name": "wewnatrz_budynku",
+      "type": "boolean",
+      "description": "true – wewnątrz budynku; false – na zewnątrz",
+      "trueValues": [
+        "true"
+      ],
+      "falseValues": [
+        "false"
+      ],
+      "x-wymagalnosc": "Z",
+      "x-grupa": "Adres i położenie"
+    },
+    {
+      "name": "kondygnacja",
+      "type": "integer",
+      "description": "0 = parter, liczby ujemne = poziomy podziemne",
+      "x-wymagalnosc": "O",
+      "x-grupa": "Adres i położenie"
+    },
+    {
+      "name": "typ_dostepu",
+      "type": "string",
+      "description": "Kto może skorzystać – słownik typ_dostepu",
+      "constraints": {
+        "required": true,
+        "enum": [
+          "publiczny",
+          "ograniczony",
+          "prywatny"
+        ]
+      },
+      "x-wymagalnosc": "W",
+      "x-grupa": "Dostępność"
+    },
+    {
+      "name": "dostepny_24_7",
+      "type": "boolean",
+      "description": "true – dostępny całą dobę, 7 dni w tygodniu",
+      "trueValues": [
+        "true"
+      ],
+      "falseValues": [
+        "false"
+      ],
+      "constraints": {
+        "required": true
+      },
+      "x-wymagalnosc": "W",
+      "x-grupa": "Dostępność"
+    },
+    {
+      "name": "godziny_dostepnosci",
+      "type": "string",
+      "description": "Godziny w składni opening_hours (OSM); puste, gdy 24/7",
+      "x-wymagalnosc": "Z",
+      "x-grupa": "Dostępność"
+    },
+    {
+      "name": "zabezpieczenie",
+      "type": "string",
+      "description": "Sposób zabezpieczenia urządzenia – słownik zabezpieczenie",
+      "constraints": {
+        "enum": [
+          "brak",
+          "szafka_otwarta",
+          "szafka_z_alarmem",
+          "szafka_na_kod",
+          "zamkniety_na_klucz"
+        ]
+      },
+      "x-wymagalnosc": "Z",
+      "x-grupa": "Dostępność"
+    },
+    {
+      "name": "instrukcja_dostepu",
+      "type": "string",
+      "description": "Jak dostać się do urządzenia. NIE wpisujemy kodów do szafek – podaje je dyspozytor",
+      "x-wymagalnosc": "O",
+      "x-grupa": "Dostępność"
+    },
+    {
+      "name": "status_urzadzenia",
+      "type": "string",
+      "description": "Stan urządzenia – słownik status_urzadzenia",
+      "constraints": {
+        "required": true,
+        "enum": [
+          "sprawny",
+          "niesprawny",
+          "w_serwisie",
+          "wycofany",
+          "nieznany"
+        ]
+      },
+      "x-wymagalnosc": "W",
+      "x-grupa": "Urządzenie i sprawność"
+    },
+    {
+      "name": "producent",
+      "type": "string",
+      "description": "Producent urządzenia",
+      "x-wymagalnosc": "O",
+      "x-grupa": "Urządzenie i sprawność"
+    },
+    {
+      "name": "model",
+      "type": "string",
+      "description": "Model urządzenia",
+      "x-wymagalnosc": "O",
+      "x-grupa": "Urządzenie i sprawność"
+    },
+    {
+      "name": "elektrody_pediatryczne",
+      "type": "boolean",
+      "description": "Czy dostępne elektrody/tryb pediatryczny",
+      "trueValues": [
+        "true"
+      ],
+      "falseValues": [
+        "false"
+      ],
+      "x-wymagalnosc": "Z",
+      "x-grupa": "Urządzenie i sprawność"
+    },
+    {
+      "name": "data_waznosci_elektrod",
+      "type": "date",
+      "description": "Data ważności elektrod (yyyy-mm-dd)",
+      "format": "%Y-%m-%d",
+      "x-wymagalnosc": "Z",
+      "x-grupa": "Urządzenie i sprawność"
+    },
+    {
+      "name": "data_waznosci_baterii",
+      "type": "date",
+      "description": "Data ważności baterii (yyyy-mm-dd)",
+      "format": "%Y-%m-%d",
+      "x-wymagalnosc": "Z",
+      "x-grupa": "Urządzenie i sprawność"
+    },
+    {
+      "name": "data_ostatniego_przegladu",
+      "type": "date",
+      "description": "Data ostatniego przeglądu/autotestu potwierdzonego przez opiekuna",
+      "format": "%Y-%m-%d",
+      "x-wymagalnosc": "Z",
+      "x-grupa": "Urządzenie i sprawność"
+    },
+    {
+      "name": "dysponent_nazwa",
+      "type": "string",
+      "description": "Właściciel lub zarządca urządzenia (instytucja, nie osoba fizyczna)",
+      "constraints": {
+        "required": true
+      },
+      "x-wymagalnosc": "W",
+      "x-grupa": "Dysponent i źródło"
+    },
+    {
+      "name": "dysponent_regon",
+      "type": "string",
+      "description": "REGON dysponenta: 9 lub 14 cyfr, TEKST",
+      "constraints": {
+        "pattern": "^(\\d{9}|\\d{14})$"
+      },
+      "x-wymagalnosc": "Z",
+      "x-grupa": "Dysponent i źródło"
+    },
+    {
+      "name": "telefon_kontaktowy",
+      "type": "string",
+      "description": "Telefon INSTYTUCJONALNY: 9 cyfr lub +48 i 9 cyfr",
+      "constraints": {
+        "pattern": "^(\\+48)?\\d{9}$"
+      },
+      "x-wymagalnosc": "Z",
+      "x-grupa": "Dysponent i źródło"
+    },
+    {
+      "name": "email_kontaktowy",
+      "type": "string",
+      "description": "E-mail INSTYTUCJONALNY (np. aed@…)",
+      "x-wymagalnosc": "O",
+      "x-grupa": "Dysponent i źródło"
+    },
+    {
+      "name": "zrodlo_danych",
+      "type": "string",
+      "description": "Pochodzenie rekordu – słownik zrodlo_danych",
+      "constraints": {
+        "required": true,
+        "enum": [
+          "dysponent",
+          "rejestr_publiczny",
+          "baza_zewnetrzna",
+          "openstreetmap",
+          "zgloszenie_obywatelskie"
+        ]
+      },
+      "x-wymagalnosc": "W",
+      "x-grupa": "Dysponent i źródło"
+    },
+    {
+      "name": "zrodlo_url",
+      "type": "string",
+      "description": "Link do zbioru źródłowego (np. zbioru dysponenta na dane.gov.pl)",
+      "x-wymagalnosc": "Z",
+      "x-grupa": "Dysponent i źródło"
+    },
+    {
+      "name": "poziom_weryfikacji",
+      "type": "string",
+      "description": "Jak potwierdzono dane – słownik poziom_weryfikacji",
+      "constraints": {
+        "required": true,
+        "enum": [
+          "zweryfikowany_w_terenie",
+          "zweryfikowany_przez_dysponenta",
+          "niezweryfikowany"
+        ]
+      },
+      "x-wymagalnosc": "W",
+      "x-grupa": "Dysponent i źródło"
+    },
+    {
+      "name": "data_weryfikacji",
+      "type": "date",
+      "description": "Kiedy ostatnio potwierdzono obecność i sprawność AED (yyyy-mm-dd)",
+      "format": "%Y-%m-%d",
+      "constraints": {
+        "required": true
+      },
+      "x-wymagalnosc": "W",
+      "x-grupa": "Dysponent i źródło"
+    },
+    {
+      "name": "data_aktualizacji",
+      "type": "datetime",
+      "description": "Ostatnia zmiana rekordu (yyyy-mm-ddThh:mm:ss)",
+      "constraints": {
+        "required": true
+      },
+      "x-wymagalnosc": "W",
+      "x-grupa": "Dysponent i źródło"
+    },
+    {
+      "name": "zdjecie_url",
+      "type": "string",
+      "description": "Zdjęcie miejsca (licencja CC0/CC BY, bez wizerunku osób)",
+      "x-wymagalnosc": "O",
+      "x-grupa": "Dysponent i źródło"
+    },
+    {
+      "name": "uwagi",
+      "type": "string",
+      "description": "Uwagi; bez znaków nowej linii",
+      "x-wymagalnosc": "O",
+      "x-grupa": "Dysponent i źródło"
+    }
+  ],
+  "primaryKey": "id_aed",
+  "missingValues": [
+    ""
+  ],
+  "x-reguly-dodatkowe": [
+    "dostepny_24_7=true ⇒ godziny_dostepnosci puste lub '24/7'",
+    "dostepny_24_7=false ⇒ godziny_dostepnosci wymagane",
+    "typ_dostepu=prywatny ⇒ rekord nie trafia do zbioru publicznego",
+    "data_waznosci_elektrod < dzisiaj ⇒ ostrzeżenie + sugestia status_urzadzenia=niesprawny",
+    "data_weryfikacji starsza niż 180 dni ⇒ ostrzeżenie 'dane nieświeże'",
+    "zabezpieczenie=zamkniety_na_klucz ⇒ podpowiedź: szafka z alarmem lub szafka na kod",
+    "punkt musi leżeć w gminie wskazanej przez kod_terc (kontrola PRG)",
+    "dwa rekordy < 30 m od siebie ⇒ kandydat na duplikat",
+    "pola tekstowe bez znaków nowej linii (Alt+Enter)"
+  ]
+}

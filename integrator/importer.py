@@ -32,14 +32,14 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent
-BASE_SCHEMA = ROOT / "format_danych" / "zrodla_wzorca" / "schemat_tableschema.json"
-DICTS = ROOT / "format_danych" / "zrodla_wzorca" / "slowniki_wartosci.json"
+BASE_SCHEMA = HERE / "wzorzec_v1" / "schemat_tableschema.json"  # shortcut: zamrożony wzorzec v1; przepiąć na v2 w kroku 2
+DICTS = HERE / "wzorzec_v1" / "slowniki_wartosci.json"
 
 PL_LAT = (49.0, 54.9)
 PL_LON = (14.1, 24.2)
 
 # --------------------------------------------------------------------------- #
-# Schemat: wzorzec 44 kolumn (format_danych/zrodla_wzorca) + rozszerzenia
+# Schemat: wzorzec v1, 44 kolumny (integrator/wzorzec_v1) + rozszerzenia
 # --------------------------------------------------------------------------- #
 EXTENSION_FIELDS = [
     {"name": "organizacja_id", "type": "string", "x-wymagalnosc": "O", "x-grupa": "Rozszerzenia",
