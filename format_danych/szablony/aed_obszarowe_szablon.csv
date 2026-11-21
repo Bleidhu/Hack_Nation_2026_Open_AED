@@ -1,0 +1,1 @@
+id_obszaru,nazwa_obszaru,typ_obszaru,organizacja_id,dysponent_nazwa,dysponent_regon,liczba_aed,liczba_pojazdow,geometria_wkt,bufor_m,gtfs_url,gtfs_rt_url,typy_pojazdow,linie,godziny_dostepnosci,jak_uzyskac_dostep,status_programu,aktywny_od,aktywny_do,telefon_kontaktowy,strona_www,zrodlo_danych,data_aktualizacji,uwagi

@@ -1,0 +1,54 @@
+{
+  "@context": {
+    "schema": "https://schema.org/",
+    "xsd": "http://www.w3.org/2001/XMLSchema#",
+    "aed": "https://dane.gov.pl/aed/def#",
+    "id_aed": "@id",
+    "nazwa_lokalizacji": "schema:name",
+    "opis_lokalizacji": "schema:description",
+    "szerokosc_geograficzna": {
+      "@id": "schema:latitude",
+      "@type": "xsd:decimal"
+    },
+    "dlugosc_geograficzna": {
+      "@id": "schema:longitude",
+      "@type": "xsd:decimal"
+    },
+    "miejscowosc": "schema:addressLocality",
+    "kod_pocztowy": "schema:postalCode",
+    "nazwa_ulicy": "schema:streetAddress",
+    "godziny_dostepnosci": "schema:openingHours",
+    "dysponent_nazwa": "schema:provider",
+    "telefon_kontaktowy": "schema:telephone",
+    "email_kontaktowy": "schema:email",
+    "producent": "schema:manufacturer",
+    "model": "schema:model",
+    "data_aktualizacji": {
+      "@id": "schema:dateModified",
+      "@type": "xsd:dateTime"
+    },
+    "zdjecie_url": {
+      "@id": "schema:image",
+      "@type": "@id"
+    },
+    "typ_dostepu": "aed:typDostepu",
+    "dostepny_24_7": {
+      "@id": "aed:dostepny247",
+      "@type": "xsd:boolean"
+    },
+    "status_urzadzenia": "aed:status",
+    "poziom_weryfikacji": "aed:poziomWeryfikacji",
+    "data_weryfikacji": {
+      "@id": "aed:dataWeryfikacji",
+      "@type": "xsd:date"
+    },
+    "organizacja_id": {
+      "@id": "schema:brand",
+      "@type": "@id"
+    },
+    "id_obszaru": {
+      "@id": "aed:obszar",
+      "@type": "@id"
+    }
+  }
+}

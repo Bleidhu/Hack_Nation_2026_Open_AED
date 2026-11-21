@@ -1,0 +1,4 @@
+Kod placówki;Nazwa placówki;Adres;Kod;Miasto;Lat;Lng;Całodobowo;Godziny otwarcia;Gdzie AED;Dostęp dla klientów
+BP-001;Oddział Bydgoszcz Centrum;ul. Gdańska 10;85-005;Bydgoszcz;53,1290;18,0080;TAK;pn-pt 9-17;hol, przy bankomatach;TAK
+BP-002;Oddział Bydgoszcz Fordon;ul. Akademicka 5;85-796;Bydgoszcz;53,1520;18,1660;NIE;Mo-Fr 09:00-17:00;obok wejścia, szafka z alarmem;TAK
+BP-003;Placówka Toruń Rynek;Rynek Staromiejski 1;87-100;Toruń;18,6040;53,0100;NIE;Mo-Sa 10:00-18:00;za ladą obsługi – poproś pracownika;NIE

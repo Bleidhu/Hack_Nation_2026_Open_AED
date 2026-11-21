@@ -1,0 +1,27 @@
+{
+  "id": "07_zrm_dyspozytor",
+  "nazwa": "Zespoły ratownictwa medycznego i dyspozytorzy",
+  "typ_dostawcy": "służby (SWD PRM / CPR 112)",
+  "przyklady_dostawcow": "ZRM, dyspozytorzy medyczni, operatorzy numeru 112",
+  "kanal": "strumień zdarzeń z systemu dyspozytorskiego (API)",
+  "czestotliwosc": "w czasie rzeczywistym",
+  "licencja": "CC0-1.0 (bez danych pacjenta)",
+  "do_zbioru_krajowego": true,
+  "pliki": [
+    {
+      "plik": "zdarzenia_swd_prm.json",
+      "tabela": "aktualizacje",
+      "adapter": "swd_prm"
+    },
+    {
+      "plik": "aktualizacje_zrm_112_przyklad.csv",
+      "tabela": "aktualizacje"
+    }
+  ],
+  "co_pokazuje": [
+    "AED użyty → elektrody zużyte → niegotowy do wymiany",
+    "świadek nie dostał się do AED w nocy → sygnał dla dysponenta",
+    "ZRM zabrał AED z pacjentem → czasowo niedostępny",
+    "zdarzenie wiązane z AED po położeniu (do 50 m)"
+  ]
+}

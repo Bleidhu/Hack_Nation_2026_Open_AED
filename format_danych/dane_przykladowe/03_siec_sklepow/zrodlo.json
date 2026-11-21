@@ -1,0 +1,21 @@
+{
+  "id": "03_siec_sklepow",
+  "nazwa": "Duża sieć sklepów",
+  "typ_dostawcy": "duży dostawca (eksport z systemu)",
+  "przyklady_dostawcow": "sieci handlowe, stacje paliw, sieci fitness",
+  "kanal": "plik TSV z systemu (CP1250) + zapisane mapowanie",
+  "czestotliwosc": "co miesiąc",
+  "licencja": "CC0-1.0",
+  "do_zbioru_krajowego": true,
+  "pliki": [
+    {
+      "plik": "duzy_dostawca_siec_sklepow_eksport.tsv",
+      "tabela": "punkty",
+      "mapowanie": "mapowanie_siec_sklepow.json"
+    }
+  ],
+  "co_pokazuje": [
+    "kodowanie CP1250, tabulator",
+    "wiersz z brakami → odrzucony z numerem wiersza i pola"
+  ]
+}

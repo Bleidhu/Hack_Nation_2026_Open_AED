@@ -1,0 +1,54 @@
+{
+  "specversion": "1.0",
+  "source": "swd-prm/przyklad",
+  "opis": "Strumień zdarzeń w stylu CloudEvents. Bez danych pacjenta: tylko numer zdarzenia, czas i położenie AED. PRZYKŁAD – dane fikcyjne",
+  "zdarzenia": [
+    {
+      "id": "ev-0001",
+      "type": "pl.prm.aed.uzyty",
+      "time": "2026-11-21T09:15:00+01:00",
+      "data": {
+        "numer_zdarzenia": "PRZYKLAD-2026-000501",
+        "zespol": "ZRM typu P (PRZYKŁAD)",
+        "aed": {
+          "lat": 50.06157,
+          "lon": 19.93812,
+          "opis": "bank, Rynek Główny"
+        },
+        "elektrody_zuzyte": true,
+        "aed_pozostawiony_na_miejscu": true
+      }
+    },
+    {
+      "id": "ev-0002",
+      "type": "pl.prm.aed.niedostepny",
+      "time": "2026-11-20T22:40:00+01:00",
+      "data": {
+        "numer_zdarzenia": "PRZYKLAD-2026-000502",
+        "zrodlo_informacji": "dyspozytor medyczny – relacja świadka",
+        "aed": {
+          "lat": 50.07031,
+          "lon": 19.93751,
+          "opis": "apteka, ul. Długa"
+        },
+        "powod": "obiekt zamknięty, AED za ladą – świadek nie uzyskał dostępu"
+      }
+    },
+    {
+      "id": "ev-0003",
+      "type": "pl.prm.aed.zabrany_przez_zrm",
+      "time": "2026-11-21T11:30:00+01:00",
+      "data": {
+        "numer_zdarzenia": "PRZYKLAD-2026-000507",
+        "zespol": "ZRM typu S (PRZYKŁAD)",
+        "aed": {
+          "lat": 50.06772,
+          "lon": 19.94762,
+          "opis": "dworzec Kraków Główny, hala"
+        },
+        "opis": "AED podłączony do pacjenta, przekazany wraz z pacjentem do SOR",
+        "przewidywany_zwrot": "2026-11-22"
+      }
+    }
+  ]
+}

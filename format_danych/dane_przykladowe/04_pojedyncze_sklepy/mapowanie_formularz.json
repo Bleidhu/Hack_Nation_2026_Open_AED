@@ -1,0 +1,124 @@
+{
+  "wersja": "1.0",
+  "opis": "Formularz www dla pojedynczych sklepów i punktów usługowych → wzorzec. Adres w jednym polu, położenie z linku do mapy, godziny opisane słowami. Dane osobowe z sekcji 'kontakt' NIE są przenoszone (RODO). PRZYKŁAD – dane fikcyjne",
+  "wejscie": {
+    "format": "json",
+    "sciezka": "zgloszenia"
+  },
+  "warunek_publikacji": {
+    "pole": "zgoda_licencja_cc0",
+    "wartosc": "true",
+    "komunikat": "brak zgody na licencję CC0 – rekord wstrzymany do kontaktu z dysponentem"
+  },
+  "pomin_dane_osobowe": [
+    "kontakt.imie_nazwisko",
+    "kontakt.telefon",
+    "kontakt.email"
+  ],
+  "przeksztalcenia": {
+    "__lat": {
+      "funkcja": "szerokosc_z_linku",
+      "z": "sklep.link_mapy"
+    },
+    "__lon": {
+      "funkcja": "dlugosc_z_linku",
+      "z": "sklep.link_mapy"
+    },
+    "__godziny": {
+      "funkcja": "godziny_z_tekstu",
+      "z": "aed.godziny_tekst",
+      "opis": "'pn-pt 8-20, sob 9-14' → 'Mo-Fr 08:00-20:00; Sa 09:00-14:00'"
+    },
+    "__data": {
+      "funkcja": "data_z_czasu",
+      "z": "wyslano"
+    }
+  },
+  "kolumny": {
+    "id_zrodlowe": {
+      "z": "id_zgloszenia"
+    },
+    "nazwa_lokalizacji": {
+      "z": "sklep.nazwa"
+    },
+    "cecha_ulicy": {
+      "z": "sklep.adres_tekst",
+      "regex": "^(ul\\.|al\\.|os\\.|pl\\.)"
+    },
+    "nazwa_ulicy": {
+      "z": "sklep.adres_tekst",
+      "regex": "^(?:ul\\.|al\\.|os\\.|pl\\.)?\\s*([^\\d,]+?)\\s+\\d"
+    },
+    "numer_budynku": {
+      "z": "sklep.adres_tekst",
+      "regex": "^[^\\d]+?\\s(\\d+[A-Za-z]?)\\b"
+    },
+    "kod_pocztowy": {
+      "z": "sklep.adres_tekst",
+      "regex": "(\\d{2}-\\d{3})"
+    },
+    "miejscowosc": {
+      "z": "sklep.adres_tekst",
+      "regex": "\\d{2}-\\d{3}\\s+(.+)$"
+    },
+    "szerokosc_geograficzna": {
+      "z": "__lat"
+    },
+    "dlugosc_geograficzna": {
+      "z": "__lon"
+    },
+    "opis_lokalizacji": {
+      "z": "aed.gdzie"
+    },
+    "wewnatrz_budynku": {
+      "stala": "true"
+    },
+    "typ_dostepu": {
+      "stala": "ograniczony"
+    },
+    "godziny_dostepnosci": {
+      "z": "__godziny"
+    },
+    "dostepny_24_7": {
+      "z": "__godziny",
+      "mapa": {
+        "24/7": "true",
+        "*": "false"
+      }
+    },
+    "zabezpieczenie": {
+      "z": "aed.zamkniety",
+      "mapa": {
+        "true": "zamkniety_na_klucz",
+        "false": "szafka_otwarta"
+      }
+    },
+    "instrukcja_dostepu": {
+      "z": "aed.kto_ma_klucz",
+      "regex": "^(.+)$"
+    },
+    "status_urzadzenia": {
+      "z": "aed.dziala",
+      "mapa": {
+        "tak": "sprawny",
+        "nie": "niesprawny",
+        "*": "nieznany"
+      }
+    },
+    "dysponent_nazwa": {
+      "z": "sklep.firma"
+    },
+    "zrodlo_danych": {
+      "stala": "dysponent"
+    },
+    "poziom_weryfikacji": {
+      "stala": "zweryfikowany_przez_dysponenta"
+    },
+    "data_weryfikacji": {
+      "z": "__data"
+    },
+    "uwagi": {
+      "z": "^uwagi"
+    }
+  }
+}

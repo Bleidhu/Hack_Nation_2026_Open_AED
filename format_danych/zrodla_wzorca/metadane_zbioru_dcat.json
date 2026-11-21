@@ -1,0 +1,100 @@
+{
+  "@context": {
+    "dcat": "http://www.w3.org/ns/dcat#",
+    "dct": "http://purl.org/dc/terms/",
+    "foaf": "http://xmlns.com/foaf/0.1/",
+    "vcard": "http://www.w3.org/2006/vcard/ns#"
+  },
+  "@type": "dcat:Dataset",
+  "dct:title": [
+    {
+      "@language": "pl",
+      "@value": "Defibrylatory AED w Polsce – zbiór krajowy"
+    },
+    {
+      "@language": "en",
+      "@value": "AED defibrillators in Poland – national dataset"
+    }
+  ],
+  "dct:description": [
+    {
+      "@language": "pl",
+      "@value": "Ogólnopolski zbiór lokalizacji automatycznych defibrylatorów zewnętrznych (AED) wraz z informacją o dostępności, sprawności, dysponencie i źródle danych. Zbiór powstaje automatycznie ze zbiorów dysponentów opublikowanych wg wzorcowego zakresu danych (akcja „Otwórz AED”). Aktualizowany codziennie."
+    },
+    {
+      "@language": "en",
+      "@value": "National dataset of automated external defibrillators (AED) in Poland with availability, readiness, operator and data provenance. Built daily from operators' datasets published using the common AED data model."
+    }
+  ],
+  "dcat:keyword": [
+    "AED",
+    "defibrylator",
+    "defibrylatory",
+    "pierwsza pomoc",
+    "nagłe zatrzymanie krążenia",
+    "ratownictwo",
+    "OtworzAED",
+    "defibrillator",
+    "first aid"
+  ],
+  "dcat:theme": "Zdrowie",
+  "dct:license": "https://creativecommons.org/publicdomain/zero/1.0/",
+  "dct:accrualPeriodicity": "http://publications.europa.eu/resource/authority/frequency/DAILY",
+  "dct:spatial": "Polska",
+  "dct:issued": "2026-11-21",
+  "dct:modified": "2026-11-21T10:15:00",
+  "dct:publisher": {
+    "@type": "foaf:Agent",
+    "foaf:name": "DO USTALENIA (MC / MZ)"
+  },
+  "dcat:contactPoint": {
+    "@type": "vcard:Organization",
+    "vcard:hasEmail": "mailto:kontakt@otworzaed.example"
+  },
+  "dcat:distribution": [
+    {
+      "@type": "dcat:Distribution",
+      "dct:title": "Defibrylatory AED – dane na 2026-11-21 (CSV)",
+      "dcat:downloadURL": "https://otworzaed.example/eksport/aed.csv",
+      "dcat:mediaType": "text/csv",
+      "dct:conformsTo": "https://otworzaed.example/wzorzec/v0.1/schemat_tableschema.json"
+    },
+    {
+      "@type": "dcat:Distribution",
+      "dct:title": "API JSON:API",
+      "dcat:accessURL": "https://api.otworzaed.example/api/v1/defibrylatory",
+      "dcat:mediaType": "application/vnd.api+json"
+    },
+    {
+      "@type": "dcat:Distribution",
+      "dct:title": "GeoJSON",
+      "dcat:downloadURL": "https://otworzaed.example/eksport/aed.geojson",
+      "dcat:mediaType": "application/geo+json"
+    }
+  ],
+  "x-dane-gov-pl": {
+    "kategoria": "Zdrowie",
+    "dane_dynamiczne": false,
+    "dane_o_wysokiej_wartosci": false,
+    "mapa": {
+      "szerokosc": "szerokosc_geograficzna",
+      "dlugosc": "dlugosc_geograficzna",
+      "etykieta": "nazwa_lokalizacji"
+    },
+    "typy_kolumn_tekst": [
+      "kod_pocztowy",
+      "kod_terc",
+      "kod_simc",
+      "kod_ulic",
+      "dysponent_regon",
+      "telefon_kontaktowy",
+      "numer_budynku"
+    ],
+    "automatyczna_aktualizacja": "codziennie (zasób jako link HTTPS do CSV)",
+    "dokumenty_uzupelniajace": [
+      "slownik_kolumn.csv",
+      "slowniki_wartosci.json",
+      "dokumentacja API (OpenAPI 3)"
+    ]
+  }
+}

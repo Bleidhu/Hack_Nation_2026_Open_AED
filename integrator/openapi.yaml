@@ -1,0 +1,203 @@
+openapi: 3.1.0
+info:
+  title: API AED – zgłoszenia, aktualizacje stanu, importy i zbiór krajowy
+  version: 1.0.0
+  description: |
+    Prototyp API (scratch/server.py). Zgodne ze Standardem API dane.gov.pl: REST, JSON:API 1.0 (`application/vnd.api+json`),
+    wersja w ścieżce `/api/v1/`, rzeczowniki w liczbie mnogiej, filtrowanie/stronicowanie w URI, błędy z polami
+    `error-result`, `error-reason`, `error-solution`, `error-code`, `error-help`. Dostęp bez logowania (odczyt).
+    Role potwierdzone (dysponent, serwis, ZRM, dyspozytor 112) – nagłówek `X-API-Key` (w prototypie klucze demo;
+    docelowo login.gov.pl / konto dostawcy dane.gov.pl / certyfikat SWD PRM). Dane kontaktowe zgłaszających nie są zwracane.
+  license: { name: "Dane: CC0 1.0 (zbiór krajowy); OSM: ODbL (tylko podgląd)" }
+servers:
+  - url: http://127.0.0.1:8787
+    description: prototyp lokalny (docelowo https://api.<domena>/api/v1)
+tags:
+  - { name: Zgłoszenia, description: "Pojedyncze zgłoszenia z aplikacji: nowy AED, użycie, stan" }
+  - { name: Aktualizacje, description: "Aktualizacje stanu – pojedynczo lub hurtowo (CSV): serwis, ZRM, 112, dysponenci" }
+  - { name: Importy, description: "Wczytywanie plików dostawców (CSV/XLSX/GeoJSON/OSM) z mapowaniem kolumn" }
+  - { name: Słowniki i organizacje, description: "Organizacje (logo, www) i AED obszarowe" }
+  - { name: Eksport, description: "Zbiór krajowy dla dane.gov.pl (link z automatyczną aktualizacją)" }
+  - { name: Transport, description: "Pozycje pojazdów z AED na żywo" }
+
+components:
+  securitySchemes:
+    kluczOrganizacji:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: "Klucz organizacji potwierdzający rolę (dysponent / serwis / zrm / dyspozytor / sluzby). Bez klucza rola jest deklarowana."
+  schemas:
+    Error:
+      type: object
+      properties:
+        status: { type: string, example: "422" }
+        error-code: { type: string, example: validation }
+        error-result: { type: string, example: "Niepoprawne pole: kod_pocztowy" }
+        error-reason: { type: string, example: "Kod pocztowy musi mieć format NN-NNN." }
+        error-solution: { type: string, example: "Np. 00-950." }
+        error-help: { type: string, example: /api/v1/version }
+        source: { type: object, properties: { pointer: { type: string, example: /data/attributes/kod_pocztowy } } }
+    Errors:
+      type: object
+      properties: { errors: { type: array, items: { $ref: "#/components/schemas/Error" } } }
+    ZgloszenieStan:
+      type: object
+      required: [typ, aed_ref, stan, rola]
+      properties:
+        typ: { const: stan }
+        aed_ref: { type: string, description: "aed_ref z API lub id_aed (PL-AED-NNNNNNN)", example: PL-AED-0000001 }
+        stan: { enum: [wymaga_serwisu, w_serwisie, po_serwisie, sprawny] }
+        rola: { enum: [obywatel, dysponent, serwis, zrm, dyspozytor, sluzby] }
+        problemy: { type: array, items: { enum: [niski_poziom_baterii, kontrolka_bledu, brak_lub_przeterminowane_elektrody, brak_urzadzenia, uszkodzona_szafka_lub_alarm, brak_dostepu_zamkniete, uszkodzone_urzadzenie, inne] } }
+        opis: { type: string, maxLength: 500 }
+        przewidywany_powrot: { type: string, format: date }
+        data_przegladu: { type: string, format: date }
+        data_waznosci_elektrod: { type: string, format: date }
+        data_waznosci_baterii: { type: string, format: date }
+        numer_protokolu: { type: string }
+        kontakt_zglaszajacego: { type: string, description: "Nie jest publikowany" }
+    ZgloszenieUzycie:
+      type: object
+      required: [typ, aed_ref]
+      properties:
+        typ: { const: uzycie }
+        aed_ref: { type: string }
+        data_uzycia: { type: string, format: date-time }
+        rola: { enum: [obywatel, dysponent, serwis, zrm, dyspozytor, sluzby] }
+        wezwano_112: { type: boolean }
+        elektrody_naklejone: { type: boolean }
+        numer_zdarzenia: { type: string, description: "Numer zdarzenia CPR/SWD PRM – bez danych pacjenta" }
+        komentarz: { type: string }
+    ZgloszenieNowyAed:
+      type: object
+      required: [typ, rola, szerokosc_geograficzna, dlugosc_geograficzna, nazwa_lokalizacji, opis_lokalizacji, zgoda_cc0]
+      description: "Pola zgodne ze wzorcem (deliverable/schemat/aed_punkty.tableschema.json). Dla rola=dysponent wymagane też: adres, typ_dostepu, zabezpieczenie, dysponent_nazwa, oswiadczenie_dysponenta."
+      properties:
+        typ: { const: nowy_aed }
+        rola: { enum: [wolontariusz, dysponent] }
+        szerokosc_geograficzna: { type: number, minimum: 49.0, maximum: 54.9 }
+        dlugosc_geograficzna: { type: number, minimum: 14.1, maximum: 24.2 }
+        nazwa_lokalizacji: { type: string }
+        opis_lokalizacji: { type: string }
+        zgoda_cc0: { const: true }
+    Import:
+      type: object
+      required: [plik_nazwa]
+      properties:
+        tabela: { enum: [punkty, organizacje, obszary, aktualizacje], default: punkty }
+        plik_nazwa: { type: string, example: placowki.csv }
+        plik_base64: { type: string, description: "Zawartość pliku (CSV/TSV/XLSX/GeoJSON/Overpass JSON) w Base64" }
+        plik_tekst: { type: string, description: "Alternatywnie: treść tekstowa pliku" }
+        preset: { enum: [wzorzec, osm] }
+        mapowanie: { $ref: "../schemat/mapowanie.schema.json" }
+        organizacja_id: { type: string, example: bank-przyklad }
+        typ_dostawcy: { enum: [dysponent, duzy_dostawca, firma] }
+        licencja: { enum: [CC0-1.0, CC-BY-4.0], default: CC0-1.0 }
+        zapisz: { type: boolean, default: false, description: "false = tylko walidacja i podgląd" }
+  parameters:
+    format:
+      name: format
+      in: query
+      schema: { enum: [csv, geojson] }
+
+paths:
+  /api/v1/version:
+    get: { summary: Wersja API, responses: { "200": { description: OK } } }
+
+  /api/v1/zgloszenia:
+    get:
+      tags: [Zgłoszenia]
+      summary: Lista zgłoszeń (bez danych kontaktowych)
+      parameters:
+        - { name: "filter[typ]", in: query, schema: { enum: [nowy_aed, uzycie, stan] } }
+        - { name: "filter[aed]", in: query, schema: { type: string } }
+        - { name: sort, in: query, schema: { enum: [utworzono, -utworzono] } }
+        - { name: "page[size]", in: query, schema: { type: integer, maximum: 1000 } }
+        - { name: "page[number]", in: query, schema: { type: integer } }
+      responses: { "200": { description: "JSON:API z linkami self/first/prev/next/last" } }
+    post:
+      tags: [Zgłoszenia]
+      summary: Nowe zgłoszenie (nowy AED / użycie / stan)
+      security: [{}, { kluczOrganizacji: [] }]
+      requestBody:
+        content:
+          application/vnd.api+json:
+            schema:
+              type: object
+              properties:
+                data:
+                  type: object
+                  properties:
+                    type: { const: zgloszenia }
+                    attributes: { oneOf: [ { $ref: "#/components/schemas/ZgloszenieNowyAed" }, { $ref: "#/components/schemas/ZgloszenieUzycie" }, { $ref: "#/components/schemas/ZgloszenieStan" } ] }
+      responses:
+        "201": { description: Utworzono }
+        "422": { description: Błędy walidacji, content: { application/vnd.api+json: { schema: { $ref: "#/components/schemas/Errors" } } } }
+  /api/v1/zgloszenia/{id}:
+    get: { tags: [Zgłoszenia], summary: Jedno zgłoszenie, parameters: [ { name: id, in: path, required: true, schema: { type: string, format: uuid } } ], responses: { "200": { description: OK }, "404": { description: Nie znaleziono } } }
+  /api/v1/statusy:
+    get: { tags: [Zgłoszenia], summary: "Aktualny stan AED (ostatnie zgłoszenie wygrywa): uzyty, wymaga_serwisu, w_serwisie, sprawny", responses: { "200": { description: OK } } }
+
+  /api/v1/aktualizacje:
+    post:
+      tags: [Aktualizacje]
+      summary: Aktualizacje stanu – pojedynczo (JSON) lub hurtowo (CSV wg aktualizacje.tableschema.json)
+      description: |
+        Firma serwisująca: `w_serwisie`, `po_serwisie` (+ nowe daty ważności, numer protokołu).
+        ZRM / dyspozytor 112 / służby: `uzycie` (+ numer zdarzenia). Dysponent: wszystkie typy.
+        `po_serwisie` i `sprawny` wymagają roli dysponent lub serwis. Odpowiedź 207, gdy część wierszy odrzucono.
+      security: [{}, { kluczOrganizacji: [] }]
+      requestBody:
+        content:
+          text/csv: { schema: { type: string }, example: "id_aed,typ_zdarzenia,rola,data_przegladu,data_waznosci_elektrod\r\nPL-AED-0000001,po_serwisie,serwis,2026-11-21,2028-11-30\r\n" }
+          application/json: { schema: { type: object, properties: { data: { type: array, items: { type: object } } } } }
+      responses:
+        "201": { description: Wszystkie przyjęte }
+        "207": { description: "Część przyjęta – meta.wyniki zawiera status każdego wiersza" }
+        "422": { description: Nic nie przyjęto }
+
+  /api/v1/importy:
+    get:
+      tags: [Importy]
+      summary: Lista zapisanych importów
+      parameters: [ { name: include, in: query, schema: { const: rekordy } } ]
+      responses: { "200": { description: OK } }
+    post:
+      tags: [Importy]
+      summary: Walidacja / zapis pliku dostawcy
+      description: "Bez `mapowanie` serwer podpowiada mapowanie kolumn (synonimy). Odpowiedź zawiera raport (poprawne / z ostrzeżeniami / odrzucone + błędy z numerem wiersza) i podgląd."
+      requestBody: { content: { application/json: { schema: { $ref: "#/components/schemas/Import" } } } }
+      responses: { "200": { description: "Raport walidacji (+ import_id, gdy zapisz=true)" }, "422": { description: Nieczytelny plik } }
+  /api/v1/importy/{id}:
+    get:
+      tags: [Importy]
+      summary: Rekordy importu we wzorcu
+      parameters: [ { name: id, in: path, required: true, schema: { type: string, format: uuid } }, { $ref: "#/components/parameters/format" } ]
+      responses: { "200": { description: "JSON:API, CSV lub GeoJSON" } }
+
+  /api/v1/organizacje:
+    get: { tags: [Słowniki i organizacje], summary: Organizacje (logo_url, logo_alt, strona_www), responses: { "200": { description: OK } } }
+    post: { tags: [Słowniki i organizacje], summary: Dodanie / aktualizacja organizacji (organizacje.tableschema.json), responses: { "201": { description: OK }, "422": { description: Błędy } } }
+  /api/v1/obszary:
+    get: { tags: [Słowniki i organizacje], summary: "AED obszarowe/mobilne – GeoJSON (lub ?format=csv z geometria_wkt)", parameters: [ { $ref: "#/components/parameters/format" } ], responses: { "200": { description: OK } } }
+    post: { tags: [Słowniki i organizacje], summary: Dodanie AED obszarowego (aed_obszarowe.tableschema.json), responses: { "201": { description: OK }, "422": { description: Błędy } } }
+
+  /api/v1/eksport/zbior-krajowy:
+    get:
+      tags: [Eksport]
+      summary: Zbiór krajowy AED (CSV RFC 4180 UTF-8 / GeoJSON) – adres podawany w dane.gov.pl jako link z automatyczną aktualizacją
+      description: "Zawiera wyłącznie dane na CC0 1.0 / CC BY 4.0 (formularze, importy dysponentów). Dane OSM (ODbL) są wyłączone. status_urzadzenia uwzględnia aktualizacje."
+      parameters: [ { $ref: "#/components/parameters/format" } ]
+      responses: { "200": { description: OK, content: { text/csv: {}, application/geo+json: {} } } }
+  /api/v1/defibrylatory-zgloszone:
+    get: { tags: [Eksport], summary: AED dodane formularzem (?format=csv), responses: { "200": { description: OK } } }
+
+  /api/v1/pojazdy:
+    get:
+      tags: [Transport]
+      summary: Pozycje pojazdów komunikacji (proxy z cache 15 s)
+      parameters: [ { name: miasto, in: query, required: true, schema: { enum: [szczecin, krakow] } } ]
+      responses: { "200": { description: OK }, "502": { description: Źródło niedostępne } }
+  /api/v1/klucze/demo:
+    get: { summary: Klucze demonstracyjne ról (tylko prototyp), responses: { "200": { description: OK } } }

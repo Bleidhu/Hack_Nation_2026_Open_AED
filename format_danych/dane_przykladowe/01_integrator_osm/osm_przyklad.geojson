@@ -1,0 +1,48 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.0001,
+          53.1235
+        ]
+      },
+      "properties": {
+        "@osm_id": 1,
+        "@osm_type": "node",
+        "emergency": "defibrillator",
+        "access": "yes",
+        "indoor": "no",
+        "opening_hours": "24/7",
+        "defibrillator:location": "elewacja przy drzwiach",
+        "operator": "Gmina Przykładowa",
+        "check_date": "2026-10-01",
+        "note": "PRZYKŁAD – dane fikcyjne"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          18.0102,
+          53.1301
+        ]
+      },
+      "properties": {
+        "@osm_id": 2,
+        "@osm_type": "node",
+        "emergency": "defibrillator",
+        "access": "customers",
+        "indoor": "yes",
+        "level": "0",
+        "defibrillator:location:pl": "recepcja hotelu",
+        "operator": "Hotel Przykład",
+        "note": "PRZYKŁAD – dane fikcyjne"
+      }
+    }
+  ]
+}

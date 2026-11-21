@@ -1,0 +1,93 @@
+{
+  "przewoznik": {
+    "nazwa": "Miejski Przewoźnik Przykład – Kraków (PRZYKŁAD)",
+    "organizacja_id": "przewoznik-krakow-przyklad"
+  },
+  "wygenerowano": "2026-11-21T06:00:00+01:00",
+  "uwagi": "PRZYKŁAD – dane fikcyjne. Rozkład GTFS i pozycje pojazdów to prawdziwe, otwarte dane ZTP Kraków; przypisanie AED do pojazdów jest zmyślone.",
+  "aed_stacjonarne": [
+    {
+      "id": "MPP-S-01",
+      "miejsce": "Zajezdnia tramwajowa (PRZYKŁAD) – portiernia",
+      "adres": "ul. Zajezdniowa 1, 30-701 Kraków",
+      "lat": 50.03,
+      "lon": 19.985,
+      "godziny": "24/7",
+      "dostep": "publiczny",
+      "zabezpieczenie": "brak",
+      "instrukcja": "AED wydaje portier – całą dobę"
+    },
+    {
+      "id": "MPP-S-02",
+      "miejsce": "Punkt Obsługi Pasażera (PRZYKŁAD)",
+      "adres": "ul. Biletowa 2, 30-702 Kraków",
+      "lat": 50.035,
+      "lon": 19.97,
+      "godziny": "Mo-Fr 07:00-19:00",
+      "dostep": "ograniczony",
+      "zabezpieczenie": "szafka_z_alarmem",
+      "instrukcja": ""
+    }
+  ],
+  "aed_w_pojazdach": {
+    "opis": "AED w kabinie motorniczego w części tramwajów",
+    "typ_pojazdow": "tramwaj",
+    "liczba_aed": 40,
+    "liczba_pojazdow": 200,
+    "linie": [
+      "1",
+      "4",
+      "8",
+      "13",
+      "52"
+    ],
+    "godziny": "Mo-Su 05:00-23:30",
+    "jak_uzyskac": "Zatrzymaj tramwaj lub podejdź do kabiny motorniczego – motorniczy poda AED i wezwie 112",
+    "gtfs": "https://gtfs.ztp.krakow.pl/GTFS_KRK_T.zip",
+    "gtfs_rt": "https://gtfs.ztp.krakow.pl/VehiclePositions_T.pb",
+    "pojazdy": [
+      {
+        "nr_taborowy": "PRZ-301",
+        "aed_model": "ZOLL AED Plus",
+        "elektrody_do": "2028-02"
+      },
+      {
+        "nr_taborowy": "PRZ-302",
+        "aed_model": "ZOLL AED Plus",
+        "elektrody_do": "2028-02"
+      },
+      {
+        "nr_taborowy": "PRZ-415",
+        "aed_model": "Philips HeartStart FRx",
+        "elektrody_do": "2027-07"
+      }
+    ]
+  },
+  "obszar_obslugi": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          19.85,
+          49.99
+        ],
+        [
+          20.1,
+          49.99
+        ],
+        [
+          20.1,
+          50.11
+        ],
+        [
+          19.85,
+          50.11
+        ],
+        [
+          19.85,
+          49.99
+        ]
+      ]
+    ]
+  }
+}

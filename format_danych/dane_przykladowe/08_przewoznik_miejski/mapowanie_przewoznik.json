@@ -1,0 +1,92 @@
+{
+  "wersja": "1.0",
+  "opis": "Przewoźnik miejski → AED stacjonarne (zajezdnie, punkty obsługi) do tabeli punktów; AED w pojazdach → tabela aed_obszarowe (flota_pojazdow, obszar obsługi + GTFS). PRZYKŁAD – dane fikcyjne",
+  "organizacja_id": "przewoznik-krakow-przyklad",
+  "wejscie": {
+    "format": "json",
+    "sciezka": "aed_stacjonarne"
+  },
+  "przeksztalcenia": {
+    "__data": {
+      "funkcja": "data_z_czasu",
+      "z": "^wygenerowano"
+    }
+  },
+  "kolumny": {
+    "id_zrodlowe": {
+      "z": "id"
+    },
+    "nazwa_lokalizacji": {
+      "z": "miejsce"
+    },
+    "cecha_ulicy": {
+      "z": "adres",
+      "regex": "^(ul\\.|al\\.|os\\.|pl\\.)"
+    },
+    "nazwa_ulicy": {
+      "z": "adres",
+      "regex": "^(?:ul\\.|al\\.|os\\.|pl\\.)?\\s*([^\\d,]+?)\\s+\\d"
+    },
+    "numer_budynku": {
+      "z": "adres",
+      "regex": "^[^\\d]+?\\s(\\d+[A-Za-z]?)\\b"
+    },
+    "kod_pocztowy": {
+      "z": "adres",
+      "regex": "(\\d{2}-\\d{3})"
+    },
+    "miejscowosc": {
+      "z": "adres",
+      "regex": "\\d{2}-\\d{3}\\s+(.+)$"
+    },
+    "szerokosc_geograficzna": {
+      "z": "lat"
+    },
+    "dlugosc_geograficzna": {
+      "z": "lon"
+    },
+    "opis_lokalizacji": {
+      "z": "miejsce"
+    },
+    "wewnatrz_budynku": {
+      "stala": "true"
+    },
+    "typ_dostepu": {
+      "z": "dostep"
+    },
+    "godziny_dostepnosci": {
+      "z": "godziny"
+    },
+    "dostepny_24_7": {
+      "z": "godziny",
+      "mapa": {
+        "24/7": "true",
+        "*": "false"
+      }
+    },
+    "zabezpieczenie": {
+      "z": "zabezpieczenie"
+    },
+    "instrukcja_dostepu": {
+      "z": "instrukcja"
+    },
+    "status_urzadzenia": {
+      "stala": "sprawny"
+    },
+    "dysponent_nazwa": {
+      "z": "^przewoznik.nazwa"
+    },
+    "zrodlo_danych": {
+      "stala": "dysponent"
+    },
+    "poziom_weryfikacji": {
+      "stala": "zweryfikowany_przez_dysponenta"
+    },
+    "data_weryfikacji": {
+      "z": "__data"
+    },
+    "uwagi": {
+      "z": "^uwagi"
+    }
+  }
+}

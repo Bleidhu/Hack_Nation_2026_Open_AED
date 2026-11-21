@@ -1,0 +1,27 @@
+{
+  "id": "09_kolej",
+  "nazwa": "Kolej: dworce, linie i pociągi",
+  "typ_dostawcy": "zarządca infrastruktury / przewoźnik kolejowy",
+  "przyklady_dostawcow": "zarządcy dworców i linii kolejowych, przewoźnicy pasażerscy",
+  "kanal": "JSON z systemu zarządcy",
+  "czestotliwosc": "co kwartał",
+  "licencja": "CC0-1.0",
+  "do_zbioru_krajowego": true,
+  "pliki": [
+    {
+      "plik": "kolej_dworce_linie_pociagi.json",
+      "tabela": "punkty",
+      "mapowanie": "mapowanie_kolej.json"
+    },
+    {
+      "plik": "kolej_dworce_linie_pociagi.json",
+      "tabela": "obszarowe",
+      "adapter": "obszary_kolej"
+    }
+  ],
+  "co_pokazuje": [
+    "dworzec z kilkoma AED (hala, peron) – rozwinięcie listy",
+    "linia kolejowa z buforem: „jesteś przy torach – najbliższe AED są na stacjach”",
+    "pociągi z AED jako flota na trasie"
+  ]
+}

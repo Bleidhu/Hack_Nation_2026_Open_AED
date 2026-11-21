@@ -1,0 +1,29 @@
+{
+  "id": "00_format_docelowy",
+  "nazwa": "Format docelowy (dysponent publikuje już we wzorcu)",
+  "typ_dostawcy": "dysponent / JST",
+  "przyklady_dostawcow": "gmina, szpital, uczelnia – każdy, kto wypełni szablon",
+  "kanal": "plik CSV na dane.gov.pl lub upload w kreatorze",
+  "czestotliwosc": "co najmniej raz na kwartał",
+  "licencja": "CC0-1.0",
+  "do_zbioru_krajowego": true,
+  "pliki": [
+    {
+      "plik": "aed_punkty_przyklad.csv",
+      "tabela": "punkty",
+      "preset": "wzorzec"
+    },
+    {
+      "plik": "aed_obszarowe_przyklad.csv",
+      "tabela": "obszarowe"
+    },
+    {
+      "plik": "organizacje_przyklad.csv",
+      "tabela": "organizacje"
+    }
+  ],
+  "co_pokazuje": [
+    "plik od razu zgodny ze wzorcem – zero mapowania",
+    "przypadki brzegowe: zamknięty na klucz, przeterminowane elektrody, AED w serwisie"
+  ]
+}

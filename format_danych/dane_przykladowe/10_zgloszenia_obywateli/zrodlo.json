@@ -1,0 +1,21 @@
+{
+  "id": "10_zgloszenia_obywateli",
+  "nazwa": "Zgłoszenia obywateli",
+  "typ_dostawcy": "obywatel",
+  "przyklady_dostawcow": "przechodnie, kursanci pierwszej pomocy, użytkownicy aplikacji",
+  "kanal": "QR na naklejce „Otwórz AED”, formularz w aplikacji",
+  "czestotliwosc": "na bieżąco",
+  "licencja": "CC0-1.0",
+  "do_zbioru_krajowego": true,
+  "pliki": [
+    {
+      "plik": "zgloszenia_qr.json",
+      "tabela": "aktualizacje",
+      "adapter": "zgloszenia_qr"
+    }
+  ],
+  "co_pokazuje": [
+    "zgłoszenie nie nadpisuje danych dysponenta – obniża pewność i trafia do kolejki",
+    "„nowy AED” → kandydat do weryfikacji, nie rekord zbioru"
+  ]
+}

@@ -1,0 +1,330 @@
+{
+  "typ_dostepu": {
+    "opis": "Kto może skorzystać z urządzenia",
+    "wartosci": [
+      {
+        "kod": "publiczny",
+        "etykieta": "Publiczny – każdy, bez ograniczeń",
+        "osm": "access=yes"
+      },
+      {
+        "kod": "ograniczony",
+        "etykieta": "Ograniczony – w godzinach obiektu / przez personel lub ochronę",
+        "osm": "access=customers|permit"
+      },
+      {
+        "kod": "prywatny",
+        "etykieta": "Prywatny – nie publikujemy w widoku publicznym",
+        "osm": "access=private"
+      }
+    ]
+  },
+  "zabezpieczenie": {
+    "opis": "Sposób zabezpieczenia urządzenia",
+    "wartosci": [
+      {
+        "kod": "brak",
+        "etykieta": "Brak – urządzenie na uchwycie"
+      },
+      {
+        "kod": "szafka_otwarta",
+        "etykieta": "Szafka bez zamka"
+      },
+      {
+        "kod": "szafka_z_alarmem",
+        "etykieta": "Szafka z alarmem (otwiera każdy)"
+      },
+      {
+        "kod": "szafka_na_kod",
+        "etykieta": "Szafka na kod (kod podaje dyspozytor 112)"
+      },
+      {
+        "kod": "zamkniety_na_klucz",
+        "etykieta": "Zamknięty na klucz (klucz u personelu)"
+      }
+    ]
+  },
+  "status_urzadzenia": {
+    "opis": "Stan urządzenia",
+    "wartosci": [
+      {
+        "kod": "sprawny",
+        "etykieta": "Sprawny"
+      },
+      {
+        "kod": "niesprawny",
+        "etykieta": "Niesprawny (np. błąd autotestu, przeterminowane elektrody)"
+      },
+      {
+        "kod": "w_serwisie",
+        "etykieta": "Czasowo zdjęty – w serwisie"
+      },
+      {
+        "kod": "wycofany",
+        "etykieta": "Wycofany / zdemontowany"
+      },
+      {
+        "kod": "nieznany",
+        "etykieta": "Nieznany – brak potwierdzenia"
+      }
+    ]
+  },
+  "zrodlo_danych": {
+    "opis": "Pochodzenie rekordu; kolejność = priorytet referencyjności (1 najwyższy)",
+    "wartosci": [
+      {
+        "kod": "dysponent",
+        "etykieta": "Dane własne dysponenta (zbiór na dane.gov.pl, plik, formularz)",
+        "priorytet": 1
+      },
+      {
+        "kod": "rejestr_publiczny",
+        "etykieta": "Rejestr publiczny / dane JST",
+        "priorytet": 2
+      },
+      {
+        "kod": "baza_zewnetrzna",
+        "etykieta": "Baza zewnętrzna o zgodnej licencji",
+        "priorytet": 3
+      },
+      {
+        "kod": "openstreetmap",
+        "etykieta": "OpenStreetMap / OpenAEDMap (ODbL) – tylko porównanie, nie trafia do zbioru CC0",
+        "priorytet": 4
+      },
+      {
+        "kod": "zgloszenie_obywatelskie",
+        "etykieta": "Zgłoszenie obywatela – wymaga potwierdzenia",
+        "priorytet": 5
+      }
+    ]
+  },
+  "poziom_weryfikacji": {
+    "opis": "Jak potwierdzono dane",
+    "wartosci": [
+      {
+        "kod": "zweryfikowany_w_terenie",
+        "etykieta": "Sprawdzony na miejscu (np. zdjęcie + data)"
+      },
+      {
+        "kod": "zweryfikowany_przez_dysponenta",
+        "etykieta": "Potwierdzony przez dysponenta"
+      },
+      {
+        "kod": "niezweryfikowany",
+        "etykieta": "Niezweryfikowany"
+      }
+    ]
+  },
+  "cecha_ulicy": {
+    "opis": "Cecha ulicy wg TERYT (reguła „Cecha adresu” w dane.gov.pl)",
+    "wartosci": [
+      {
+        "kod": "ul."
+      },
+      {
+        "kod": "al."
+      },
+      {
+        "kod": "pl."
+      },
+      {
+        "kod": "skwer"
+      },
+      {
+        "kod": "bulw."
+      },
+      {
+        "kod": "rondo"
+      },
+      {
+        "kod": "park"
+      },
+      {
+        "kod": "rynek"
+      },
+      {
+        "kod": "szosa"
+      },
+      {
+        "kod": "droga"
+      },
+      {
+        "kod": "os."
+      },
+      {
+        "kod": "ogród"
+      },
+      {
+        "kod": "wyspa"
+      },
+      {
+        "kod": "wyb."
+      },
+      {
+        "kod": "inne"
+      }
+    ]
+  },
+  "typ_obszaru": {
+    "opis": "Rodzaj AED obszarowego/mobilnego",
+    "wartosci": [
+      {
+        "wartosc": "flota_pojazdow",
+        "opis": "AED w pojazdach (tramwaje, autobusy, taksówki) – zasięg tras"
+      },
+      {
+        "wartosc": "patrol_mobilny",
+        "opis": "Patrol z AED (WOPR, straż miejska, ochrona) – obszar patrolowania"
+      },
+      {
+        "wartosc": "wydarzenie",
+        "opis": "Wydarzenie masowe – AED na czas wydarzenia (aktywny_od/do)"
+      },
+      {
+        "wartosc": "teren_obiektu",
+        "opis": "Duży teren (kampus, park, stok, plaża) z kilkoma AED / punktem informacji"
+      },
+      {
+        "wartosc": "trasa",
+        "opis": "Trasa (szlak, pociąg, prom) – geometria liniowa + bufor"
+      },
+      {
+        "wartosc": "inne",
+        "opis": "Inny rodzaj zasięgu"
+      }
+    ]
+  },
+  "status_programu": {
+    "opis": "Status programu AED obszarowego",
+    "wartosci": [
+      {
+        "wartosc": "aktywny"
+      },
+      {
+        "wartosc": "w_realizacji"
+      },
+      {
+        "wartosc": "planowany"
+      },
+      {
+        "wartosc": "zakonczony"
+      }
+    ]
+  },
+  "typ_organizacji": {
+    "opis": "Rodzaj organizacji w tabeli organizacji",
+    "wartosci": [
+      {
+        "wartosc": "jst"
+      },
+      {
+        "wartosc": "administracja"
+      },
+      {
+        "wartosc": "firma"
+      },
+      {
+        "wartosc": "przewoznik"
+      },
+      {
+        "wartosc": "uczelnia"
+      },
+      {
+        "wartosc": "szkola"
+      },
+      {
+        "wartosc": "ngo"
+      },
+      {
+        "wartosc": "sluzby"
+      },
+      {
+        "wartosc": "inne"
+      }
+    ]
+  },
+  "typ_zdarzenia": {
+    "opis": "Aktualizacja stanu AED (tabela aktualizacji)",
+    "wartosci": [
+      {
+        "wartosc": "uzycie",
+        "opis": "AED użyty – niedostępny do potwierdzenia sprawności"
+      },
+      {
+        "wartosc": "wymaga_serwisu",
+        "opis": "Usterka (np. niski poziom baterii, brak elektrod)"
+      },
+      {
+        "wartosc": "w_serwisie",
+        "opis": "Urządzenie zabrane do serwisu – niedostępne"
+      },
+      {
+        "wartosc": "po_serwisie",
+        "opis": "Serwis zakończony – sprawny (tylko dysponent / firma serwisująca)"
+      },
+      {
+        "wartosc": "sprawny",
+        "opis": "Potwierdzenie sprawności bez serwisu (tylko dysponent / serwis)"
+      }
+    ]
+  },
+  "rola": {
+    "opis": "Rola zgłaszającego aktualizację",
+    "wartosci": [
+      {
+        "wartosc": "obywatel",
+        "opis": "Osoba postronna – rola deklarowana"
+      },
+      {
+        "wartosc": "dysponent",
+        "opis": "Właściciel / opiekun AED"
+      },
+      {
+        "wartosc": "serwis",
+        "opis": "Firma serwisująca AED"
+      },
+      {
+        "wartosc": "zrm",
+        "opis": "Zespół Ratownictwa Medycznego"
+      },
+      {
+        "wartosc": "dyspozytor",
+        "opis": "Dyspozytor 112 / dyspozytor medyczny"
+      },
+      {
+        "wartosc": "sluzby",
+        "opis": "PSP, OSP, Policja, Straż Miejska, WOPR, GOPR/TOPR"
+      }
+    ]
+  },
+  "problemy": {
+    "opis": "Rodzaje usterek (lista oddzielona |)",
+    "wartosci": [
+      {
+        "wartosc": "niski_poziom_baterii"
+      },
+      {
+        "wartosc": "kontrolka_bledu"
+      },
+      {
+        "wartosc": "brak_lub_przeterminowane_elektrody"
+      },
+      {
+        "wartosc": "brak_urzadzenia"
+      },
+      {
+        "wartosc": "uszkodzona_szafka_lub_alarm"
+      },
+      {
+        "wartosc": "brak_dostepu_zamkniete"
+      },
+      {
+        "wartosc": "uszkodzone_urzadzenie"
+      },
+      {
+        "wartosc": "inne"
+      }
+    ]
+  }
+}

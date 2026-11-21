@@ -1,0 +1,87 @@
+{
+  "wersja": "1.0",
+  "opis": "Eksport z systemu sieci sklepów (TSV, CP1250) → wzorzec. PRZYKŁAD – dane fikcyjne",
+  "kolumny": {
+    "id_zrodlowe": {
+      "z": "NR_SKLEPU"
+    },
+    "nazwa_lokalizacji": {
+      "z": "NAZWA"
+    },
+    "miejscowosc": {
+      "z": "MIASTO"
+    },
+    "kod_pocztowy": {
+      "z": "KOD_PNA"
+    },
+    "cecha_ulicy": {
+      "stala": "ul."
+    },
+    "nazwa_ulicy": {
+      "z": "ULICA"
+    },
+    "numer_budynku": {
+      "z": "NR"
+    },
+    "szerokosc_geograficzna": {
+      "z": "GPS_N"
+    },
+    "dlugosc_geograficzna": {
+      "z": "GPS_E"
+    },
+    "opis_lokalizacji": {
+      "z": "MIEJSCE_AED"
+    },
+    "typ_dostepu": {
+      "z": "DLA_KLIENTOW",
+      "mapa": {
+        "tak": "ograniczony",
+        "nie": "prywatny"
+      }
+    },
+    "godziny_dostepnosci": {
+      "z": "GODZINY"
+    },
+    "dostepny_24_7": {
+      "z": "GODZINY",
+      "mapa": {
+        "24/7": "true",
+        "*": "false"
+      }
+    },
+    "data_waznosci_elektrod": {
+      "z": "ELEKTRODY_DO"
+    },
+    "data_waznosci_baterii": {
+      "z": "BATERIA_DO"
+    },
+    "data_ostatniego_przegladu": {
+      "z": "PRZEGLAD"
+    },
+    "zabezpieczenie": {
+      "stala": "szafka_otwarta"
+    },
+    "status_urzadzenia": {
+      "stala": "sprawny"
+    },
+    "wewnatrz_budynku": {
+      "stala": "true"
+    },
+    "dysponent_nazwa": {
+      "stala": "Sieć Sklepów Przykład Sp. z o.o."
+    },
+    "zrodlo_danych": {
+      "stala": "dysponent"
+    },
+    "poziom_weryfikacji": {
+      "stala": "zweryfikowany_przez_dysponenta"
+    },
+    "data_weryfikacji": {
+      "stala": "2026-11-19"
+    },
+    "uwagi": {
+      "stala": "PRZYKŁAD – dane fikcyjne"
+    }
+  },
+  "organizacja_id": "siec-sklepow-przyklad"
+}

@@ -1,0 +1,4 @@
+aed_ref,id_aed,typ_zdarzenia,data_zdarzenia,rola,problemy,opis,data_przegladu,data_waznosci_elektrod,data_waznosci_baterii,numer_protokolu,numer_zdarzenia,przewidywany_powrot
+,PL-AED-0000001,po_serwisie,,serwis,,"Wymiana elektrod i baterii, test samokontroli OK",2026-11-21,2028-11-30,2030-11-30,SRV/2026/1188,,
+,PL-AED-0000002,w_serwisie,,serwis,kontrolka_bledu,Urządzenie zabrane – błąd autotestu,,,,SRV/2026/1189,,2026-11-28
+,PL-AED-0000004,wymaga_serwisu,,serwis,brak_lub_przeterminowane_elektrody,Elektrody tracą ważność 2026-12-15,,,,,,

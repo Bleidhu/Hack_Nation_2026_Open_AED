@@ -1,0 +1,169 @@
+{
+  "typ_dostepu": {
+    "opis": "Kto może skorzystać z urządzenia",
+    "wartosci": [
+      {
+        "kod": "publiczny",
+        "etykieta": "Publiczny – każdy, bez ograniczeń",
+        "osm": "access=yes"
+      },
+      {
+        "kod": "ograniczony",
+        "etykieta": "Ograniczony – w godzinach obiektu / przez personel lub ochronę",
+        "osm": "access=customers|permit"
+      },
+      {
+        "kod": "prywatny",
+        "etykieta": "Prywatny – nie publikujemy w widoku publicznym",
+        "osm": "access=private"
+      }
+    ]
+  },
+  "zabezpieczenie": {
+    "opis": "Sposób zabezpieczenia urządzenia",
+    "wartosci": [
+      {
+        "kod": "brak",
+        "etykieta": "Brak – urządzenie na uchwycie"
+      },
+      {
+        "kod": "szafka_otwarta",
+        "etykieta": "Szafka bez zamka"
+      },
+      {
+        "kod": "szafka_z_alarmem",
+        "etykieta": "Szafka z alarmem (otwiera każdy)"
+      },
+      {
+        "kod": "szafka_na_kod",
+        "etykieta": "Szafka na kod (kod podaje dyspozytor 112)"
+      },
+      {
+        "kod": "zamkniety_na_klucz",
+        "etykieta": "Zamknięty na klucz (klucz u personelu)"
+      }
+    ]
+  },
+  "status_urzadzenia": {
+    "opis": "Stan urządzenia",
+    "wartosci": [
+      {
+        "kod": "sprawny",
+        "etykieta": "Sprawny"
+      },
+      {
+        "kod": "niesprawny",
+        "etykieta": "Niesprawny (np. błąd autotestu, przeterminowane elektrody)"
+      },
+      {
+        "kod": "w_serwisie",
+        "etykieta": "Czasowo zdjęty – w serwisie"
+      },
+      {
+        "kod": "wycofany",
+        "etykieta": "Wycofany / zdemontowany"
+      },
+      {
+        "kod": "nieznany",
+        "etykieta": "Nieznany – brak potwierdzenia"
+      }
+    ]
+  },
+  "zrodlo_danych": {
+    "opis": "Pochodzenie rekordu; kolejność = priorytet referencyjności (1 najwyższy)",
+    "wartosci": [
+      {
+        "kod": "dysponent",
+        "etykieta": "Dane własne dysponenta (zbiór na dane.gov.pl, plik, formularz)",
+        "priorytet": 1
+      },
+      {
+        "kod": "rejestr_publiczny",
+        "etykieta": "Rejestr publiczny / dane JST",
+        "priorytet": 2
+      },
+      {
+        "kod": "baza_zewnetrzna",
+        "etykieta": "Baza zewnętrzna o zgodnej licencji",
+        "priorytet": 3
+      },
+      {
+        "kod": "openstreetmap",
+        "etykieta": "OpenStreetMap / OpenAEDMap (ODbL) – tylko porównanie, nie trafia do zbioru CC0",
+        "priorytet": 4
+      },
+      {
+        "kod": "zgloszenie_obywatelskie",
+        "etykieta": "Zgłoszenie obywatela – wymaga potwierdzenia",
+        "priorytet": 5
+      }
+    ]
+  },
+  "poziom_weryfikacji": {
+    "opis": "Jak potwierdzono dane",
+    "wartosci": [
+      {
+        "kod": "zweryfikowany_w_terenie",
+        "etykieta": "Sprawdzony na miejscu (np. zdjęcie + data)"
+      },
+      {
+        "kod": "zweryfikowany_przez_dysponenta",
+        "etykieta": "Potwierdzony przez dysponenta"
+      },
+      {
+        "kod": "niezweryfikowany",
+        "etykieta": "Niezweryfikowany"
+      }
+    ]
+  },
+  "cecha_ulicy": {
+    "opis": "Cecha ulicy wg TERYT (reguła „Cecha adresu” w dane.gov.pl)",
+    "wartosci": [
+      {
+        "kod": "ul."
+      },
+      {
+        "kod": "al."
+      },
+      {
+        "kod": "pl."
+      },
+      {
+        "kod": "skwer"
+      },
+      {
+        "kod": "bulw."
+      },
+      {
+        "kod": "rondo"
+      },
+      {
+        "kod": "park"
+      },
+      {
+        "kod": "rynek"
+      },
+      {
+        "kod": "szosa"
+      },
+      {
+        "kod": "droga"
+      },
+      {
+        "kod": "os."
+      },
+      {
+        "kod": "ogród"
+      },
+      {
+        "kod": "wyspa"
+      },
+      {
+        "kod": "wyb."
+      },
+      {
+        "kod": "inne"
+      }
+    ]
+  }
+}

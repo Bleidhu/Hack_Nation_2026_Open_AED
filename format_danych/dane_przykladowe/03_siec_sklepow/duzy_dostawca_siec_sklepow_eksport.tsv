@@ -1,0 +1,5 @@
+NR_SKLEPU	NAZWA	MIASTO	KOD_PNA	ULICA	NR	GPS_N	GPS_E	MIEJSCE_AED	DLA_KLIENTOW	GODZINY	ELEKTRODY_DO	BATERIA_DO	PRZEGLAD
+S-0101	Market Przyk³ad Bydgoszcz Wy¿yny	Bydgoszcz	85-791	Ogrody	12	53.12345	18.04567	kasa nr 1, œciana	tak	24/7	2027-05-31	2029-01-31	2026-10-01
+S-0102	Market Przyk³ad Bydgoszcz B³onie	Bydgoszcz	85-822	Szubiñska	60	53.11890	17.94120	wejœcie g³ówne	tak	Mo-Su 06:00-23:00	2027-02-28	2028-12-31	2026-09-12
+S-0103	Market Przyk³ad Solec Kujawski	Solec Kujawski	86-050	Toruñska	3	53.08710	18.22650	zaplecze – zapytaj obs³ugê	nie	Mo-Sa 07:00-21:00			
+S-0104	Market Przyk³ad Nak³o	Nak³o nad Noteci¹	89-100	Pocztowa		53.14200	17.60000	przy wyjœciu	tak		2026-01-31		

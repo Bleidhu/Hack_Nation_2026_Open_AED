@@ -1,0 +1,62 @@
+{
+  "firma": "AED-Tech Serwis Sp. z o.o. (PRZYKŁAD)",
+  "organizacja_id": "aedtech-serwis",
+  "eksport": "2026-11-21T08:00:00+01:00",
+  "uwagi": "PRZYKŁAD – dane fikcyjne. Urządzenia identyfikowane numerem seryjnym; id_aed tylko gdy technik zeskanował naklejkę.",
+  "protokoly": [
+    {
+      "nr": "SRV/2026/2001",
+      "data": "2026-11-19",
+      "technik": "T-07",
+      "urzadzenie": {
+        "nr_seryjny": "PRZ-ZOLL-0101",
+        "model": "ZOLL AED Plus",
+        "id_aed_z_naklejki": null
+      },
+      "lokalizacja_tekst": "SP nr 999, hol",
+      "wynik": "sprawny",
+      "czynnosci": [
+        "wymiana elektrod",
+        "test samokontroli – OK"
+      ],
+      "elektrody_do": "2029-05-31",
+      "bateria_do": "2030-01-31",
+      "nastepny_przeglad": "2027-11-19"
+    },
+    {
+      "nr": "SRV/2026/2002",
+      "data": "2026-11-20",
+      "technik": "T-03",
+      "urzadzenie": {
+        "nr_seryjny": "PRZ-HS1-0004",
+        "model": "Philips HeartStart HS1",
+        "id_aed_z_naklejki": null
+      },
+      "lokalizacja_tekst": "Bank, Nowa Huta",
+      "wynik": "wymaga_serwisu",
+      "czynnosci": [
+        "kontrola – elektrody przeterminowane (10/2026)"
+      ],
+      "uwagi": "Elektrody zamówione, wymiana do 2026-11-27",
+      "elektrody_do": null,
+      "bateria_do": null
+    },
+    {
+      "nr": "SRV/2026/2003",
+      "data": "2026-11-20",
+      "technik": "T-03",
+      "urzadzenie": {
+        "nr_seryjny": "PRZ-XYZ-9999",
+        "model": "nieznany",
+        "id_aed_z_naklejki": null
+      },
+      "lokalizacja_tekst": "Klient indywidualny – lokal usługowy",
+      "wynik": "sprawny",
+      "czynnosci": [
+        "przegląd okresowy"
+      ],
+      "elektrody_do": "2028-01-31",
+      "bateria_do": "2029-01-31"
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "id": "08_przewoznik_miejski",
+  "nazwa": "Przewoźnik miejski (AED w pojazdach i zajezdniach)",
+  "typ_dostawcy": "przewoźnik",
+  "przyklady_dostawcow": "MPK, ZTM, MZK – np. komunikacja miejska w Krakowie, Szczecinie, Wrocławiu",
+  "kanal": "JSON z systemu przewoźnika + GTFS / GTFS-RT",
+  "czestotliwosc": "przy zmianie floty; pozycje pojazdów na żywo",
+  "licencja": "CC0-1.0",
+  "do_zbioru_krajowego": true,
+  "pliki": [
+    {
+      "plik": "komunikacja_miejska_przyklad.json",
+      "tabela": "punkty",
+      "mapowanie": "mapowanie_przewoznik.json"
+    },
+    {
+      "plik": "komunikacja_miejska_przyklad.json",
+      "tabela": "obszarowe",
+      "adapter": "obszary_przewoznik"
+    }
+  ],
+  "co_pokazuje": [
+    "AED mobilne: nie punkt, tylko flota i obszar obsługi",
+    "powiązanie z rozkładem GTFS i pozycjami na żywo"
+  ]
+}

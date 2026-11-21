@@ -1,0 +1,5 @@
+organizacja_id,nazwa,typ_organizacji,regon,nip,strona_www,logo_url,logo_alt,email_kontaktowy,telefon_kontaktowy,liczba_aed,licencja_danych,uwagi
+bank-przyklad,Bank Przykład S.A.,firma,000000000,0000000000,https://bank-przyklad.example,https://bank-przyklad.example/logo.svg,Logo Banku Przykład,aed@bank-przyklad.example,225550000,3,CC0-1.0,PRZYKŁAD – dane fikcyjne
+siec-sklepow-przyklad,Sieć Sklepów Przykład Sp. z o.o.,firma,,,https://sklepy-przyklad.example,https://sklepy-przyklad.example/logo.png,Logo Sieci Sklepów Przykład,bhp@sklepy-przyklad.example,,4,CC0-1.0,PRZYKŁAD – dane fikcyjne
+mzk-przyklad,Miejski Zakład Komunikacji Przykład,przewoznik,,,https://mzk-przyklad.example,,,aed@mzk-przyklad.example,523000000,69,CC0-1.0,PRZYKŁAD – dane fikcyjne
+aedtech-serwis,AED-Tech Serwis Sp. z o.o.,firma,,,https://aedtech.example,,,serwis@aedtech.example,,,CC0-1.0,PRZYKŁAD – dane fikcyjne – firma serwisująca

@@ -1,0 +1,101 @@
+{
+  "version": 0.6,
+  "generator": "Overpass API (PRZYKŁAD – odpowiedź spreparowana do demo)",
+  "osm3s": {
+    "timestamp_osm_base": "2026-11-21T06:00:00Z",
+    "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL."
+  },
+  "elements": [
+    {
+      "type": "node",
+      "id": 900000001,
+      "lat": 50.0616,
+      "lon": 19.9382,
+      "tags": {
+        "emergency": "defibrillator",
+        "access": "customers",
+        "indoor": "yes",
+        "level": "0",
+        "opening_hours": "Mo-Fr 09:00-17:00",
+        "operator": "Bank Przykład",
+        "defibrillator:location:pl": "w holu banku",
+        "check_date": "2023-04-02",
+        "note": "PRZYKŁAD – dane fikcyjne"
+      }
+    },
+    {
+      "type": "node",
+      "id": 900000002,
+      "lat": 50.0704,
+      "lon": 19.9376,
+      "tags": {
+        "emergency": "defibrillator",
+        "access": "yes",
+        "indoor": "yes",
+        "name": "Apteka",
+        "opening_hours": "Mo-Fr 08:00-20:00",
+        "note": "PRZYKŁAD – dane fikcyjne"
+      }
+    },
+    {
+      "type": "node",
+      "id": 900000003,
+      "lat": 50.06785,
+      "lon": 19.9477,
+      "tags": {
+        "emergency": "defibrillator",
+        "access": "yes",
+        "indoor": "yes",
+        "opening_hours": "24/7",
+        "defibrillator:location:pl": "hala dworca, obok kas",
+        "operator": "PKP",
+        "check_date": "2025-06-10",
+        "note": "PRZYKŁAD – dane fikcyjne"
+      }
+    },
+    {
+      "type": "node",
+      "id": 900000004,
+      "lat": 50.0672,
+      "lon": 19.945,
+      "tags": {
+        "emergency": "defibrillator",
+        "access": "customers",
+        "indoor": "yes",
+        "level": "1",
+        "defibrillator:location:pl": "galeria handlowa, 1 piętro przy toaletach",
+        "note": "PRZYKŁAD – dane fikcyjne"
+      }
+    },
+    {
+      "type": "node",
+      "id": 900000005,
+      "lat": 50.064,
+      "lon": 19.94,
+      "tags": {
+        "emergency": "defibrillator",
+        "access": "yes",
+        "indoor": "no",
+        "opening_hours": "24/7",
+        "defibrillator:location:pl": "Planty, przy kiosku",
+        "check_date": "2021-09-14",
+        "note": "PRZYKŁAD – dane fikcyjne"
+      }
+    },
+    {
+      "type": "node",
+      "id": 900000006,
+      "lat": 50.01205,
+      "lon": 19.8901,
+      "tags": {
+        "emergency": "defibrillator",
+        "access": "yes",
+        "indoor": "no",
+        "opening_hours": "24/7",
+        "operator": "OSP",
+        "defibrillator:location:pl": "elewacja remizy",
+        "note": "PRZYKŁAD – dane fikcyjne"
+      }
+    }
+  ]
+}

@@ -1,0 +1,90 @@
+{
+  "wersja": "1.0",
+  "opis": "Kolej → AED na dworcach i peronach do tabeli punktów (rozwinięcie listy 'aed' każdego dworca); odcinki linii i pociągi z AED → tabela aed_obszarowe (trasa / flota_pojazdow). PRZYKŁAD – dane fikcyjne",
+  "organizacja_id": "kolej-przyklad",
+  "wejscie": {
+    "format": "json",
+    "sciezka": "dworce",
+    "rozwin": "aed"
+  },
+  "przeksztalcenia": {
+    "__data": {
+      "funkcja": "data_z_czasu",
+      "z": "^wygenerowano"
+    }
+  },
+  "kolumny": {
+    "id_zrodlowe": {
+      "z": "aed.id"
+    },
+    "nazwa_lokalizacji": {
+      "z": "stacja"
+    },
+    "cecha_ulicy": {
+      "z": "adres.ulica",
+      "regex": "^(ul\\.|al\\.|os\\.|pl\\.)"
+    },
+    "nazwa_ulicy": {
+      "z": "adres.ulica",
+      "regex": "^(?:ul\\.|al\\.|os\\.|pl\\.)?\\s*(.+)$"
+    },
+    "numer_budynku": {
+      "z": "adres.nr"
+    },
+    "kod_pocztowy": {
+      "z": "adres.kod"
+    },
+    "miejscowosc": {
+      "z": "adres.miasto"
+    },
+    "szerokosc_geograficzna": {
+      "z": "aed.lat"
+    },
+    "dlugosc_geograficzna": {
+      "z": "aed.lon"
+    },
+    "opis_lokalizacji": {
+      "z": "aed.miejsce"
+    },
+    "wewnatrz_budynku": {
+      "stala": "true"
+    },
+    "typ_dostepu": {
+      "z": "aed.dostep"
+    },
+    "godziny_dostepnosci": {
+      "z": "aed.godziny"
+    },
+    "dostepny_24_7": {
+      "z": "aed.godziny",
+      "mapa": {
+        "24/7": "true",
+        "*": "false"
+      }
+    },
+    "zabezpieczenie": {
+      "z": "aed.zabezpieczenie"
+    },
+    "status_urzadzenia": {
+      "stala": "sprawny"
+    },
+    "data_waznosci_elektrod": {
+      "z": "aed.elektrody_do"
+    },
+    "dysponent_nazwa": {
+      "z": "^zarzadca.nazwa"
+    },
+    "zrodlo_danych": {
+      "stala": "dysponent"
+    },
+    "poziom_weryfikacji": {
+      "stala": "zweryfikowany_przez_dysponenta"
+    },
+    "data_weryfikacji": {
+      "z": "__data"
+    },
+    "uwagi": {
+      "z": "^uwagi"
+    }
+  }
+}

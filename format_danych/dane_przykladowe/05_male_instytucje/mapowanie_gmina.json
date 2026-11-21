@@ -1,0 +1,131 @@
+{
+  "wersja": "1.0",
+  "opis": "Zestawienie AED w jednostkach gminy (szkoły, przedszkola, OSP, biblioteki, kluby) zebrane przez koordynatora → wzorzec. Polskie nagłówki, przecinek dziesiętny, daty dd.mm.rrrr, ważność elektrod jako mm/rrrr. Kolumna 'Osoba odpowiedzialna' NIE jest przenoszona (RODO). PRZYKŁAD – dane fikcyjne",
+  "wejscie": {
+    "format": "json",
+    "sciezka": "jednostki"
+  },
+  "pomin_dane_osobowe": [
+    "Osoba odpowiedzialna"
+  ],
+  "przeksztalcenia": {
+    "__godziny": {
+      "funkcja": "godziny_z_tekstu",
+      "z": "Godziny"
+    },
+    "__elektrody": {
+      "funkcja": "miesiac_na_date",
+      "z": "Elektrody ważne do",
+      "opis": "'03/2027' → '2027-03-31'"
+    }
+  },
+  "nr_seryjny": {
+    "z": "Nr seryjny"
+  },
+  "kolumny": {
+    "id_zrodlowe": {
+      "z": "Lp"
+    },
+    "nazwa_lokalizacji": {
+      "z": "Jednostka"
+    },
+    "cecha_ulicy": {
+      "z": "Adres",
+      "regex": "^(ul\\.|al\\.|os\\.|pl\\.)"
+    },
+    "nazwa_ulicy": {
+      "z": "Adres",
+      "regex": "^(?:ul\\.|al\\.|os\\.|pl\\.)?\\s*([^\\d,]+?)\\s+\\d"
+    },
+    "numer_budynku": {
+      "z": "Adres",
+      "regex": "^[^\\d]+?\\s(\\d+[A-Za-z]?)\\b"
+    },
+    "kod_pocztowy": {
+      "z": "Adres",
+      "regex": "(\\d{2}-\\d{3})"
+    },
+    "miejscowosc": {
+      "z": "Adres",
+      "regex": "\\d{2}-\\d{3}\\s+(.+)$"
+    },
+    "szerokosc_geograficzna": {
+      "z": "Współrzędne",
+      "regex": "^\\s*([\\d.,]+)\\s*;"
+    },
+    "dlugosc_geograficzna": {
+      "z": "Współrzędne",
+      "regex": ";\\s*([\\d.,]+)\\s*$"
+    },
+    "opis_lokalizacji": {
+      "z": "Gdzie wisi AED"
+    },
+    "wewnatrz_budynku": {
+      "z": "Dostęp",
+      "mapa": {
+        "całodobowo – szafka na zewnątrz": "false",
+        "*": "true"
+      }
+    },
+    "typ_dostepu": {
+      "z": "Dostęp",
+      "mapa": {
+        "całodobowo – szafka na zewnątrz": "publiczny",
+        "*": "ograniczony"
+      }
+    },
+    "dostepny_24_7": {
+      "z": "Dostęp",
+      "mapa": {
+        "całodobowo – szafka na zewnątrz": "true",
+        "*": "false"
+      }
+    },
+    "godziny_dostepnosci": {
+      "z": "__godziny"
+    },
+    "zabezpieczenie": {
+      "z": "Szafka",
+      "mapa": {
+        "z alarmem": "szafka_z_alarmem",
+        "zamknięta na klucz": "zamkniety_na_klucz",
+        "brak": "brak"
+      }
+    },
+    "status_urzadzenia": {
+      "z": "Sprawny",
+      "mapa": {
+        "tak": "sprawny",
+        "nie": "niesprawny",
+        "*": "nieznany"
+      }
+    },
+    "model": {
+      "z": "Model"
+    },
+    "elektrody_pediatryczne": {
+      "z": "Elektrody dziecięce"
+    },
+    "data_waznosci_elektrod": {
+      "z": "__elektrody"
+    },
+    "data_ostatniego_przegladu": {
+      "z": "Data przeglądu"
+    },
+    "dysponent_nazwa": {
+      "z": "Jednostka"
+    },
+    "zrodlo_danych": {
+      "stala": "rejestr_publiczny"
+    },
+    "poziom_weryfikacji": {
+      "stala": "zweryfikowany_przez_dysponenta"
+    },
+    "data_weryfikacji": {
+      "z": "^data_zebrania"
+    },
+    "uwagi": {
+      "z": "^uwagi"
+    }
+  }
+}

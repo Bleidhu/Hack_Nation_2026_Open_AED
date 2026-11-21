@@ -1,0 +1,3 @@
+aed_ref,id_aed,typ_zdarzenia,data_zdarzenia,rola,problemy,opis,data_przegladu,data_waznosci_elektrod,data_waznosci_baterii,numer_protokolu,numer_zdarzenia,przewidywany_powrot
+,PL-AED-0000002,uzycie,2026-11-21T14:05:00,zrm,,AED użyty przez świadków przed przyjazdem ZRM,,,,,CPR-2026-000123,
+,PL-AED-0000006,uzycie,2026-11-21T16:40:00,dyspozytor,,Dyspozytor 112 skierował świadka do AED,,,,,CPR-2026-000131,

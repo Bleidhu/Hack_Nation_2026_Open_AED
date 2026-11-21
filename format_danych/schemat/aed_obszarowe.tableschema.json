@@ -1,0 +1,220 @@
+{
+  "name": "aed-obszarowe",
+  "title": "AED obszarowe i mobilne",
+  "version": "1.0.0",
+  "fields": [
+    {
+      "name": "id_obszaru",
+      "type": "string",
+      "description": "Identyfikator obszaru: PL-AEDO-NNNNN",
+      "x-wymagalnosc": "W",
+      "constraints": {
+        "required": true
+      },
+      "example": "PL-AEDO-00001"
+    },
+    {
+      "name": "nazwa_obszaru",
+      "type": "string",
+      "description": "Nazwa obszaru lub floty",
+      "x-wymagalnosc": "W",
+      "constraints": {
+        "required": true
+      },
+      "example": "Tramwaje MZK – linie 1–12"
+    },
+    {
+      "name": "typ_obszaru",
+      "type": "string",
+      "description": "Słownik typ_obszaru",
+      "x-wymagalnosc": "W",
+      "constraints": {
+        "required": true,
+        "enum": [
+          "flota_pojazdow",
+          "patrol_mobilny",
+          "wydarzenie",
+          "teren_obiektu",
+          "trasa",
+          "inne"
+        ]
+      },
+      "example": "flota_pojazdow"
+    },
+    {
+      "name": "organizacja_id",
+      "type": "string",
+      "description": "Organizacja odpowiedzialna (tabela organizacji)",
+      "x-wymagalnosc": "Z",
+      "example": "mzk-przyklad"
+    },
+    {
+      "name": "dysponent_nazwa",
+      "type": "string",
+      "description": "Dysponent urządzeń",
+      "x-wymagalnosc": "W",
+      "constraints": {
+        "required": true
+      },
+      "example": "Miejski Zakład Komunikacji Przykład"
+    },
+    {
+      "name": "dysponent_regon",
+      "type": "string",
+      "description": "REGON 9 lub 14 cyfr",
+      "x-wymagalnosc": "Z",
+      "example": "012345678"
+    },
+    {
+      "name": "liczba_aed",
+      "type": "integer",
+      "description": "Liczba AED w obszarze / flocie",
+      "x-wymagalnosc": "W",
+      "constraints": {
+        "required": true
+      },
+      "example": "69"
+    },
+    {
+      "name": "liczba_pojazdow",
+      "type": "integer",
+      "description": "Liczba pojazdów floty (gdy AED tylko w części)",
+      "x-wymagalnosc": "O",
+      "example": "120"
+    },
+    {
+      "name": "geometria_wkt",
+      "type": "string",
+      "description": "Zasięg: WKT w WGS84 (POLYGON, MULTIPOLYGON, LINESTRING, MULTILINESTRING) – lon lat",
+      "x-wymagalnosc": "W",
+      "constraints": {
+        "required": true
+      },
+      "example": "POLYGON((14.50 53.40, …))"
+    },
+    {
+      "name": "bufor_m",
+      "type": "integer",
+      "description": "Bufor wokół linii (trasy) w metrach",
+      "x-wymagalnosc": "O",
+      "example": "300"
+    },
+    {
+      "name": "gtfs_url",
+      "type": "string",
+      "description": "Rozkład GTFS przewoźnika (zasięg tras i przystanków)",
+      "x-wymagalnosc": "O",
+      "example": "https://…/gtfs.zip"
+    },
+    {
+      "name": "gtfs_rt_url",
+      "type": "string",
+      "description": "Pozycje pojazdów na żywo (GTFS-RT VehiclePositions lub API JSON)",
+      "x-wymagalnosc": "O",
+      "example": "https://…/VehiclePositions.pb"
+    },
+    {
+      "name": "typy_pojazdow",
+      "type": "string",
+      "description": "Lista oddzielona |: tramwaj|autobus|karetka|patrol_pieszy|rower|lodz",
+      "x-wymagalnosc": "O",
+      "example": "tramwaj"
+    },
+    {
+      "name": "linie",
+      "type": "string",
+      "description": "Numery linii oddzielone |",
+      "x-wymagalnosc": "O",
+      "example": "1|2|3"
+    },
+    {
+      "name": "godziny_dostepnosci",
+      "type": "string",
+      "description": "opening_hours (OSM), np. Mo-Su 05:00-23:00",
+      "x-wymagalnosc": "Z",
+      "example": "Mo-Su 05:00-23:30"
+    },
+    {
+      "name": "jak_uzyskac_dostep",
+      "type": "string",
+      "description": "Instrukcja dla świadka zdarzenia",
+      "x-wymagalnosc": "W",
+      "constraints": {
+        "required": true
+      },
+      "example": "Zatrzymaj tramwaj, poproś motorniczego – AED w kabinie"
+    },
+    {
+      "name": "status_programu",
+      "type": "string",
+      "description": "Słownik status_programu",
+      "x-wymagalnosc": "W",
+      "constraints": {
+        "required": true,
+        "enum": [
+          "aktywny",
+          "w_realizacji",
+          "planowany",
+          "zakonczony"
+        ]
+      },
+      "example": "aktywny"
+    },
+    {
+      "name": "aktywny_od",
+      "type": "date",
+      "description": "Od kiedy (yyyy-mm-dd)",
+      "x-wymagalnosc": "O",
+      "example": "2026-12-01"
+    },
+    {
+      "name": "aktywny_do",
+      "type": "date",
+      "description": "Do kiedy – dla wydarzeń (yyyy-mm-dd)",
+      "x-wymagalnosc": "O"
+    },
+    {
+      "name": "telefon_kontaktowy",
+      "type": "string",
+      "description": "9 cyfr / +48…",
+      "x-wymagalnosc": "Z",
+      "example": "914800000"
+    },
+    {
+      "name": "strona_www",
+      "type": "string",
+      "description": "Strona programu (https)",
+      "x-wymagalnosc": "O",
+      "example": "https://example.org/aed"
+    },
+    {
+      "name": "zrodlo_danych",
+      "type": "string",
+      "description": "Słownik zrodlo_danych",
+      "x-wymagalnosc": "W",
+      "constraints": {
+        "required": true
+      },
+      "example": "dysponent"
+    },
+    {
+      "name": "data_aktualizacji",
+      "type": "datetime",
+      "description": "ISO 8601",
+      "x-wymagalnosc": "W",
+      "constraints": {
+        "required": true
+      },
+      "example": "2026-11-21T10:00:00"
+    },
+    {
+      "name": "uwagi",
+      "type": "string",
+      "description": "",
+      "x-wymagalnosc": "O"
+    }
+  ],
+  "missingValues": [
+    ""
+  ]
+}

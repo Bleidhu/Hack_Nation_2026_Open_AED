@@ -1,0 +1,48 @@
+{
+  "kanal": "naklejka QR „Otwórz AED” / formularz w aplikacji (PRZYKŁAD)",
+  "uwagi": "PRZYKŁAD – dane fikcyjne. Zgłoszenie nie nadpisuje danych dysponenta – trafia do kolejki weryfikacji.",
+  "zgloszenia": [
+    {
+      "id": "Z-0001",
+      "czas": "2026-11-19T17:02:00+01:00",
+      "kanal": "naklejka_qr",
+      "id_aed_z_naklejki": null,
+      "gps": {
+        "lat": 50.06401,
+        "lon": 19.94002,
+        "dokladnosc_m": 15
+      },
+      "typ": "brak_urzadzenia",
+      "opis": "Pusta szafka na Plantach, brak defibrylatora",
+      "zdjecie": true
+    },
+    {
+      "id": "Z-0002",
+      "czas": "2026-11-20T08:10:00+01:00",
+      "kanal": "aplikacja",
+      "id_aed_z_naklejki": null,
+      "gps": {
+        "lat": 50.05602,
+        "lon": 19.90498,
+        "dokladnosc_m": 8
+      },
+      "typ": "brak_dostepu_zamkniete",
+      "opis": "AED w przedszkolu zamknięty na klucz, obsługa nie wiedziała, gdzie jest klucz",
+      "zdjecie": false
+    },
+    {
+      "id": "Z-0003",
+      "czas": "2026-11-20T19:45:00+01:00",
+      "kanal": "aplikacja",
+      "id_aed_z_naklejki": null,
+      "gps": {
+        "lat": 50.056,
+        "lon": 19.937,
+        "dokladnosc_m": 20
+      },
+      "typ": "nowy_aed",
+      "opis": "AED w holu kina, przy kasach – nie ma go na mapie",
+      "zdjecie": true
+    }
+  ]
+}

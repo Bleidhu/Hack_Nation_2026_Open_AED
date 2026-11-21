@@ -1,0 +1,37 @@
+{
+  "platforma": "Zdalny monitoring AED producenta (PRZYKŁAD)",
+  "format": "raport dobowy z autotestu, wysyłany przez modem LTE urządzenia",
+  "uwagi": "PRZYKŁAD – dane fikcyjne",
+  "raporty": [
+    {
+      "nr_seryjny": "PRZ-FRX-0102",
+      "czas": "2026-11-21T03:00:00Z",
+      "autotest": "BLAD",
+      "kod_bledu": "E-BAT-LOW",
+      "bateria_proc": 12,
+      "elektrody_waznosc": "2028-08-31",
+      "temperatura_c": -9,
+      "polaczenie": "LTE"
+    },
+    {
+      "nr_seryjny": "PRZ-FRX-0001",
+      "czas": "2026-11-21T03:00:00Z",
+      "autotest": "OK",
+      "kod_bledu": null,
+      "bateria_proc": 87,
+      "elektrody_waznosc": "2027-03-31",
+      "temperatura_c": 21,
+      "polaczenie": "LTE"
+    },
+    {
+      "nr_seryjny": "PRZ-ZOLL-0002",
+      "czas": "2026-11-21T03:00:00Z",
+      "autotest": "OK",
+      "kod_bledu": null,
+      "bateria_proc": 95,
+      "elektrody_waznosc": "2028-06-30",
+      "temperatura_c": 22,
+      "polaczenie": "WiFi"
+    }
+  ]
+}

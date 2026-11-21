@@ -1,0 +1,23 @@
+{
+  "id": "04_pojedyncze_sklepy",
+  "nazwa": "Pojedyncze sklepy i punkty usługowe",
+  "typ_dostawcy": "mały dysponent bez działu IT",
+  "przyklady_dostawcow": "apteka, piekarnia, stacja paliw, salon fryzjerski",
+  "kanal": "formularz www „Dodaj swoje AED” (bez konta)",
+  "czestotliwosc": "jednorazowo + przypomnienie co rok",
+  "licencja": "CC0-1.0 (zgoda w formularzu)",
+  "do_zbioru_krajowego": true,
+  "pliki": [
+    {
+      "plik": "formularz_zgloszenia_sklepy.json",
+      "tabela": "punkty",
+      "mapowanie": "mapowanie_formularz.json"
+    }
+  ],
+  "co_pokazuje": [
+    "adres w jednym polu, położenie z linku do mapy (OSM / Google)",
+    "godziny słowami: 'pn-pt 8-20, sob 9-14'",
+    "dane osobowe z formularza są odrzucane (RODO)",
+    "brak zgody na CC0 → rekord wstrzymany"
+  ]
+}

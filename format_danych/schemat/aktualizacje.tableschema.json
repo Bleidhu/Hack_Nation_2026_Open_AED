@@ -1,0 +1,121 @@
+{
+  "name": "aktualizacje",
+  "title": "Aktualizacje stanu AED (użycie, serwis)",
+  "version": "1.0.0",
+  "fields": [
+    {
+      "name": "aed_ref",
+      "type": "string",
+      "description": "Identyfikator AED z API (aed_ref) – podaj to pole albo id_aed",
+      "x-wymagalnosc": "Z",
+      "example": "PL-AED-0000001"
+    },
+    {
+      "name": "id_aed",
+      "type": "string",
+      "description": "Identyfikator ze zbioru krajowego (PL-AED-NNNNNNN)",
+      "x-wymagalnosc": "Z",
+      "example": "PL-AED-0000001"
+    },
+    {
+      "name": "typ_zdarzenia",
+      "type": "string",
+      "description": "Słownik typ_zdarzenia",
+      "x-wymagalnosc": "W",
+      "constraints": {
+        "required": true,
+        "enum": [
+          "uzycie",
+          "wymaga_serwisu",
+          "w_serwisie",
+          "po_serwisie",
+          "sprawny"
+        ]
+      },
+      "example": "po_serwisie"
+    },
+    {
+      "name": "data_zdarzenia",
+      "type": "datetime",
+      "description": "Czas zdarzenia ISO 8601 (dla użycia)",
+      "x-wymagalnosc": "Z",
+      "example": "2026-11-21T14:05:00"
+    },
+    {
+      "name": "rola",
+      "type": "string",
+      "description": "Słownik rola (z kluczem organizacji rola jest potwierdzana)",
+      "x-wymagalnosc": "Z",
+      "constraints": {
+        "enum": [
+          "obywatel",
+          "dysponent",
+          "serwis",
+          "zrm",
+          "dyspozytor",
+          "sluzby"
+        ]
+      },
+      "example": "serwis"
+    },
+    {
+      "name": "problemy",
+      "type": "string",
+      "description": "Lista oddzielona | ze słownika problemy",
+      "x-wymagalnosc": "O",
+      "example": "niski_poziom_baterii"
+    },
+    {
+      "name": "opis",
+      "type": "string",
+      "description": "Opis – bez danych osobowych",
+      "x-wymagalnosc": "O",
+      "example": "Wymiana elektrod i baterii"
+    },
+    {
+      "name": "data_przegladu",
+      "type": "date",
+      "description": "Data przeglądu serwisowego",
+      "x-wymagalnosc": "O",
+      "example": "2026-11-21"
+    },
+    {
+      "name": "data_waznosci_elektrod",
+      "type": "date",
+      "description": "Nowa data ważności elektrod",
+      "x-wymagalnosc": "O",
+      "example": "2028-11-30"
+    },
+    {
+      "name": "data_waznosci_baterii",
+      "type": "date",
+      "description": "Nowa data ważności baterii",
+      "x-wymagalnosc": "O",
+      "example": "2030-11-30"
+    },
+    {
+      "name": "numer_protokolu",
+      "type": "string",
+      "description": "Numer protokołu serwisowego",
+      "x-wymagalnosc": "O",
+      "example": "SRV/2026/1188"
+    },
+    {
+      "name": "numer_zdarzenia",
+      "type": "string",
+      "description": "Numer zdarzenia CPR/SWD PRM (bez danych pacjenta)",
+      "x-wymagalnosc": "O",
+      "example": "CPR-2026-112-000123"
+    },
+    {
+      "name": "przewidywany_powrot",
+      "type": "date",
+      "description": "Dla w_serwisie: kiedy AED wróci",
+      "x-wymagalnosc": "O",
+      "example": "2026-11-28"
+    }
+  ],
+  "missingValues": [
+    ""
+  ]
+}

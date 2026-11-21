@@ -1,0 +1,80 @@
+{
+  "wersja": "1.0",
+  "opis": "Mapowanie pliku placówek Banku Przykład na wzorzec AED (PRZYKŁAD – dane fikcyjne)",
+  "kolumny": {
+    "id_zrodlowe": {
+      "z": "Kod placówki"
+    },
+    "nazwa_lokalizacji": {
+      "z": "Nazwa placówki"
+    },
+    "cecha_ulicy": {
+      "z": "Adres",
+      "regex": "^(ul\\.|al\\.|pl\\.)",
+      "mapa": {
+        "*": "ul."
+      }
+    },
+    "nazwa_ulicy": {
+      "z": "Adres",
+      "regex": "^(?:ul\\.|al\\.|pl\\.)?\\s*(.+?)\\s+\\d"
+    },
+    "numer_budynku": {
+      "z": "Adres",
+      "regex": "(\\d+[A-Za-z]?)\\s*$"
+    },
+    "kod_pocztowy": {
+      "z": "Kod"
+    },
+    "miejscowosc": {
+      "z": "Miasto"
+    },
+    "szerokosc_geograficzna": {
+      "z": "Lat"
+    },
+    "dlugosc_geograficzna": {
+      "z": "Lng"
+    },
+    "dostepny_24_7": {
+      "z": "Całodobowo"
+    },
+    "godziny_dostepnosci": {
+      "z": "Godziny otwarcia"
+    },
+    "opis_lokalizacji": {
+      "z": "Gdzie AED"
+    },
+    "typ_dostepu": {
+      "z": "Dostęp dla klientów",
+      "mapa": {
+        "TAK": "ograniczony",
+        "NIE": "prywatny"
+      }
+    },
+    "wewnatrz_budynku": {
+      "stala": "true"
+    },
+    "zabezpieczenie": {
+      "stala": "szafka_z_alarmem"
+    },
+    "status_urzadzenia": {
+      "stala": "sprawny"
+    },
+    "dysponent_nazwa": {
+      "stala": "Bank Przykład S.A."
+    },
+    "zrodlo_danych": {
+      "stala": "dysponent"
+    },
+    "poziom_weryfikacji": {
+      "stala": "zweryfikowany_przez_dysponenta"
+    },
+    "data_weryfikacji": {
+      "stala": "2026-11-20"
+    },
+    "uwagi": {
+      "stala": "PRZYKŁAD – dane fikcyjne"
+    }
+  },
+  "organizacja_id": "bank-przyklad"
+}

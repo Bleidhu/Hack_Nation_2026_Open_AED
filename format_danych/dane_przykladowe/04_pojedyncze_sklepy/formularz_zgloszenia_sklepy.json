@@ -1,0 +1,82 @@
+{
+  "formularz": "Dodaj swoje AED – wersja 1 (PRZYKŁAD)",
+  "eksport": "2026-11-21T07:00:00+01:00",
+  "uwagi": "PRZYKŁAD – dane fikcyjne",
+  "zgloszenia": [
+    {
+      "id_zgloszenia": "F-2026-0042",
+      "wyslano": "2026-11-18T19:22:31+01:00",
+      "sklep": {
+        "firma": "Apteka Pod Przykładem s.c.",
+        "nazwa": "Apteka Pod Przykładem",
+        "adres_tekst": "ul. Długa 20, 31-146 Kraków",
+        "link_mapy": "https://www.openstreetmap.org/?mlat=50.07030&mlon=19.93750#map=19/50.07030/19.93750"
+      },
+      "aed": {
+        "gdzie": "za ladą, na ścianie obok kasy",
+        "godziny_tekst": "pn-pt 8-20, sob 9-14",
+        "zamkniety": true,
+        "kto_ma_klucz": "farmaceuta na zmianie",
+        "dziala": "tak",
+        "model": "nie wiem"
+      },
+      "kontakt": {
+        "imie_nazwisko": "Jan Przykładowy",
+        "telefon": "600 000 001",
+        "email": "apteka@przyklad.example"
+      },
+      "zgoda_licencja_cc0": true,
+      "zdjecie_dolaczone": true
+    },
+    {
+      "id_zgloszenia": "F-2026-0043",
+      "wyslano": "2026-11-19T06:05:12+01:00",
+      "sklep": {
+        "firma": "Piekarnia Przykład Sp. z o.o.",
+        "nazwa": "Piekarnia Przykład",
+        "adres_tekst": "Kalwaryjska 40 30-504 Kraków",
+        "link_mapy": "https://www.google.com/maps/place/@50.04501,19.94812,19z"
+      },
+      "aed": {
+        "gdzie": "przy wejściu, biała szafka",
+        "godziny_tekst": "pon.-sob. 6:00-18:00",
+        "zamkniety": false,
+        "kto_ma_klucz": "",
+        "dziala": "nie wiem",
+        "model": ""
+      },
+      "kontakt": {
+        "imie_nazwisko": "Anna Przykład",
+        "telefon": "+48 600 000 002",
+        "email": ""
+      },
+      "zgoda_licencja_cc0": true,
+      "zdjecie_dolaczone": false
+    },
+    {
+      "id_zgloszenia": "F-2026-0044",
+      "wyslano": "2026-11-20T23:48:00+01:00",
+      "sklep": {
+        "firma": "Stacja Paliw Przykład",
+        "nazwa": "Stacja paliw Przykład – Konopnickiej",
+        "adres_tekst": "ul. Konopnickiej 100, 30-302 Kraków",
+        "link_mapy": "https://www.openstreetmap.org/?mlat=50.03100&mlon=19.93000"
+      },
+      "aed": {
+        "gdzie": "wewnątrz, przy kasie",
+        "godziny_tekst": "całą dobę",
+        "zamkniety": false,
+        "kto_ma_klucz": "",
+        "dziala": "tak",
+        "model": "ZOLL AED Plus"
+      },
+      "kontakt": {
+        "imie_nazwisko": "Piotr Przykładny",
+        "telefon": "600 000 003",
+        "email": ""
+      },
+      "zgoda_licencja_cc0": false,
+      "zdjecie_dolaczone": false
+    }
+  ]
+}

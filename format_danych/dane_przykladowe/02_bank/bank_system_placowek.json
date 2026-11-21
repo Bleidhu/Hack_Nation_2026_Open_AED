@@ -1,0 +1,138 @@
+{
+  "system": "FM-Placówki v4 (PRZYKŁAD)",
+  "wygenerowano": "2026-11-20T23:00:00+01:00",
+  "organizacja": {
+    "nazwa": "Bank Przykład S.A.",
+    "organizacja_id": "bank-przyklad"
+  },
+  "uwagi": "PRZYKŁAD – dane fikcyjne",
+  "placowki": [
+    {
+      "kod": "KR-001",
+      "nazwa": "Oddział Kraków Rynek",
+      "adres": {
+        "ulica": "Rynek Główny",
+        "nr": "30",
+        "kod": "31-010",
+        "miasto": "Kraków"
+      },
+      "geo": {
+        "lat": 50.06155,
+        "lng": 19.9381
+      },
+      "godziny": {
+        "pn": "09:00-17:00",
+        "wt": "09:00-17:00",
+        "sr": "09:00-17:00",
+        "cz": "09:00-17:00",
+        "pt": "09:00-17:00",
+        "sb": null,
+        "nd": null
+      },
+      "urzadzenia": [
+        {
+          "nr_inwentarzowy": "AED-KR-001-1",
+          "producent": "Philips",
+          "model": "HeartStart FRx",
+          "nr_seryjny": "PRZ-FRX-0001",
+          "lokalizacja": "hol kasowy, przy wejściu, szafka z alarmem",
+          "dla_klientow": true,
+          "szafka": "alarm",
+          "elektrody_waznosc": "2027-03",
+          "bateria_waznosc": "2029-01",
+          "przeglad": "2026-10-05",
+          "elektrody_dzieciece": false
+        }
+      ]
+    },
+    {
+      "kod": "KR-002",
+      "nazwa": "Centrum Biznesowe Kraków Pawia",
+      "adres": {
+        "ulica": "ul. Pawia",
+        "nr": "5",
+        "kod": "31-154",
+        "miasto": "Kraków"
+      },
+      "geo": {
+        "lat": 50.0669,
+        "lng": 19.9439
+      },
+      "godziny": {
+        "pn": "08:00-19:00",
+        "wt": "08:00-19:00",
+        "sr": "08:00-19:00",
+        "cz": "08:00-19:00",
+        "pt": "08:00-19:00",
+        "sb": "09:00-14:00",
+        "nd": null
+      },
+      "urzadzenia": [
+        {
+          "nr_inwentarzowy": "AED-KR-002-1",
+          "producent": "ZOLL",
+          "model": "AED Plus",
+          "nr_seryjny": "PRZ-ZOLL-0002",
+          "lokalizacja": "parter, recepcja",
+          "dla_klientow": true,
+          "szafka": "alarm",
+          "elektrody_waznosc": "2028-06",
+          "bateria_waznosc": "2030-02",
+          "przeglad": "2026-09-12",
+          "elektrody_dzieciece": true
+        },
+        {
+          "nr_inwentarzowy": "AED-KR-002-2",
+          "producent": "ZOLL",
+          "model": "AED Plus",
+          "nr_seryjny": "PRZ-ZOLL-0003",
+          "lokalizacja": "3 piętro, strefa biurowa (tylko pracownicy)",
+          "dla_klientow": false,
+          "szafka": "brak",
+          "elektrody_waznosc": "2028-06",
+          "bateria_waznosc": "2030-02",
+          "przeglad": "2026-09-12",
+          "elektrody_dzieciece": false
+        }
+      ]
+    },
+    {
+      "kod": "KR-003",
+      "nazwa": "Oddział Kraków Nowa Huta",
+      "adres": {
+        "ulica": "os. Centrum B",
+        "nr": "1",
+        "kod": "31-927",
+        "miasto": "Kraków"
+      },
+      "geo": {
+        "lat": 50.0717,
+        "lng": 20.0378
+      },
+      "godziny": {
+        "pn": "09:00-16:00",
+        "wt": "09:00-16:00",
+        "sr": "09:00-16:00",
+        "cz": "09:00-16:00",
+        "pt": "09:00-16:00",
+        "sb": null,
+        "nd": null
+      },
+      "urzadzenia": [
+        {
+          "nr_inwentarzowy": "AED-KR-003-1",
+          "producent": "Philips",
+          "model": "HeartStart HS1",
+          "nr_seryjny": "PRZ-HS1-0004",
+          "lokalizacja": "sala obsługi klienta, za stanowiskiem kasy",
+          "dla_klientow": true,
+          "szafka": "brak",
+          "elektrody_waznosc": "2026-10",
+          "bateria_waznosc": "2028-04",
+          "przeglad": "2025-10-01",
+          "elektrody_dzieciece": false
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,141 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              17.93,
+              53.1
+            ],
+            [
+              18.12,
+              53.1
+            ],
+            [
+              18.12,
+              53.17
+            ],
+            [
+              17.93,
+              53.17
+            ],
+            [
+              17.93,
+              53.1
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "id_obszaru": "PL-AEDO-00001",
+        "nazwa_obszaru": "Tramwaje MZK Przykład – cała sieć",
+        "typ_obszaru": "flota_pojazdow",
+        "organizacja_id": "mzk-przyklad",
+        "dysponent_nazwa": "Miejski Zakład Komunikacji Przykład",
+        "liczba_aed": "69",
+        "liczba_pojazdow": "120",
+        "bufor_m": "300",
+        "gtfs_url": "https://mzk-przyklad.example/gtfs.zip",
+        "gtfs_rt_url": "https://mzk-przyklad.example/VehiclePositions.pb",
+        "typy_pojazdow": "tramwaj",
+        "linie": "1|2|3|4|5|6|7|8|9|10",
+        "godziny_dostepnosci": "Mo-Su 05:00-23:30",
+        "jak_uzyskac_dostep": "Zatrzymaj tramwaj lub podejdź do kabiny motorniczego – AED przy kabinie, motorniczy wezwie 112",
+        "status_programu": "w_realizacji",
+        "aktywny_od": "2026-12-01",
+        "telefon_kontaktowy": "523000000",
+        "strona_www": "https://mzk-przyklad.example/aed",
+        "zrodlo_danych": "dysponent",
+        "data_aktualizacji": "2026-11-21T10:00:00",
+        "uwagi": "PRZYKŁAD – dane fikcyjne"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            18.5,
+            54.8
+          ],
+          [
+            18.56,
+            54.79
+          ],
+          [
+            18.62,
+            54.78
+          ]
+        ]
+      },
+      "properties": {
+        "id_obszaru": "PL-AEDO-00002",
+        "nazwa_obszaru": "Patrol WOPR – plaża Przykładowo",
+        "typ_obszaru": "patrol_mobilny",
+        "dysponent_nazwa": "WOPR Przykład",
+        "liczba_aed": "2",
+        "bufor_m": "200",
+        "typy_pojazdow": "patrol_pieszy|lodz",
+        "godziny_dostepnosci": "Mo-Su 09:00-19:00",
+        "jak_uzyskac_dostep": "Wieże ratownicze 1 i 2 – AED u ratownika; dzwoń 601 100 100 lub 112",
+        "status_programu": "aktywny",
+        "aktywny_od": "2026-06-20",
+        "aktywny_do": "2026-08-31",
+        "telefon_kontaktowy": "601100100",
+        "zrodlo_danych": "dysponent",
+        "data_aktualizacji": "2026-11-21T10:00:00",
+        "uwagi": "PRZYKŁAD – dane fikcyjne – sezonowy"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              18.0,
+              53.12
+            ],
+            [
+              18.02,
+              53.12
+            ],
+            [
+              18.02,
+              53.13
+            ],
+            [
+              18.0,
+              53.13
+            ],
+            [
+              18.0,
+              53.12
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "id_obszaru": "PL-AEDO-00003",
+        "nazwa_obszaru": "Bieg Przykładowy 2026 – trasa i strefa startu",
+        "typ_obszaru": "wydarzenie",
+        "dysponent_nazwa": "Fundacja Bieg Przykład",
+        "liczba_aed": "6",
+        "typy_pojazdow": "rower|patrol_pieszy",
+        "jak_uzyskac_dostep": "Rowerowi ratownicy z AED co 2 km trasy; namiot medyczny przy starcie",
+        "status_programu": "planowany",
+        "aktywny_od": "2026-05-10",
+        "aktywny_do": "2026-05-10",
+        "zrodlo_danych": "dysponent",
+        "data_aktualizacji": "2026-11-21T10:00:00",
+        "uwagi": "PRZYKŁAD – dane fikcyjne"
+      }
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "id": "02_bank",
+  "nazwa": "Bank – sieć placówek",
+  "typ_dostawcy": "firma z wieloma lokalizacjami",
+  "przyklady_dostawcow": "banki, ubezpieczyciele, operatorzy telekomunikacyjni",
+  "kanal": "eksport z systemu zarządzania nieruchomościami (JSON) albo CSV",
+  "czestotliwosc": "co miesiąc (automatycznie)",
+  "licencja": "CC0-1.0",
+  "do_zbioru_krajowego": true,
+  "pliki": [
+    {
+      "plik": "bank_system_placowek.json",
+      "tabela": "punkty",
+      "mapowanie": "mapowanie_bank_system.json"
+    },
+    {
+      "plik": "firma_bank_placowki_wlasny_format.csv",
+      "tabela": "punkty",
+      "mapowanie": "mapowanie_bank_przyklad.json"
+    }
+  ],
+  "co_pokazuje": [
+    "zagnieżdżony JSON: placówka → kilka urządzeń (dwa AED w jednym budynku to dwa rekordy, nie duplikat)",
+    "godziny per dzień tygodnia → opening_hours",
+    "ważność elektrod jako rrrr-mm",
+    "AED tylko dla pracowników → typ prywatny, poza widokiem publicznym"
+  ]
+}

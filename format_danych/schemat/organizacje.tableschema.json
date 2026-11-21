@@ -1,0 +1,127 @@
+{
+  "name": "organizacje",
+  "title": "Organizacje (dysponenci, firmy) – logo i strona www",
+  "version": "1.0.0",
+  "fields": [
+    {
+      "name": "organizacja_id",
+      "type": "string",
+      "description": "Krótki identyfikator: małe litery, cyfry, '-'",
+      "x-wymagalnosc": "W",
+      "constraints": {
+        "required": true
+      },
+      "example": "bank-przyklad"
+    },
+    {
+      "name": "nazwa",
+      "type": "string",
+      "description": "Pełna nazwa organizacji",
+      "x-wymagalnosc": "W",
+      "constraints": {
+        "required": true
+      },
+      "example": "Bank Przykład S.A."
+    },
+    {
+      "name": "typ_organizacji",
+      "type": "string",
+      "description": "Słownik typ_organizacji",
+      "x-wymagalnosc": "W",
+      "constraints": {
+        "required": true,
+        "enum": [
+          "jst",
+          "administracja",
+          "firma",
+          "przewoznik",
+          "uczelnia",
+          "szkola",
+          "ngo",
+          "sluzby",
+          "inne"
+        ]
+      },
+      "example": "firma"
+    },
+    {
+      "name": "regon",
+      "type": "string",
+      "description": "REGON 9 lub 14 cyfr",
+      "x-wymagalnosc": "Z",
+      "example": "012345678"
+    },
+    {
+      "name": "nip",
+      "type": "string",
+      "description": "NIP 10 cyfr",
+      "x-wymagalnosc": "O",
+      "example": "5250000000"
+    },
+    {
+      "name": "strona_www",
+      "type": "string",
+      "description": "Strona organizacji (https)",
+      "x-wymagalnosc": "Z",
+      "example": "https://bank-przyklad.example"
+    },
+    {
+      "name": "logo_url",
+      "type": "string",
+      "description": "Logo: https, PNG lub SVG, min. 128 px, przezroczyste tło",
+      "x-wymagalnosc": "O",
+      "example": "https://bank-przyklad.example/logo.svg"
+    },
+    {
+      "name": "logo_alt",
+      "type": "string",
+      "description": "Tekst alternatywny logo (WCAG) – wymagany, gdy jest logo",
+      "x-wymagalnosc": "O",
+      "example": "Logo Banku Przykład"
+    },
+    {
+      "name": "email_kontaktowy",
+      "type": "string",
+      "description": "Kontakt instytucjonalny w sprawie AED",
+      "x-wymagalnosc": "Z",
+      "example": "aed@bank-przyklad.example"
+    },
+    {
+      "name": "telefon_kontaktowy",
+      "type": "string",
+      "description": "9 cyfr / +48…",
+      "x-wymagalnosc": "O",
+      "example": "225550000"
+    },
+    {
+      "name": "liczba_aed",
+      "type": "integer",
+      "description": "Deklarowana liczba AED (kontrola kompletności)",
+      "x-wymagalnosc": "O",
+      "example": "120"
+    },
+    {
+      "name": "licencja_danych",
+      "type": "string",
+      "description": "CC0-1.0 (zalecana) lub CC-BY-4.0",
+      "x-wymagalnosc": "W",
+      "constraints": {
+        "required": true,
+        "enum": [
+          "CC0-1.0",
+          "CC-BY-4.0"
+        ]
+      },
+      "example": "CC0-1.0"
+    },
+    {
+      "name": "uwagi",
+      "type": "string",
+      "description": "Logo i nazwa są znakami towarowymi – nie podlegają licencji danych",
+      "x-wymagalnosc": "O"
+    }
+  ],
+  "missingValues": [
+    ""
+  ]
+}

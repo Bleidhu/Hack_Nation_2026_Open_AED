@@ -1,0 +1,23 @@
+{
+  "id": "05_male_instytucje",
+  "nazwa": "Małe instytucje publiczne (zestawienie gminy)",
+  "typ_dostawcy": "JST zbierająca dane od swoich jednostek",
+  "przyklady_dostawcow": "szkoły, przedszkola, OSP, biblioteki, kluby sportowe",
+  "kanal": "arkusz koordynatora gminy (tu jako JSON)",
+  "czestotliwosc": "co pół roku",
+  "licencja": "CC0-1.0",
+  "do_zbioru_krajowego": true,
+  "pliki": [
+    {
+      "plik": "jednostki_gminy_zbiorczo.json",
+      "tabela": "punkty",
+      "mapowanie": "mapowanie_gmina.json"
+    }
+  ],
+  "co_pokazuje": [
+    "przecinek dziesiętny, daty dd.mm.rrrr, elektrody mm/rrrr",
+    "AED w przedszkolu zamknięty na klucz",
+    "jednostka bez współrzędnych → odrzucona z podpowiedzią",
+    "kolumna z nazwiskiem osoby odpowiedzialnej pomijana (RODO)"
+  ]
+}

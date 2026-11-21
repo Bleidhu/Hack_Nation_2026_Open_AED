@@ -1,0 +1,130 @@
+{
+  "wersja": "1.0",
+  "opis": "System placówek Banku Przykład (zagnieżdżony JSON: placówka → lista urządzeń) → wzorzec. PRZYKŁAD – dane fikcyjne",
+  "organizacja_id": "bank-przyklad",
+  "wejscie": {
+    "format": "json",
+    "sciezka": "placowki",
+    "rozwin": "urzadzenia",
+    "opis": "Każde urządzenie z listy 'urzadzenia' staje się osobnym rekordem; pola placówki są kopiowane."
+  },
+  "przeksztalcenia": {
+    "__godziny": {
+      "funkcja": "godziny_z_dni",
+      "z": "godziny",
+      "opis": "{pn: '09:00-17:00', …} → 'Mo-Fr 09:00-17:00'"
+    },
+    "__elektrody": {
+      "funkcja": "miesiac_na_date",
+      "z": "urzadzenia.elektrody_waznosc",
+      "opis": "'2027-03' → '2027-03-31'"
+    },
+    "__bateria": {
+      "funkcja": "miesiac_na_date",
+      "z": "urzadzenia.bateria_waznosc"
+    },
+    "__data_eksportu": {
+      "funkcja": "data_z_czasu",
+      "z": "^wygenerowano"
+    }
+  },
+  "nr_seryjny": {
+    "z": "urzadzenia.nr_seryjny"
+  },
+  "kolumny": {
+    "id_zrodlowe": {
+      "z": "urzadzenia.nr_inwentarzowy"
+    },
+    "nazwa_lokalizacji": {
+      "z": "nazwa"
+    },
+    "cecha_ulicy": {
+      "z": "adres.ulica",
+      "regex": "^(ul\\.|al\\.|os\\.|pl\\.|Rynek)",
+      "mapa": {
+        "Rynek": "rynek"
+      }
+    },
+    "nazwa_ulicy": {
+      "z": "adres.ulica",
+      "regex": "^(?:ul\\.|al\\.|os\\.|pl\\.)?\\s*(.+)$"
+    },
+    "numer_budynku": {
+      "z": "adres.nr"
+    },
+    "kod_pocztowy": {
+      "z": "adres.kod"
+    },
+    "miejscowosc": {
+      "z": "adres.miasto"
+    },
+    "szerokosc_geograficzna": {
+      "z": "geo.lat"
+    },
+    "dlugosc_geograficzna": {
+      "z": "geo.lng"
+    },
+    "opis_lokalizacji": {
+      "z": "urzadzenia.lokalizacja"
+    },
+    "wewnatrz_budynku": {
+      "stala": "true"
+    },
+    "typ_dostepu": {
+      "z": "urzadzenia.dla_klientow",
+      "mapa": {
+        "true": "ograniczony",
+        "false": "prywatny"
+      }
+    },
+    "dostepny_24_7": {
+      "stala": "false"
+    },
+    "godziny_dostepnosci": {
+      "z": "__godziny"
+    },
+    "zabezpieczenie": {
+      "z": "urzadzenia.szafka",
+      "mapa": {
+        "alarm": "szafka_z_alarmem",
+        "brak": "brak"
+      }
+    },
+    "status_urzadzenia": {
+      "stala": "sprawny"
+    },
+    "producent": {
+      "z": "urzadzenia.producent"
+    },
+    "model": {
+      "z": "urzadzenia.model"
+    },
+    "elektrody_pediatryczne": {
+      "z": "urzadzenia.elektrody_dzieciece"
+    },
+    "data_waznosci_elektrod": {
+      "z": "__elektrody"
+    },
+    "data_waznosci_baterii": {
+      "z": "__bateria"
+    },
+    "data_ostatniego_przegladu": {
+      "z": "urzadzenia.przeglad"
+    },
+    "dysponent_nazwa": {
+      "z": "^organizacja.nazwa"
+    },
+    "zrodlo_danych": {
+      "stala": "dysponent"
+    },
+    "poziom_weryfikacji": {
+      "stala": "zweryfikowany_przez_dysponenta"
+    },
+    "data_weryfikacji": {
+      "z": "__data_eksportu"
+    },
+    "uwagi": {
+      "z": "^uwagi"
+    }
+  }
+}

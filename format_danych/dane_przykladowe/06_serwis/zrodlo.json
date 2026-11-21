@@ -1,0 +1,31 @@
+{
+  "id": "06_serwis",
+  "nazwa": "Firma serwisująca i telemetria producenta",
+  "typ_dostawcy": "serwis / producent",
+  "przyklady_dostawcow": "autoryzowane serwisy AED, platformy zdalnego monitoringu producentów",
+  "kanal": "API (klucz serwisu) lub CSV aktualizacji",
+  "czestotliwosc": "po każdym przeglądzie; telemetria codziennie",
+  "licencja": "CC0-1.0",
+  "do_zbioru_krajowego": true,
+  "pliki": [
+    {
+      "plik": "protokoly_przegladow.json",
+      "tabela": "aktualizacje",
+      "adapter": "protokoly_serwisu"
+    },
+    {
+      "plik": "telemetria_producenta.json",
+      "tabela": "aktualizacje",
+      "adapter": "telemetria"
+    },
+    {
+      "plik": "aktualizacje_serwis_przyklad.csv",
+      "tabela": "aktualizacje"
+    }
+  ],
+  "co_pokazuje": [
+    "urządzenie rozpoznawane po numerze seryjnym (nie po adresie)",
+    "autotest z błędem baterii → AED niesprawny bez czekania na przegląd",
+    "protokół dla nieznanego urządzenia → kolejka do wyjaśnienia"
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "id": "01_integrator_osm",
+  "nazwa": "Duży integrator: OpenStreetMap / OpenAEDMap",
+  "typ_dostawcy": "integrator (baza społecznościowa)",
+  "przyklady_dostawcow": "OpenStreetMap, OpenAEDMap (z nich korzysta CPR 112)",
+  "kanal": "Overpass API / GeoJSON OpenAEDMap",
+  "czestotliwosc": "codziennie",
+  "licencja": "ODbL-1.0",
+  "do_zbioru_krajowego": false,
+  "pliki": [
+    {
+      "plik": "osm_overpass_krakow.json",
+      "tabela": "punkty",
+      "mapowanie": "mapowanie_osm.json"
+    },
+    {
+      "plik": "osm_przyklad.geojson",
+      "tabela": "punkty",
+      "mapowanie": "mapowanie_osm.json"
+    }
+  ],
+  "co_pokazuje": [
+    "licencja ODbL – rekordy tylko do porównania, nie do zbioru CC0",
+    "brak adresu, stanu i daty weryfikacji",
+    "punkty, których nie ma nigdzie indziej → kandydaci do weryfikacji"
+  ]
+}

@@ -1,0 +1,79 @@
+{
+  "$comment": "PRZYKŁAD – jeden AED znaleziony w 3 źródłach. Agregator wybiera rekord referencyjny i zachowuje ślad pochodzenia (provenance).",
+  "id_aed": "PL-AED-0000002",
+  "rekord_referencyjny": {
+    "zrodlo_danych": "dysponent",
+    "id_zrodlowe": "UM-RYN-1",
+    "zrodlo_url": "https://dane.gov.pl/pl/dataset/PRZYKLAD"
+  },
+  "regula_wyboru": "1) priorytet źródła (dysponent > rejestr_publiczny > baza_zewnetrzna > openstreetmap > zgloszenie_obywatelskie); 2) przy remisie nowsza data_weryfikacji; 3) przy remisie wyższa kompletność pól W+Z",
+  "wiarygodnosc": {
+    "wynik": 92,
+    "skala": "0–100",
+    "skladowe": {
+      "priorytet_zrodla": {
+        "waga": 40,
+        "punkty": 40,
+        "opis": "dysponent"
+      },
+      "poziom_weryfikacji": {
+        "waga": 25,
+        "punkty": 25,
+        "opis": "zweryfikowany_w_terenie"
+      },
+      "swiezosc": {
+        "waga": 20,
+        "punkty": 19,
+        "opis": "11 dni od weryfikacji (pełne punkty do 30 dni, 0 po 365 dniach)"
+      },
+      "kompletnosc": {
+        "waga": 15,
+        "punkty": 8,
+        "opis": "uzupełnione 16 z 30 pól W+Z"
+      }
+    }
+  },
+  "gotowosc": {
+    "$comment": "Wyliczane w API w chwili zapytania – odpowiedź na 3 pytania z zadania",
+    "gdzie": "Na zewnątrz, elewacja przy drzwiach głównych, podświetlana szafka",
+    "czy_dostepny_teraz": true,
+    "czy_dziala": "sprawny (zweryfikowano 2026-11-10; elektrody ważne do 2028-01-31)",
+    "etykieta": "GOTOWY"
+  },
+  "zrodla": [
+    {
+      "zrodlo_danych": "dysponent",
+      "id_zrodlowe": "UM-RYN-1",
+      "odleglosc_m": 0.0,
+      "data_weryfikacji": "2026-11-10",
+      "referencyjny": true,
+      "licencja": "CC0 1.0"
+    },
+    {
+      "zrodlo_danych": "openstreetmap",
+      "id_zrodlowe": "node/0000000002",
+      "odleglosc_m": 6.4,
+      "data_weryfikacji": "2023-04-03",
+      "referencyjny": false,
+      "licencja": "ODbL 1.0",
+      "uwaga": "Tylko do porównania – atrybuty OSM nie są kopiowane do zbioru CC0"
+    },
+    {
+      "zrodlo_danych": "zgloszenie_obywatelskie",
+      "id_zrodlowe": "ZGL-2026-000123",
+      "odleglosc_m": 11.9,
+      "data_weryfikacji": "2026-11-19",
+      "referencyjny": false,
+      "licencja": "CC0 1.0",
+      "uwaga": "Zgłoszenie 'szafka podświetlona, działa' – potwierdza rekord, nie nadpisuje go"
+    }
+  ],
+  "konflikty": [
+    {
+      "pole": "godziny_dostepnosci",
+      "dysponent": "(24/7)",
+      "openstreetmap": "Mo-Fr 08:00-16:00",
+      "rozstrzygniecie": "wartość dysponenta; różnica zgłoszona do weryfikacji w OSM"
+    }
+  ]
+}
