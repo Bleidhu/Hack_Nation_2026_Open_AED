@@ -28,6 +28,7 @@ ______________________________________________________________________
 - Dodano zadanie `create_main_aed_resource_task` do eksportów `mcod.resources.tasks` - AED-07
 - Zarejestrowano schemat `AggregatedAEDInfo` i ścieżkę `/aed-aggregated` w specyfikacji OpenAPI - AED-08
 - Dodano serializer `AggregatedAEDInfoApiResponse`, widok `AggregatedAEDInfoView` i trasę `/aed-aggregated` - AED-08
+- Dodano podpowiedź (help_text) przy polu „Pola niestandardowe” formularza zbioru opisującą oznaczenie zbioru do Wykazu AED (`standard` = `AED`) - AED-09
 
 ### Fixes
 

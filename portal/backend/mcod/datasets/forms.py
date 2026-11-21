@@ -81,6 +81,13 @@ class DatasetForm(ModelFormWithKeywords, HighValueDataFormValidatorMixin):
         label=_("Customfields"),
         widget=JsonPairDatasetInputs(val_attrs={"size": 35}, key_attrs={"class": "large"}),
         required=False,
+        help_text=(
+            "Wykaz AED: aby zasoby tego zbioru trafiły do krajowego Wykazu AED, dodaj pole "
+            "o nazwie <b>standard</b> i wartości <b>AED</b>. Zasoby muszą być plikami CSV lub XLSX "
+            "z kolumnami wzorcowego zakresu danych AED (co najmniej: nazwa_lokalizacji, miejscowosc, "
+            "szerokosc_geograficzna, dlugosc_geograficzna). Zbiór musi mieć licencję CC0 1.0 lub CC BY 4.0. "
+            "Kontakty podawaj wyłącznie instytucjonalne."
+        ),
     )
 
     status = forms.ChoiceField(
