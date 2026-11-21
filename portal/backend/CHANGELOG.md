@@ -16,11 +16,15 @@ ______________________________________________________________________
 - Dodano ustawienia `MAIN_AED_*` (właściciel, tytuły i opisy zbioru oraz zasobu zbiorczego AED, katalog plików CSV) - AED-05
 - Dodano tworzenie zbioru i zasobu zbiorczego Wykazu AED (CSV, licencja CC BY 4.0, schemat z mapowaniem mapy b/l/label, rozpoznawanie po polach niestandardowych bez nowego modelu) - AED-06
 - Dodano testy `test_main_aed_resource` - AED-06
+- Dodano zadanie Celery `create_main_aed_resource_task` budujące codziennie zasób zbiorczy Wykazu AED - AED-07
+- Dodano komendę `create_main_aed_resource` (opcje `--eager`, `--dry-run`) do ręcznego budowania Wykazu AED - AED-07
 
 ### Changes
 
 - Zarejestrowano fikstury testowe `aed` w `mcod/core/tests/fixtures/__init__.py` - AED-04
 - Dodano trasę kolejki `resources` dla zadania `create_main_aed_resource_task` - AED-05
+- Dodano do harmonogramu Celery Beat wpis `aed_main_resource_creation` (codziennie 4:15, tylko gdy `AED_AGGREGATION_ENABLED`) - AED-07
+- Dodano zadanie `create_main_aed_resource_task` do eksportów `mcod.resources.tasks` - AED-07
 
 ### Fixes
 

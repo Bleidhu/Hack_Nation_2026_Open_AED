@@ -47,7 +47,10 @@ def update_beat_schedule(beat_schedule_to_update: dict, update_data: str) -> boo
 
 
 def get_beat_schedule(
-    enable_monthly_reports: bool, enable_create_xml_metadata_report: bool, update_beat_schedule_data: str = ""
+    enable_monthly_reports: bool,
+    enable_create_xml_metadata_report: bool,
+    update_beat_schedule_data: str = "",
+    enable_aed_aggregation: bool = False,
 ) -> dict:
     """Create a schedule for Celery Beat, with monthly reports
     if `enable_monthly_reports` is `True`.
@@ -165,6 +168,17 @@ def get_beat_schedule(
             }
         )
 
+    if enable_aed_aggregation:
+        beat_schedule.update(
+            {
+                "aed_main_resource_creation": {
+                    "task": "mcod.resources.tasks.create_main_aed_resource_task",
+                    "options": default_options,
+                    "schedule": crontab(minute=15, hour=4),
+                },
+            }
+        )
+
     if update_beat_schedule_data:
         update_beat_schedule(beat_schedule, update_beat_schedule_data)
 
@@ -175,4 +189,5 @@ app.conf.beat_schedule = get_beat_schedule(
     enable_monthly_reports=settings.ENABLE_MONTHLY_REPORTS,
     enable_create_xml_metadata_report=settings.ENABLE_CREATE_XML_METADATA_REPORT,
     update_beat_schedule_data=settings.UPDATE_TASKS_CELERY_BEAT_TIME,
+    enable_aed_aggregation=settings.AED_AGGREGATION_ENABLED,
 )
