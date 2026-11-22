@@ -124,4 +124,6 @@ Dodaliśmy do portalu **Wykaz AED**, czyli nocny zasób zbiorczy zbudowany na wz
 - **Akcja „Dane (prze)życie”:** [`branding/`](branding/README.md): logotyp, księga znaku, opis akcji.
 - **Prezentacja:** [`prezentacja/`](prezentacja/README.md).
 - **Integrator** dla dostawców bez wzorcowego formatu (dodatek): [`integrator/`](integrator/README.md).
+  - Integrator jest **osobną aplikacją poza `portal/`**: mapa kolumn na wzorzec v2, normalizacja, walidacja, kandydaci na duplikaty, porównanie z OSM, adaptery Warszawy i Gdańska, lokalne UI. Wynik wchodzi do portalu zwykłym zasobem typu „link”, więc w `portal/` nie przybyło przez niego ani jednej linii kodu ani żadnej migracji (faza 2 integratora nie zmienia `portal/`; jedyna rozważana zmiana, schemat źródła wg Table Schema, została świadomie odłożona).
+  - Przykładowe wyniki na realnych plikach z dane.gov.pl: [`demo/integrator/`](demo/integrator/README.md) (generuje je jedno polecenie, `python integrator/generuj_demo.py`).
 - **Instrukcja dla jury:** [`INSTRUKCJA_DLA_JURY.md`](INSTRUKCJA_DLA_JURY.md).

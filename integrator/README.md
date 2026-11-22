@@ -50,12 +50,13 @@ nocne zadanie portalu (krok 1) → krajowy zasób zbiorczy AED
   Serwer nasłuchuje tylko na 127.0.0.1, używa wyłącznie `rdzen/` i **nie zapisuje nic na dysku** –
   wyniki (CSV po dopisaniu, CSV wynikowy importu) przeglądarka pobiera jako plik.
 - `openapi.yaml`: szkic API integratora z poprzedniego demonstratora (import, aktualizacje stanu, organizacje, AED obszarowe). Traktuj go jako propozycję, a nie działającą usługę w tym repo.
+- **Demo offline:** `python integrator/generuj_demo.py` zapisuje do [`../demo/integrator/`](../demo/integrator/README.md) przykładowe wyniki na realnych plikach z `references/dane_gov_pl_aed/`: CSV v2 z odpowiedzi API Warszawy, raporty walidacji, duplikatów i porównania z OSM oraz statystykę Gdańska.
 
 Przykładowe pliki dostawców wraz z mapowaniami są w `dane_przykladowe/` (bank, sieć sklepów, OSM, gmina, przewoźnik, kolej, serwis, ZRM). Adaptery Warszawy i Gdańska czytają realne pliki z `../references/dane_gov_pl_aed/` (odpowiedź API Warszawy, baza pojazdów ZTM Gdańska) – oba źródła nie dają dziś tabeli w portalu.
 
-> **Stan: wzorzec v1.** Integrator, próbki, `schemat/` (tabele obszarowe, organizacji, aktualizacji, mapowania), `szablony/`, `narzedzia/` (generatory v1) i opis `FORMAT_V1.md` pochodzą sprzed decyzji o wzorcu v2 (`../docs/06_DECYZJE_STRUKTURA_DANYCH_AED.md`). Importer czyta zamrożoną kopię wzorca v1 z `wzorzec_v1/`. Generatory v1 w `narzedzia/` mają ścieżki starego układu i nie są uruchamiane. Przepięcie na v2 (41 kolumn, bez `id_aed`) należy do kroku 2.
+> **Archiwum v1.** Pliki z wersji przed wzorcem v2 (`wzorzec_v1/`, próbki v1 w `dane_przykladowe/00_format_v1/`, `schemat/`, `szablony/`, `narzedzia/`, `FORMAT_V1.md`) są opisane w `ARCHIWUM_V1.md` i pozostają w repo. Importer działa na wzorcu v2 (`../format_danych/`).
 
-> **Faza 2 (w toku):** plan w `../.scratch/integrator-faza2/`. Pliki v1 są opisane w `ARCHIWUM_V1.md` (nic nie usuwamy). Układ docelowy: `rdzen/` (czyste funkcje), `adaptery/`, `ui/`, `testy/`; `importer.py` zostaje cienką powłoką CLI. Cel: przepięcie na wzorzec v2 (`../format_danych/`).
+> **Faza 2 (zakończona):** plan i decyzje w `../.scratch/integrator-faza2/` (12 zadań, zadania 01–09, 11 i 12 wykonane; 10, czyli schemat źródła wg wzorca w portalu, świadomie odłożone). Importer jest cienką powłoką CLI nad `rdzen/` (czyste funkcje), `adaptery/` (OSM, Warszawa, Gdańsk), `ui/` i `testy/` (87 testów, bez Dockera).
 
 ## Zasady
 

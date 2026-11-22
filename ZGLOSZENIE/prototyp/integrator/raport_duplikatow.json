@@ -1,0 +1,40 @@
+{
+  "promien_m": 25.0,
+  "prog_podobienstwa": 0.6,
+  "liczba_wierszy": 8,
+  "wiersze_ze_wspolrzednymi": 8,
+  "pary": [
+    {
+      "indeks_a": 2,
+      "indeks_b": 3,
+      "pochodzenie_a": {
+        "wiersz": 4,
+        "zrodlo_danych": "dysponent",
+        "id_zrodlowe": "SP99-1",
+        "dysponent_nazwa": "Szkoła Podstawowa nr 99 (przykład)"
+      },
+      "pochodzenie_b": {
+        "wiersz": 5,
+        "zrodlo_danych": "dysponent",
+        "id_zrodlowe": "SP99-2",
+        "dysponent_nazwa": "Szkoła Podstawowa nr 99 (przykład)"
+      },
+      "odleglosc_m": 0.0,
+      "podobienstwo": 0.46,
+      "przyczyna": "ta_sama_instytucja",
+      "pewnosc": "maloprawdopodobny",
+      "powody_niskiej_pewnosci": [
+        "różna kondygnacja",
+        "podobieństwo 0.46 < 0.6"
+      ]
+    }
+  ],
+  "podsumowanie": {
+    "kandydaci": 1,
+    "prawdopodobne": 0,
+    "maloprawdopodobne": 1,
+    "ta_sama_instytucja": 1,
+    "rozne_instytucje": 0
+  },
+  "uwaga": "Raport tylko flaguje kandydatów na duplikaty; niczego nie scala i nie usuwa."
+}

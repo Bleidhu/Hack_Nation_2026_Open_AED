@@ -1,0 +1,347 @@
+{
+  "oznaczenie": "Raport zawiera dane z OpenStreetMap (ODbL): tylko do użytku lokalnego, nie do publikacji w portalu jako CC0 / CC BY.",
+  "promien_m": 25.0,
+  "prog_podobienstwa": 0.6,
+  "podsumowanie": {
+    "wiersze_wykazu": 32,
+    "wiersze_osm": 6,
+    "w_obu": 0,
+    "tylko_w_wykazie": 32,
+    "tylko_w_osm": 6,
+    "pary_do_sprawdzenia": 0,
+    "bez_wspolrzednych": {
+      "wykaz": 0,
+      "osm": 0
+    }
+  },
+  "w_obu": [],
+  "tylko_w_wykazie": [
+    {
+      "wiersz": 1,
+      "id_aed": "PL-AED-d45e0fc80679",
+      "id_zrodlowe": "",
+      "nazwa_lokalizacji": "Urząd Miasta Legionowo",
+      "szerokosc_geograficzna": "52.395198",
+      "dlugosc_geograficzna": "20.931382",
+      "zrodlo_danych": ""
+    },
+    {
+      "wiersz": 2,
+      "id_aed": "PL-AED-d81356444e3a",
+      "id_zrodlowe": "",
+      "nazwa_lokalizacji": "Starostwo Powiatowe",
+      "szerokosc_geograficzna": "52.421807",
+      "dlugosc_geograficzna": "20.939056",
+      "zrodlo_danych": ""
+    },
+    {
+      "wiersz": 3,
+      "id_aed": "PL-AED-47e35c046341",
+      "id_zrodlowe": "",
+      "nazwa_lokalizacji": "Arena Legionowo",
+      "szerokosc_geograficzna": "52.400177",
+      "dlugosc_geograficzna": "20.917295",
+      "zrodlo_danych": ""
+    },
+    {
+      "wiersz": 4,
+      "id_aed": "PL-AED-def67746a5f3",
+      "id_zrodlowe": "",
+      "nazwa_lokalizacji": "Centrum Komunikacyjne",
+      "szerokosc_geograficzna": "52.401135",
+      "dlugosc_geograficzna": "20.940969",
+      "zrodlo_danych": ""
+    },
+    {
+      "wiersz": 5,
+      "id_aed": "PL-AED-8ddf99a29bfb",
+      "id_zrodlowe": "",
+      "nazwa_lokalizacji": "Komenda Powiatowa Państwowej Straży Pożarnej",
+      "szerokosc_geograficzna": "52.408839",
+      "dlugosc_geograficzna": "20.916510",
+      "zrodlo_danych": ""
+    },
+    {
+      "wiersz": 6,
+      "id_aed": "PL-AED-6c40811fdcc3",
+      "id_zrodlowe": "",
+      "nazwa_lokalizacji": "Ochotnicza Straż Pożarna",
+      "szerokosc_geograficzna": "52.403239",
+      "dlugosc_geograficzna": "20.930048",
+      "zrodlo_danych": ""
+    },
+    {
+      "wiersz": 7,
+      "id_aed": "PL-AED-41b679a60cad",
+      "id_zrodlowe": "",
+      "nazwa_lokalizacji": "Komenda Powiatowa Policji",
+      "szerokosc_geograficzna": "52.402691",
+      "dlugosc_geograficzna": "20.927850",
+      "zrodlo_danych": ""
+    },
+    {
+      "wiersz": 8,
+      "id_aed": "PL-AED-ba6143fa72e2",
+      "id_zrodlowe": "",
+      "nazwa_lokalizacji": "Straż Miejska",
+      "szerokosc_geograficzna": "52.402691",
+      "dlugosc_geograficzna": "20.927850",
+      "zrodlo_danych": ""
+    },
+    {
+      "wiersz": 9,
+      "id_aed": "PL-AED-5cb9ed292078",
+      "id_zrodlowe": "",
+      "nazwa_lokalizacji": "Centrum Szkolenia Policji",
+      "szerokosc_geograficzna": "52.414488",
+      "dlugosc_geograficzna": "20.952687",
+      "zrodlo_danych": ""
+    },
+    {
+      "wiersz": 10,
+      "id_aed": "PL-AED-b52fb0ac7a78",
+      "id_zrodlowe": "",
+      "nazwa_lokalizacji": "Pływalnia \"Wodne Piaski\"",
+      "szerokosc_geograficzna": "52.410412",
+      "dlugosc_geograficzna": "20.947626",
+      "zrodlo_danych": ""
+    },
+    {
+      "wiersz": 11,
+      "id_aed": "PL-AED-835a2ff64cdb",
+      "id_zrodlowe": "",
+      "nazwa_lokalizacji": "Zespół Szkolno-Przedszkolny nr 2",
+      "szerokosc_geograficzna": "52.405901",
+      "dlugosc_geograficzna": "20.918020",
+      "zrodlo_danych": ""
+    },
+    {
+      "wiersz": 12,
+      "id_aed": "PL-AED-b967eaef14d0",
+      "id_zrodlowe": "",
+      "nazwa_lokalizacji": "Klinika Mediq",
+      "szerokosc_geograficzna": "52.397458",
+      "dlugosc_geograficzna": "20.933695",
+      "zrodlo_danych": ""
+    },
+    {
+      "wiersz": 13,
+      "id_aed": "PL-AED-4c3b88526399",
+      "id_zrodlowe": "",
+      "nazwa_lokalizacji": "Wojskowy Instytut Medyczny Szpital w Legionowie",
+      "szerokosc_geograficzna": "52.404009",
+      "dlugosc_geograficzna": "20.950132",
+      "zrodlo_danych": ""
+    },
+    {
+      "wiersz": 14,
+      "id_aed": "PL-AED-81695323f1c4",
+      "id_zrodlowe": "",
+      "nazwa_lokalizacji": "Legio-Med. NZOZ",
+      "szerokosc_geograficzna": "52.391494",
+      "dlugosc_geograficzna": "20.918366",
+      "zrodlo_danych": ""
+    },
+    {
+      "wiersz": 15,
+      "id_aed": "PL-AED-d89e2d593efb",
+      "id_zrodlowe": "",
+      "nazwa_lokalizacji": "Przychodnia lekarska \"Puls\"",
+      "szerokosc_geograficzna": "52.407905",
+      "dlugosc_geograficzna": "20.951152",
+      "zrodlo_danych": ""
+    },
+    {
+      "wiersz": 16,
+      "id_aed": "PL-AED-85cdeec5332d",
+      "id_zrodlowe": "",
+      "nazwa_lokalizacji": "Parafia Matki Bożej Fatimskiej",
+      "szerokosc_geograficzna": "52.403689",
+      "dlugosc_geograficzna": "20.955478",
+      "zrodlo_danych": ""
+    },
+    {
+      "wiersz": 17,
+      "id_aed": "PL-AED-8e0f659d7a0d",
+      "id_zrodlowe": "",
+      "nazwa_lokalizacji": "Szkoła Podstawowa nr 8",
+      "szerokosc_geograficzna": "52.410253",
+      "dlugosc_geograficzna": "20.948494",
+      "zrodlo_danych": ""
+    },
+    {
+      "wiersz": 18,
+      "id_aed": "PL-AED-661b037334d4",
+      "id_zrodlowe": "",
+      "nazwa_lokalizacji": "Liceum Ogólnokształczące",
+      "szerokosc_geograficzna": "52.395922",
+      "dlugosc_geograficzna": "20.929996",
+      "zrodlo_danych": ""
+    },
+    {
+      "wiersz": 19,
+      "id_aed": "PL-AED-1239aa9ef10c",
+      "id_zrodlowe": "",
+      "nazwa_lokalizacji": "Powiatowy Zespół Szkół Ponadpodstawowych",
+      "szerokosc_geograficzna": "52.411683",
+      "dlugosc_geograficzna": "20.917855",
+      "zrodlo_danych": ""
+    },
+    {
+      "wiersz": 20,
+      "id_aed": "PL-AED-256fdf077550",
+      "id_zrodlowe": "",
+      "nazwa_lokalizacji": "Powiatowy Zespół Szkół i Placówek Specjalnych",
+      "szerokosc_geograficzna": "52.407280",
+      "dlugosc_geograficzna": "20.917662",
+      "zrodlo_danych": ""
+    },
+    {
+      "wiersz": 21,
+      "id_aed": "PL-AED-ae13e0b3ced2",
+      "id_zrodlowe": "",
+      "nazwa_lokalizacji": "Parafia Najświętszego Ciała i Krwi Chrystusa",
+      "szerokosc_geograficzna": "52.392091",
+      "dlugosc_geograficzna": "20.926457",
+      "zrodlo_danych": ""
+    },
+    {
+      "wiersz": 22,
+      "id_aed": "PL-AED-52fbf51554a6",
+      "id_zrodlowe": "",
+      "nazwa_lokalizacji": "Zespół Szkolno-Przedszkolny nr 3",
+      "szerokosc_geograficzna": "52.394028",
+      "dlugosc_geograficzna": "20.926166",
+      "zrodlo_danych": ""
+    },
+    {
+      "wiersz": 23,
+      "id_aed": "PL-AED-38cf5e9f6f64",
+      "id_zrodlowe": "",
+      "nazwa_lokalizacji": "Faktoria",
+      "szerokosc_geograficzna": "52.389337",
+      "dlugosc_geograficzna": "20.921079",
+      "zrodlo_danych": ""
+    },
+    {
+      "wiersz": 24,
+      "id_aed": "PL-AED-4084fe6e5aa1",
+      "id_zrodlowe": "",
+      "nazwa_lokalizacji": "Centrum Integracji Organizacji Pozarządowych",
+      "szerokosc_geograficzna": "52.397203",
+      "dlugosc_geograficzna": "20.927590",
+      "zrodlo_danych": ""
+    },
+    {
+      "wiersz": 25,
+      "id_aed": "PL-AED-7e649367c1b8",
+      "id_zrodlowe": "CT-01",
+      "nazwa_lokalizacji": "Centrum targowe – hala A, wejście główne",
+      "szerokosc_geograficzna": "53.150120",
+      "dlugosc_geograficzna": "18.017350",
+      "zrodlo_danych": "dysponent"
+    },
+    {
+      "wiersz": 26,
+      "id_aed": "PL-AED-65383850a61c",
+      "id_zrodlowe": "UM-RYN-1",
+      "nazwa_lokalizacji": "Stary Rynek – ratusz, wejście od rynku",
+      "szerokosc_geograficzna": "53.122640",
+      "dlugosc_geograficzna": "17.999870",
+      "zrodlo_danych": "dysponent"
+    },
+    {
+      "wiersz": 27,
+      "id_aed": "PL-AED-fa27645d35c8",
+      "id_zrodlowe": "SP99-1",
+      "nazwa_lokalizacji": "Szkoła Podstawowa nr 99 – sala gimnastyczna",
+      "szerokosc_geograficzna": "53.131870",
+      "dlugosc_geograficzna": "18.034410",
+      "zrodlo_danych": "dysponent"
+    },
+    {
+      "wiersz": 28,
+      "id_aed": "PL-AED-ab85f7fc510a",
+      "id_zrodlowe": "SP99-2",
+      "nazwa_lokalizacji": "Szkoła Podstawowa nr 99 – pokój nauczycielski",
+      "szerokosc_geograficzna": "53.131870",
+      "dlugosc_geograficzna": "18.034410",
+      "zrodlo_danych": "dysponent"
+    },
+    {
+      "wiersz": 29,
+      "id_aed": "PL-AED-9f808a3622dd",
+      "id_zrodlowe": "OSP-PRZ-1",
+      "nazwa_lokalizacji": "OSP Przykładowo – remiza",
+      "szerokosc_geograficzna": "53.105530",
+      "dlugosc_geograficzna": "18.069920",
+      "zrodlo_danych": "dysponent"
+    },
+    {
+      "wiersz": 30,
+      "id_aed": "PL-AED-8816bdaddea4",
+      "id_zrodlowe": "ZOO-2",
+      "nazwa_lokalizacji": "Park miejski – pawilon kasowy",
+      "szerokosc_geograficzna": "53.140210",
+      "dlugosc_geograficzna": "17.977560",
+      "zrodlo_danych": "rejestr_publiczny"
+    },
+    {
+      "wiersz": 31,
+      "id_aed": "PL-AED-60706a121134",
+      "id_zrodlowe": "ZGL-2026-0017",
+      "nazwa_lokalizacji": "Pływalnia osiedlowa – recepcja",
+      "szerokosc_geograficzna": "53.114470",
+      "dlugosc_geograficzna": "18.006780",
+      "zrodlo_danych": "zgloszenie_obywatelskie"
+    },
+    {
+      "wiersz": 32,
+      "id_aed": "PL-AED-2f3b76fdceb2",
+      "id_zrodlowe": "UNI-B-3",
+      "nazwa_lokalizacji": "Uczelnia – budynek B, portiernia",
+      "szerokosc_geograficzna": "53.127990",
+      "dlugosc_geograficzna": "18.011230",
+      "zrodlo_danych": "dysponent"
+    }
+  ],
+  "tylko_w_osm": [
+    {
+      "id_zrodlowe": "osm:node/900000001",
+      "zrodlo_url": "https://www.openstreetmap.org/node/900000001",
+      "szerokosc_geograficzna": "50.0616",
+      "dlugosc_geograficzna": "19.9382"
+    },
+    {
+      "id_zrodlowe": "osm:node/900000002",
+      "zrodlo_url": "https://www.openstreetmap.org/node/900000002",
+      "szerokosc_geograficzna": "50.0704",
+      "dlugosc_geograficzna": "19.9376"
+    },
+    {
+      "id_zrodlowe": "osm:node/900000003",
+      "zrodlo_url": "https://www.openstreetmap.org/node/900000003",
+      "szerokosc_geograficzna": "50.06785",
+      "dlugosc_geograficzna": "19.9477"
+    },
+    {
+      "id_zrodlowe": "osm:node/900000004",
+      "zrodlo_url": "https://www.openstreetmap.org/node/900000004",
+      "szerokosc_geograficzna": "50.0672",
+      "dlugosc_geograficzna": "19.945"
+    },
+    {
+      "id_zrodlowe": "osm:node/900000005",
+      "zrodlo_url": "https://www.openstreetmap.org/node/900000005",
+      "szerokosc_geograficzna": "50.064",
+      "dlugosc_geograficzna": "19.94"
+    },
+    {
+      "id_zrodlowe": "osm:node/900000006",
+      "zrodlo_url": "https://www.openstreetmap.org/node/900000006",
+      "szerokosc_geograficzna": "50.01205",
+      "dlugosc_geograficzna": "19.8901"
+    }
+  ],
+  "pary_do_sprawdzenia": []
+}

@@ -93,6 +93,22 @@ def sample_rows():
     return {"naglowki": SAMPLE_COLUMNS, "wiersze": [[row[c] for c in SAMPLE_COLUMNS] for row in rows[:3]], "liczba": len(rows)}
 
 
+def integrator_summary():
+    """Wyniki dodatkowego integratora (demo/integrator/, generuje integrator/generuj_demo.py)."""
+    out = DEMO / "integrator"
+
+    def wczytaj(nazwa):
+        return json.loads((out / nazwa).read_text(encoding="utf-8"))
+
+    raport_warszawa = wczytaj("raport_warszawa.json")
+    return {
+        "warszawa": {"poprawne": raport_warszawa["poprawne"], "licencja": raport_warszawa["pochodzenie"]["licencja"]},
+        "duplikaty": wczytaj("raport_duplikatow.json")["podsumowanie"],
+        "osm": wczytaj("raport_porownania_osm.json")["podsumowanie"],
+        "gdansk": wczytaj("statystyka_gdansk.json"),
+    }
+
+
 def main():
     csv_text = (DEMO / "wynik" / "zestawienie_aed.csv").read_bytes().decode("utf-8")
     table = list(csv.reader(io.StringIO(csv_text, newline="")))
@@ -110,6 +126,7 @@ def main():
         "raport": read_text("demo/wynik/raport_agregacji.txt"),
         "przyklad": sample_rows(),
         "zmiany": portal_changes(),
+        "integrator": integrator_summary(),
     }
     data_json = json.dumps(data, ensure_ascii=False, separators=(",", ":")).replace("<", "\\u003c")
     logo = read_text("branding/logo/dane-przezycie_logo_poziome.svg").strip()

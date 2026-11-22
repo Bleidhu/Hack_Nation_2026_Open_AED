@@ -312,12 +312,37 @@ const slajd = (master = "TRESC") => pres.addSlide({ masterName: master });
     ["Brak deduplikacji. ", "Ten sam AED zgłoszony przez dwóch dostawców da dwa wiersze, każdy z własnym pochodzeniem."],
     ["Warszawa i Gdańsk. ", "Warszawa: w portalu tylko strona WWW, dane w API z tokenem. Gdańsk: dane flotowe, nie punkty."],
     ["Typy zgadywane przez portal. ", "Walidacja portalu może oznaczyć błędem plik zgodny ze wzorcem (np. „5A” w numerze budynku); wykaz czyta go wprost."],
-    ["Integrator i frontend. ", "Integrator dla dostawców bez wzorca to zalążek (krok 2). Osobnej strony „Wykaz AED” we froncie nie ma."],
+    ["Integrator (dodatek). ", "Pomaga dostawcom bez wzorca (Warszawa, Gdańsk, OSM), ale jest poza portalem: portal może działać bez niego. Osobnej strony „Wykaz AED” we froncie nie ma."],
     ["Akcja promocyjna. ", "To projekt znaku i materiałów. Kolizji nazwy (UPRP, EUIPO, domeny) nie sprawdzaliśmy."],
   ];
   [0, 1].forEach((k) => {
     tx(s, zLead(o.slice(k * 3, k * 3 + 3), K.czerwien), { x: M + k * 6.2, y: 1.6, w: 5.8, h: 4.8, fontSize: 16, paraSpaceAfter: 18 });
   });
+}
+
+// 13a. Dodatek: integrator (osobna aplikacja, poza portalem)
+{
+  const s = slajd();
+  s.addText("Dodatek: integrator dla dostawców bez wzorcowego formatu", { placeholder: "title" });
+  tx(s, [
+    { text: "Dwie największe instytucje na dane.gov.pl nie publikują dziś tabeli AED. Integrator (osobna aplikacja, zero zmian w portalu) przepisuje ich pliki na wzorzec v2, a dostawca podłącza wynik zwykłym zasobem typu „link”.", options: { breakLine: true } },
+  ], { x: M, y: 1.5, w: 12, h: 1.0, fontSize: 16, color: K.szary });
+  const w = [
+    ["Warszawa", "API z tokenem → czytamy przykład odpowiedzi z dokumentacji", "1 wiersz zgodny z v2, licencja CC BY 4.0 jawnie w pochodzeniu"],
+    ["Gdańsk", "baza 503 pojazdów ZTM, 278 z AED", "0 wierszy punktowych + jednoznaczny powód: dane flotowe, a wzorzec opisuje punkty"],
+    ["Duplikaty i OSM", "pary kandydatów tylko flagowane (bez scalania); OSM tylko lokalnie z oznaczeniem ODbL", "raporty: w obu / tylko w wykazie / tylko w OSM"],
+    ["Lokalne UI i testy", "python integrator/ui/serwer.py → http://127.0.0.1:8765 (offline, nic nie zapisuje na dysku)", "87 testów bez Dockera; demo/integrator/ generuje jedno polecenie"],
+  ];
+  let y = 2.6;
+  w.forEach(([t, d1, d2]) => {
+    linia(s, M, y, 12);
+    tx(s, t, { x: M, y: y + 0.12, w: 2.4, h: 1.0, fontSize: 16, bold: true, color: K.zielen });
+    tx(s, d1, { x: M + 2.6, y: y + 0.12, w: 4.6, h: 1.0, fontSize: 15 });
+    tx(s, d2, { x: M + 7.4, y: y + 0.12, w: 4.6, h: 1.0, fontSize: 15, color: K.szary });
+    y += 1.05;
+  });
+  tx(s, "Wykaz AED w portalu działa bez integratora. Dowody: demo/integrator/ (jedno polecenie: python integrator/generuj_demo.py) i integrator/README.md; instrukcja dla jury, krok 14.",
+    { x: M, y: 6.75, w: 12, h: 0.5, fontSize: 12, color: K.szary });
 }
 
 // 14. Jak sprawdzić i użycie AI

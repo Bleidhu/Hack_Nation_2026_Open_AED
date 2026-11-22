@@ -39,6 +39,7 @@ def copy_prototype():
     shutil.copytree(ROOT / "demo" / "zrzuty", target / "zrzuty")
     for name in ("komenda_create_main_aed_resource.txt", "testy.txt", "zestawienie_aed.csv"):
         shutil.copy2(ROOT / "demo" / "wynik" / name, target / "wynik" / name)
+    shutil.copytree(ROOT / "demo" / "integrator", target / "integrator")  # dodatek: wyniki integratora
 
 
 def write_portal_patch():

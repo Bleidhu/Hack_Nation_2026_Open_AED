@@ -11,8 +11,8 @@ Tu są pliki do przekazania organizatorowi. To kopie: oryginały zostają w repo
   - prototyp offline, wzorcowy zakres danych XLSX i wynik agregacji;
   - dowody z portalu uruchomionego we własnym środowisku;
   - prezentację;
-  - akcję „Dane (prze)życie”: nazwę, hasło, logotyp i księgę znaku.
-- **Poza zakresem:** integrator danych dla dostawców bez wzorcowego formatu (`../integrator/`, zalążek).
+  - akcję "Dane (prze)życie": nazwę, hasło, logotyp i księgę znaku.
+- **Dodatek (nie główny rezultat):** integrator danych dla dostawców bez wzorcowego formatu (`../integrator/`): mapowanie na wzorzec v2, walidacja, duplikaty, porównanie z OSM, adaptery Warszawy i Gdańska, lokalne UI, 87 testów. Przykładowe wyniki w [`prototyp/integrator/`](prototyp/integrator/README.md); portal nie wymaga integratora do działania.
 
 ## Zawartość i wymagania
 
@@ -20,7 +20,7 @@ Tu są pliki do przekazania organizatorowi. To kopie: oryginały zostają w repo
 |---|---|---|
 | Instrukcja dla jury w ponumerowanych krokach | [`INSTRUKCJA_DLA_JURY.md`](INSTRUKCJA_DLA_JURY.md) | jest |
 | §4 tytuł i szczegółowy opis projektu | [`../README.md`](../README.md), [`ZMIANY_W_PORTALU.md`](ZMIANY_W_PORTALU.md) | jest |
-| §4 prezentacja (min. 5 slajdów ze zrzutami, kroki użytkownika, ograniczenia) | [`prezentacja/dane_przezycie_prezentacja.pdf`](prezentacja/dane_przezycie_prezentacja.pdf), [`.pptx`](prezentacja/dane_przezycie_prezentacja.pptx) | jest (14 slajdów, zrzuty na slajdach 4–10) |
+| §4 prezentacja (min. 5 slajdów ze zrzutami, kroki użytkownika, ograniczenia) | [`prezentacja/dane_przezycie_prezentacja.pdf`](prezentacja/dane_przezycie_prezentacja.pdf), [`.pptx`](prezentacja/dane_przezycie_prezentacja.pptx) | jest (15 slajdów, zrzuty na slajdach 4-10) |
 | §4 prototyp rozwiązania, klikalny | [`prototyp/index.html`](prototyp/index.html) | jest |
 | §4 wzorcowy zakres danych (XLSX) | [`wzorcowy_zakres_danych.xlsx`](wzorcowy_zakres_danych.xlsx) | jest |
 | §4 kod źródłowy | całe repozytorium; zmiany portalu jako łatka względem oryginału (`a119b1b`): [`kod/zmiany_portalu_wzgledem_oryginalu.patch`](kod/zmiany_portalu_wzgledem_oryginalu.patch) | jest |
@@ -30,8 +30,8 @@ Tu są pliki do przekazania organizatorowi. To kopie: oryginały zostają w repo
 | §5 format odczytywalny maszynowo | [`dane/wykaz_aed_wynik_agregacji.csv`](dane/wykaz_aed_wynik_agregacji.csv) (CSV, 51 kolumn); schematy: [`../format_danych/schemat/`](../format_danych/schemat/) | jest |
 | Portal uruchomiony we własnym środowisku | [`prototyp/zrzuty/`](prototyp/zrzuty/README.md), [`prototyp/wynik/testy.txt`](prototyp/wynik/testy.txt) | jest |
 | §5 WCAG, responsywność, UX | prototyp; podglądy 1440 i 390 px: [`../demo/wynik/`](../demo/wynik/) | jest |
-| Zakres użycia AI (`regulamin_zadania.pdf` §2 ust. 8) | instrukcja, krok 16; prezentacja, slajd 14 | jest |
-| Integrator danych (dodatek, krok 2) | — (zalążek: `../integrator/`) | **poza zakresem** |
+| Zakres użycia AI (`regulamin_zadania.pdf` §2 ust. 8) | instrukcja, krok 16; prezentacja, slajd 15 | jest |
+| Integrator danych (dodatek, krok 2) | instrukcja, krok 14; wyniki: [`prototyp/integrator/`](prototyp/integrator/README.md); kod: `../integrator/` | jest (dodatek) |
 
 ## Weryfikacja z `references/`
 

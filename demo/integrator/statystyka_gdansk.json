@@ -1,0 +1,9 @@
+{
+  "pojazdy": 503,
+  "pojazdy_z_aed": 278,
+  "rozbicie_typow": {
+    "Autobus": 156,
+    "Tramwaj": 122
+  },
+  "powod": "Baza pojazdów ZTM to dane flotowe (AED w autobusach i tramwajach), a nie punkty; wzorzec v2 nie ma kolumny pojazdu, więc te dane nie trafiają do wykazu punktów. Punkty AED w Gdańsku trzeba zgłosić osobnym zasobem."
+}
