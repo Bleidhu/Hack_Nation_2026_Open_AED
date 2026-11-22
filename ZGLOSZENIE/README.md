@@ -30,7 +30,7 @@ Tu są pliki do przekazania organizatorowi. To kopie: oryginały zostają w repo
 | §5 format odczytywalny maszynowo | [`dane/wykaz_aed_wynik_agregacji.csv`](dane/wykaz_aed_wynik_agregacji.csv) (CSV, 51 kolumn); schematy: [`../format_danych/schemat/`](../format_danych/schemat/) | jest |
 | Portal uruchomiony we własnym środowisku | [`prototyp/zrzuty/`](prototyp/zrzuty/README.md), [`prototyp/wynik/testy.txt`](prototyp/wynik/testy.txt), film [`wideo/dane_przezycie_wykaz_aed.mp4`](wideo/dane_przezycie_wykaz_aed.mp4) | jest |
 | §5 WCAG, responsywność, UX | prototyp; podglądy 1440 i 390 px: [`../demo/wynik/`](../demo/wynik/) | jest |
-| Zakres użycia AI (`regulamin_zadania.pdf` §2 ust. 8) | instrukcja, krok 16; prezentacja, slajd 15 | jest |
+| Zakres użycia AI (`regulamin_zadania.pdf` §2 ust. 8) | instrukcja, krok 16; prezentacja, slajd 19 | jest |
 | Integrator danych (dodatek, krok 2) | instrukcja, krok 14; wyniki: [`prototyp/integrator/`](prototyp/integrator/README.md); kod: `../integrator/` | jest (dodatek) |
 
 ## Weryfikacja z `references/`

@@ -49,6 +49,7 @@ Opis kroków z prawdziwymi zrzutami z portalu: [`../INSTRUKCJA_DLA_JURY.md`](../
 |---|---|---|
 | **Naklejka A6 na szafkę** z ID z wykazu, datą sprawdzenia i kodem QR do zgłoszenia problemu | druk | wzór: [`materialy/dane-przezycie_naklejka_A6.svg`](materialy/dane-przezycie_naklejka_A6.svg) |
 | **Odznaka „Nasze AED są w Wykazie AED”** na www, w stopce e-maila i przy wejściu | 0 zł | wzór: [`materialy/dane-przezycie_odznaka_dysponenta.svg`](materialy/dane-przezycie_odznaka_dysponenta.svg) |
+| **Zwrot AED po użyciu** | 0 zł | Wykaz podaje dysponenta i kontakt funkcyjny do opiekuna, więc po użyciu wiadomo, do kogo zwrócić urządzenie. Numer seryjny, który ułatwi identyfikację egzemplarza, jest planowany |
 | **Przypomnienia o terminach elektrod i baterii** wyliczane z pól wzorca | automat | propozycja rozwoju, poza zakresem prototypu |
 | **Ranking gmin i powiatów** według kompletności i aktualności danych | automat | propozycja rozwoju, poza zakresem prototypu |
 | **Wyróżnienie „Gmina z otwartym AED”** wręczane 16 października (Europejski Dzień Przywracania Czynności Serca) | niski | decyzja organizatora akcji |

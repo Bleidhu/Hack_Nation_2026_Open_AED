@@ -147,9 +147,9 @@ Każde wymaganie zadania „Misja AED – Dane na ratunek” ma osobny krok: kt�
 
 ### 13. Prezentacja
 
-1. [`prezentacja/dane_przezycie_prezentacja.pdf`](prezentacja/dane_przezycie_prezentacja.pdf), 15 slajdów. Wersja edytowalna: [`.pptx`](prezentacja/dane_przezycie_prezentacja.pptx).
-2. Slajdy 4–10 to dowody: zrzuty z portalu uruchomionego lokalnie, z podpisami zgodnymi z [`demo/zrzuty/README.md`](demo/zrzuty/README.md).
-3. Kroki dostawcy: slajdy 4–5, odbiorcy: 7–9. Ograniczenia: 13. Integrator: 14. Użycie AI: 15.
+1. [`prezentacja/dane_przezycie_prezentacja.pdf`](prezentacja/dane_przezycie_prezentacja.pdf), 19 slajdów. Wersja edytowalna: [`.pptx`](prezentacja/dane_przezycie_prezentacja.pptx).
+2. Slajdy 8–14 to dowody: zrzuty z portalu uruchomionego lokalnie, z podpisami zgodnymi z [`demo/zrzuty/README.md`](demo/zrzuty/README.md).
+3. Problem i źródła: slajdy 2–3, z potrzeb do pól wzorca: 4–6. Kroki dostawcy: 8–9, odbiorcy: 11–13. Dodatki (integrator, deduplikacja): 15. Ograniczenia: 16. Akcja: 17–18. Użycie AI: 19.
 
 **Dowodzi:** §4 (min. 5 slajdów ze zrzutami, opis funkcji i kroków użytkownika, lista ograniczeń).
 
