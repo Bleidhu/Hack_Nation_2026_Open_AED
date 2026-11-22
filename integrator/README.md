@@ -62,3 +62,7 @@ Przykładowe pliki dostawców wraz z mapowaniami są w `dane_przykladowe/` (bank
 - Dane OSM (ODbL) służą wyłącznie do porównań i nie trafiają do zbioru CC0.
 - Licencji źródła nie zakładamy domyślnie: musi ją jawnie wskazać dostawca.
 - Do zasobu zbiorczego trafiają **punkty**, a nie flota: baza pojazdów ZTM w Gdańsku (AED w autobusach i tramwajach) nie ma kolumny we wzorcu v2, więc adapter `gdansk` zwraca tylko statystykę (503 pojazdy, 278 z AED) i jednoznaczny powód, zamiast wierszy punktowych.
+
+## Co dalej, świadomie poza zakresem
+
+- **Deduplikacja w portalu.** Flagowanie kandydatów na duplikaty działa w integratorze (`rdzen/duplikaty.py`). Gdy pomysł się sprawdzi na realnych próbkach, można go dodać do agregacji w portalu za ustawieniem `AED_DEDUP_ENABLED` (domyślnie wyłączone, nowy plik `mcod/resources/aed_dedup.py`, wynik tylko w logu i statystykach komendy, **bez** nowych kolumn w zasobie zbiorczym i bez usuwania wierszy). Nie robimy tego teraz: zmiana w portalu miałaby być czysto opcjonalna, a głównym rezultatem zadania pozostaje wykaz z agregacją.
