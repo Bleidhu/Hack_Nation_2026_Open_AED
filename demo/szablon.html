@@ -23,7 +23,7 @@ a:hover { text-decoration-thickness: 2px; }
 .skip:focus { top: .5rem; }
 code, pre, kbd { font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; font-size: .9em; }
 code { background: var(--tlo); padding: .05em .3em; border-radius: 3px; overflow-wrap: anywhere; }
-pre { background: #0f1b2a; color: #e8eef5; padding: 1rem; border-radius: 6px; overflow-x: auto; font-size: .82rem; line-height: 1.45; max-width: 100%; }
+pre { background: #0f1b2a; color: #e8eef5; padding: 1rem; border-radius: 3px; overflow-x: auto; font-size: .82rem; line-height: 1.45; max-width: 100%; }
 .wrap { max-width: 72rem; margin: 0 auto; padding: 0 1rem; }
 
 header.top { border-bottom: 4px solid var(--zielen); }
@@ -33,12 +33,12 @@ header.top svg { width: 16rem; height: auto; max-width: 100%; }
 .podtytul { margin: 0; color: var(--szary); font-size: .95rem; flex-basis: 100%; }
 
 nav.etapy { background: var(--tlo); border-bottom: 1px solid var(--ramka); }
-.kroki { list-style: none; margin: 0 auto; padding: .5rem 1rem; display: flex; gap: .35rem; max-width: 72rem; overflow-x: auto; }
+.kroki { list-style: none; margin: 0 auto; padding: 0 1rem; display: flex; gap: 0; max-width: 72rem; overflow-x: auto; }
 .kroki li { flex: none; }
-.kroki button { font: inherit; font-size: .88rem; border: 2px solid var(--ramka); background: #fff; color: var(--granat); border-radius: 999px; padding: .3rem .7rem; cursor: pointer; min-height: 44px; white-space: nowrap; }
-.kroki button:hover { border-color: var(--granat); }
-.kroki button.zrobiony { border-color: var(--zielen); color: var(--zielen-ciemna); }
-.kroki button[aria-current="step"] { background: var(--granat); border-color: var(--granat); color: #fff; font-weight: 700; }
+.kroki button { font: inherit; font-size: .88rem; border: 0; border-bottom: 4px solid transparent; background: none; color: var(--szary); padding: .5rem .8rem .35rem; cursor: pointer; min-height: 48px; white-space: nowrap; }
+.kroki button:hover { color: var(--granat); border-bottom-color: var(--ramka); }
+.kroki button.zrobiony { color: var(--zielen-ciemna); border-bottom-color: var(--zielen); }
+.kroki button[aria-current="step"] { color: var(--granat); border-bottom-color: var(--granat); font-weight: 700; }
 
 main { padding: 1.5rem 0 2rem; }
 main:focus { outline: none; }
@@ -50,18 +50,18 @@ h2 .nr::after { content: "."; }
 h3 { font-size: 1.15rem; color: var(--granat); margin: 1.5rem 0 .5rem; }
 .krok > p, .krok > ul, .krok > ol { max-width: 50rem; }
 .lead { font-size: 1.15rem; }
-.uwaga { border-left: 5px solid var(--zielen); background: var(--zielen-jasna); padding: .75rem 1rem; border-radius: 0 6px 6px 0; max-width: 50rem; }
-.uwaga.ilustracja { border-color: var(--bursztyn); background: #fff6e0; }
+.uwaga { background: var(--zielen-jasna); padding: .75rem 1rem; border-radius: 2px; max-width: 50rem; }
+.uwaga.ilustracja { background: #fff6e0; }
 .zrodlo { color: var(--szary); font-size: .9rem; }
 
 figure { margin: 1rem 0; max-width: 60rem; }
-figure img { display: block; width: 100%; height: auto; border: 1px solid var(--ramka); border-radius: 6px; }
+figure img { display: block; width: 100%; height: auto; border: 1px solid var(--ramka); }
 figcaption { color: var(--szary); font-size: .92rem; margin-top: .4rem; }
 .galeria { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 22rem), 1fr)); gap: 1rem 1.5rem; }
 .galeria figure { margin: 0; }
 .galeria img { max-height: 28rem; object-fit: cover; object-position: top; }
 
-.tabela-wrap { overflow-x: auto; max-width: 100%; border: 1px solid var(--ramka); border-radius: 6px; margin: .75rem 0; }
+.tabela-wrap { overflow-x: auto; max-width: 100%; border: 1px solid var(--ramka); margin: .75rem 0; }
 table { border-collapse: collapse; width: 100%; font-size: .93rem; }
 caption { text-align: left; padding: .5rem .75rem; color: var(--szary); font-size: .9rem; caption-side: top; }
 th, td { padding: .45rem .6rem; text-align: left; vertical-align: top; border-top: 1px solid var(--ramka); }
@@ -71,30 +71,32 @@ tbody tr:nth-child(even) { background: #f8fafb; }
 tbody tr.wybrany { background: #fff3c4; }
 td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
 
-.karty { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr)); gap: .75rem; margin: 1rem 0; }
-.karta { border: 1px solid var(--ramka); border-radius: 8px; padding: .75rem 1rem; background: #fff; }
-.karta h3 { margin: 0 0 .25rem; font-size: 1.05rem; }
-.karta p { margin: .25rem 0 0; font-size: .95rem; }
-.liczba { font-size: 2.2rem; font-weight: 700; color: var(--granat); line-height: 1.1; }
+.karty { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr)); gap: .75rem 2rem; margin: 1rem 0; padding: .5rem 0 .75rem; border-top: 2px solid var(--granat); border-bottom: 1px solid var(--ramka); align-items: end; }
+.karta:first-child { grid-column: span 2; }
+.karta h3 { margin: 0 0 .15rem; font-size: 1rem; }
+.karta p { margin: .15rem 0 0; font-size: .92rem; color: var(--szary); }
+.liczba { font-size: 2rem; font-weight: 700; color: var(--granat); line-height: 1.1; font-variant-numeric: tabular-nums; }
+.karta:first-child .liczba { font-size: 3.6rem; color: var(--zielen-ciemna); }
+.karta:first-child h3 { font-size: 1.15rem; }
 .etykieta-zla { color: var(--czerwien); font-weight: 700; }
 .etykieta-dobra { color: var(--zielen-ciemna); font-weight: 700; }
 
 .przyciski { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; }
-.btn { font: inherit; font-weight: 700; border: 2px solid var(--granat); background: var(--granat); color: #fff; border-radius: 6px; padding: .5rem 1rem; cursor: pointer; min-height: 44px; text-decoration: none; display: inline-flex; align-items: center; }
+.btn { font: inherit; font-weight: 700; border: 2px solid var(--granat); background: var(--granat); color: #fff; border-radius: 3px; padding: .5rem 1rem; cursor: pointer; min-height: 44px; text-decoration: none; display: inline-flex; align-items: center; }
 .btn:hover { background: #163c63; }
 .btn.drugi { background: #fff; color: var(--granat); }
 .btn.drugi:hover { background: var(--tlo); }
 .btn[aria-pressed="true"] { background: var(--zielen); border-color: var(--zielen); color: #fff; }
 .btn:disabled { opacity: .45; cursor: not-allowed; }
 
-.filtry { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr)); gap: .75rem; background: var(--tlo); border: 1px solid var(--ramka); border-radius: 8px; padding: .75rem 1rem; margin: 1rem 0 .5rem; }
+.filtry { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr)); gap: .75rem; background: var(--tlo); border: 0; border-radius: 3px; padding: .75rem 1rem; margin: 1rem 0 .5rem; }
 .filtry label { display: block; font-weight: 700; font-size: .92rem; margin-bottom: .2rem; }
-.filtry input, .filtry select { width: 100%; font: inherit; padding: .4rem .5rem; border: 2px solid var(--szary); border-radius: 4px; background: #fff; min-height: 44px; }
+.filtry input, .filtry select { width: 100%; font: inherit; padding: .4rem .5rem; border: 2px solid var(--szary); border-radius: 3px; background: #fff; min-height: 44px; }
 #licznik-wynikow { font-weight: 700; margin: .5rem 0; }
 
 .wykaz { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1rem; }
-.mapa-box { border: 1px solid var(--ramka); border-radius: 8px; padding: .5rem; background: #fff; }
-#mapa { display: block; width: 100%; height: 22rem; margin: .5rem 0 0; background: #eaf1f7; border-radius: 4px; }
+.mapa-box { padding: 0; }
+#mapa { display: block; width: 100%; height: 22rem; margin: .5rem 0 0; background: #eaf1f7; border-radius: 3px; }
 #mapa .kraj { fill: #fbfcf7; stroke: var(--granat); stroke-width: 1.5; vector-effect: non-scaling-stroke; }
 #mapa .punkt { stroke: #fff; stroke-width: 1.5; vector-effect: non-scaling-stroke; cursor: pointer; }
 #mapa .punkt:focus { outline: none; stroke: var(--focus); stroke-width: 4; }
@@ -115,7 +117,7 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
 .maly { font-size: .85rem; color: var(--szary); }
 button.link { font: inherit; background: none; border: 0; color: #0b4f8a; text-decoration: underline; cursor: pointer; padding: .2rem 0; min-height: 32px; text-align: left; }
 
-#szczegoly { border: 2px solid var(--granat); border-radius: 8px; padding: 1rem; margin-top: 1rem; }
+#szczegoly { border-top: 4px solid var(--granat); background: var(--tlo); padding: 1rem 1.25rem; margin-top: 1rem; }
 #szczegoly h3 { margin-top: 0; }
 #szczegoly h3:focus { outline: none; }
 #szczegoly h4 { margin: 1rem 0 .4rem; color: var(--granat); }
@@ -221,15 +223,15 @@ footer p { margin: .3rem 0; }
     <desc id="proces-d">Pięć etapów od lewej do prawej. Pierwszy: zbiory z wpisem standard = AED. Drugi: kontrola zasobu, czyli format CSV lub XLSX, licencja CC0 lub CC BY i kolumny minimum. Trzeci: normalizacja, czyli aliasy nagłówków, identyfikator id_aed, wartości jawne i pochodzenie. Czwarty: zasób zbiorczy CSV z 51 kolumnami w zbiorze Wykaz AED. Piąty: tabela, mapa i API portalu. Pod schematem: zasoby odrzucone trafiają do logu z powodem.</desc>
     <defs><marker id="strz" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#0E2A47"/></marker></defs>
     <g font-size="17" text-anchor="middle" fill="#1b2430">
-      <rect x="5" y="20" width="170" height="120" rx="10" fill="#e6f2ec" stroke="#007A45" stroke-width="2"/>
+      <rect x="5" y="20" width="170" height="120" rx="3" fill="#e6f2ec" stroke="#007A45" stroke-width="2"/>
       <text x="90" y="55" font-weight="700" fill="#0E2A47">Zbiory</text><text x="90" y="80">customfields</text><text x="90" y="104">standard = AED</text>
-      <rect x="210" y="20" width="170" height="120" rx="10" fill="#fff" stroke="#0E2A47" stroke-width="2"/>
+      <rect x="210" y="20" width="170" height="120" rx="3" fill="#fff" stroke="#0E2A47" stroke-width="2"/>
       <text x="295" y="55" font-weight="700" fill="#0E2A47">Kontrola zasobu</text><text x="295" y="80">CSV / XLSX</text><text x="295" y="104">CC0 lub CC BY</text><text x="295" y="128">kolumny minimum</text>
-      <rect x="415" y="20" width="170" height="120" rx="10" fill="#fff" stroke="#0E2A47" stroke-width="2"/>
+      <rect x="415" y="20" width="170" height="120" rx="3" fill="#fff" stroke="#0E2A47" stroke-width="2"/>
       <text x="500" y="55" font-weight="700" fill="#0E2A47">Normalizacja</text><text x="500" y="80">aliasy nagłówków</text><text x="500" y="104">id_aed, wartości</text><text x="500" y="128">jawne, pochodzenie</text>
-      <rect x="620" y="20" width="170" height="120" rx="10" fill="#0E2A47"/>
-      <text x="705" y="55" font-weight="700" fill="#fff">Zasób zbiorczy</text><text x="705" y="80" fill="#fff">CSV, 51 kolumn</text><text x="705" y="104" fill="#fff">zbiór Wykaz AED</text><text x="705" y="128" fill="#fff">CC BY 4.0</text>
-      <rect x="825" y="20" width="170" height="120" rx="10" fill="#e6f2ec" stroke="#007A45" stroke-width="2"/>
+      <rect x="620" y="0" width="170" height="160" rx="3" fill="#0E2A47"/>
+      <text x="705" y="45" font-weight="700" font-size="19" fill="#fff">Zasób zbiorczy</text><text x="705" y="80" fill="#fff">CSV, 51 kolumn</text><text x="705" y="104" fill="#fff">zbiór Wykaz AED</text><text x="705" y="128" fill="#fff">CC BY 4.0</text>
+      <rect x="825" y="20" width="170" height="120" rx="3" fill="#e6f2ec" stroke="#007A45" stroke-width="2"/>
       <text x="910" y="55" font-weight="700" fill="#0E2A47">Portal</text><text x="910" y="80">tabela</text><text x="910" y="104">mapa</text><text x="910" y="128">API</text>
     </g>
     <g stroke="#0E2A47" stroke-width="3" marker-end="url(#strz)"><line x1="177" y1="80" x2="206" y2="80"/><line x1="382" y1="80" x2="411" y2="80"/><line x1="587" y1="80" x2="616" y2="80"/><line x1="792" y1="80" x2="821" y2="80"/></g>
@@ -454,9 +456,9 @@ footer p { margin: .3rem 0; }
       return el("div", { class: "karta" }, el("div", { class: "liczba", text: plNumber(number) }), el("h3", { text: title }), text ? el("p", { text: text }) : null);
     }
     var cards = $("#karty-statystyk");
+    cards.appendChild(card(s.wiersze, "wierszy w wykazie", "zbiór " + s.zbior_zbiorczy_id + ", zasób " + s.zasob_zbiorczy_id));
     cards.appendChild(card(s.zasoby_przyjete, "zasoby przyjęte", "Legionowo (CC0) i plik wzorca (CC BY 4.0)"));
     cards.appendChild(card(s.zasoby_pominiete.length, "zasoby pominięte", "z powodem w logu"));
-    cards.appendChild(card(s.wiersze, "wierszy w wykazie", "zbiór " + s.zbior_zbiorczy_id + ", zasób " + s.zasob_zbiorczy_id));
     s.zasoby_pominiete.forEach(function (p) {
       $("#lista-pominietych").appendChild(el("li", null, el("span", { class: "etykieta-zla", text: "Pominięty: " }),
         (p.nazwa || "zasób") + " (id " + p.resource_id + "): " + p.powod));
@@ -667,9 +669,9 @@ footer p { margin: .3rem 0; }
     var modified = changes.filter(function (c) { return c.status !== "A"; });
     var sum = function (list, key) { return list.reduce(function (a, c) { return a + c[key]; }, 0); };
     var cards = $("#karty-zmian");
-    [[added.length, "nowe pliki", "kod AED, testy, próbki danych"],
-     [modified.length, "istniejące pliki z dopiskami", "+" + plNumber(sum(modified, "dodane")) + " / −" + plNumber(sum(modified, "usuniete")) + " linii"],
-     [0, "migracji", "bez nowych pól i tabel"]].forEach(function (c) {
+    [[0, "migracji", "bez nowych pól i tabel"],
+     [added.length, "nowe pliki", "kod AED, testy, próbki danych"],
+     [modified.length, "istniejące pliki z dopiskami", "+" + plNumber(sum(modified, "dodane")) + " / −" + plNumber(sum(modified, "usuniete")) + " linii"]].forEach(function (c) {
       cards.appendChild(el("div", { class: "karta" }, el("div", { class: "liczba", text: plNumber(c[0]) }), el("h3", { text: c[1] }), el("p", { text: c[2] })));
     });
     modified.concat(added).forEach(function (c) {
