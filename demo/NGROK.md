@@ -1,34 +1,41 @@
-# Wystawienie dema przez ngrok (opcjonalnie, ostrożnie)
+# Wersja live przez ngrok (dodatek, uruchamiana na żądanie)
 
-Wdrożenia są **dodatkiem**. Nic w ocenie od nich nie zależy: wszystkie dowody są plikami w repozytorium, a prototyp działa z dysku. Tunel włączaj tylko na czas oceny i wyłącz zaraz po niej.
+Nic w ocenie od niej nie zależy: wszystkie dowody są plikami w repozytorium, a prototyp działa z dysku. Aktualne adresy są w [`../WERSJA_LIVE.md`](../WERSJA_LIVE.md).
 
-## Co wolno wystawiać
+## Uruchomienie (PowerShell, portal w Dockerze już działa)
 
-| Co | Po co | Uwagi |
-|---|---|---|
-| `demo/serwer_zewnetrzny.py` (tylko GET, 3 pliki, dane fikcyjne) | „zewnętrzny serwer dostawcy” z adresem https, jakiego wymaga portal | bezpieczne: nie ma zapisu, logowania ani danych osobowych |
-| statyczny prototyp (`python -m http.server`) | podgląd `demo/index.html` pod adresem https | tylko pliki statyczne |
-| **portal (Django, panel, API)** | nie wystawiamy | konto administratora z hasłem testowym, brak utwardzenia, ryzyko awarii w czasie oceny |
-
-## Zewnętrzny serwer dostawcy przez ngrok
-
-```bash
-python demo/serwer_zewnetrzny.py            # http na porcie 8099 (ngrok dostarcza https)
-ngrok http 8099                             # w drugim terminalu; skopiuj adres https://….ngrok-free.app
-python manage.py import_aed_xml https://….ngrok-free.app/aed.xml --organizacja <ID>   # w portalu
+```powershell
+ngrok config add-authtoken <TOKEN>                                    # jednorazowo; token zostaje w globalnym configu ngroka
+powershell -ExecutionPolicy Bypass -File demo/uruchom_live.ps1        # start: serwer dostawcy, brama, tunel, wpis do WERSJA_LIVE.md
+powershell -ExecutionPolicy Bypass -File demo/uruchom_live.ps1 -Zatrzymaj
 ```
 
-Portal przyjmuje tylko linki https, a ngrok daje certyfikat zaufany, więc nie trzeba `--https`.
+Skrypt uruchamia w tle:
+- serwer dostawcy `demo/serwer_zewnetrzny.py --https --port 8098`, jeśli jeszcze nie działa (zbiór z opisu XML w portalu wskazuje `https://host.docker.internal:8098`);
+- bramę `demo/brama_live.py` na `127.0.0.1:8090`;
+- `ngrok start --all --config "$env:LOCALAPPDATA\ngrok\ngrok.yml" --config demo/ngrok.yml`.
 
-**Nie sprawdzone na tym komputerze (brak ngroka).** Znane ryzyko: darmowy ngrok może pokazywać przeglądarkom stronę ostrzegawczą zamiast pliku. Portal pobiera plik jak przeglądarka (losowy User-Agent), więc przy stronie ostrzegawczej walidacja linku się nie powiedzie. Wtedy użyj płatnego/własnej domeny albo (bezpieczniej) zostań przy lokalnym `--https` z Dockera (`https://host.docker.internal:8099/aed.xml`), który przetestowaliśmy i z którego pochodzą zrzuty.
+Potem odczytuje adres z API agenta (`http://127.0.0.1:4040/api/tunnels`) i wywołuje `python demo/ustaw_link_live.py --portal <adres> --sprawdz`. Dzienniki trafiają do `%TEMP%\aed_live\`.
 
-## Prototyp przez ngrok
+## Dlaczego jeden tunel i brama
 
-```bash
-python -m http.server 8080 --directory .    # katalog główny repo, żeby działały linki względne
-ngrok http 8080                              # prototyp: https://….ngrok-free.app/demo/index.html
-```
+Darmowe konto ngrok ma jedną domenę (`*.ngrok-free.dev`). Kilka tuneli w jednej sesji dostaje ten sam adres, a ngrok rozkłada między nie ruch losowo (sprawdzone 22.11.2026). Dlatego tunel prowadzi do bramy (biblioteka standardowa Pythona), która rozdziela ruch po ścieżce:
 
-## Statyczna strona (GitHub Pages)
+| Ścieżka | Cel |
+|---|---|
+| `/` i `/pl/...` | frontend portalu (nginx, `Host: mcod.local`) |
+| `/api/...` | API portalu (frontend przekazuje je do `api.mcod.local`) |
+| `/admin/` oraz `/login/`, `/datasets/`, `/resources/`, … | panel (`Host: admin.mcod.local`) |
+| `/demo/`, `/format_danych/`, `/branding/`, `/prezentacja/` | pliki z repozytorium (bez `demo/.cert` i plików ukrytych) |
+| `/dostawca/...` | serwer dostawcy |
+| `/live/` | strona startowa z odnośnikami |
 
-Workflow `.github/workflows/pages.yml` publikuje `demo/`, `format_danych/`, `branding/`, `prezentacja/` i kilka plików `.md`. Nie publikuje portalu. Uruchomienie: Settings → Pages → Source: GitHub Actions, potem Actions → „Prototyp na GitHub Pages” → Run workflow. Wymaga zgody właściciela repozytorium.
+Kod portalu i konfiguracja Dockera zostają bez zmian. Brama przepisuje adresy `https://(api.|admin.)mcod.local` w odpowiedziach HTML i JSON na adres publiczny. Usuwa też `Domain=mcod.local` z ciasteczek i podstawia lokalny `Referer` (CSRF Django). Blokuje konsolę debugera Werkzeug (`?__debugger__`) i zamienia strony błędów trybu DEBUG na zwykły komunikat. Pliki danych przechodzą bez zmian.
+
+## Gdy zmieni się adres serwera dostawcy
+
+Portal czyta zbiór z opisu XML pod adresem lokalnym (`https://host.docker.internal:8098/opis.xml`), więc tunel tego nie zmienia. Przepięcie zbioru na inny adres: `docker exec mcod-admin python manage.py import_aed_xml <nowy adres>/opis.xml --organizacja <ID>`. Przebudowa wykazu bez czekania na noc: `demo/wymus_harvest.py`.
+
+## Bezpieczeństwo
+
+Panel jest publiczny. Konto testowe portalu ma hasło opisane w `portal/backend/README.md`. Przed udostępnieniem adresu trzeba zmienić hasło albo uruchomić bramę z `-BezAdmina` albo z dodatkowym hasłem `$env:BRAMA_ADMIN_AUTH = "login:haslo"`. Portal działa w trybie deweloperskim (`DEBUG=True`, `runserver`, werkzeug `--debug`), więc tunel należy wyłączać zaraz po ocenie.

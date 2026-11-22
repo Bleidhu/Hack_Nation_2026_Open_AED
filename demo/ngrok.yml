@@ -1,0 +1,14 @@
+# Tunel wersji live (ngrok 3). BEZ TOKENU: token zostaje w globalnej konfiguracji ngroka (ngrok config add-authtoken).
+# Uruchomienie (PowerShell, z katalogu repozytorium); najprościej skryptem: powershell -File demo/uruchom_live.ps1
+#   ngrok start --all --config "$env:LOCALAPPDATA\ngrok\ngrok.yml" --config demo/ngrok.yml
+#
+# Jeden tunel, bo darmowe konto ma jedną domenę: kilka tuneli w jednej sesji dostaje ten sam adres i ngrok rozkłada
+# między nie ruch (sprawdzone 22.11.2026). Cały ruch idzie więc do bramy demo/brama_live.py (port 8090), która
+# rozdziela go po ścieżce na frontend, API i panel portalu, prototyp oraz serwer dostawcy.
+version: "3"
+tunnels:
+  aed-live:
+    proto: http
+    addr: 127.0.0.1:8090
+    # bez podglądu żądań w panelu agenta (127.0.0.1:4040): nie przechowuje m.in. formularza logowania do panelu
+    inspect: false
