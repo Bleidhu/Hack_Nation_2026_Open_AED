@@ -112,7 +112,7 @@ def main():
         "zmiany": portal_changes(),
     }
     data_json = json.dumps(data, ensure_ascii=False, separators=(",", ":")).replace("<", "\\u003c")
-    logo = read_text("branding/logo/otworz-aed_logo_poziome.svg").strip()
+    logo = read_text("branding/logo/dane-przezycie_logo_poziome.svg").strip()
     logo = logo.replace('aria-labelledby="t d"', 'aria-labelledby="logo-t"').replace('id="t"', 'id="logo-t"')
     logo = logo.replace('<desc id="d">', "<desc>")
 
