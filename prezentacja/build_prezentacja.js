@@ -363,7 +363,7 @@ const slajd = (master = "TRESC") => pres.addSlide({ masterName: master });
     y += 0.62;
   });
   linia(s, M, y, 12, K.szary);
-  tx(s, zLead([["Użycie AI. ", "Asystentów AI (Claude, Cursor) używaliśmy do analizy kodu portalu, pisania kodu i testów według naszego planu, redakcji dokumentów, automatyzacji zrzutów oraz generowania plików znaku i prezentacji ze skryptów. Kierunek rozwiązania, decyzje o danych, licencjach i ochronie danych oraz wybór znaku należą do zespołu. Każdą zmianę sprawdziliśmy testami i w uruchomionym portalu."]], K.zolc),
+  tx(s, zLead([["Użycie AI. ", "Asystentów AI (Claude, Cursor) używaliśmy do wsparcia analizy kodu portalu, pisania kodu i implementacji testów oraz do wsparcia tworzenia księgi znaku i plików znaku, a także przy redakcji dokumentów, zrzutach ekranu i składaniu prezentacji. Kierunek rozwiązania, decyzje o danych, licencjach i ochronie danych oraz wybór znaku należą do zespołu. Każdą zmianę sprawdziliśmy testami i w uruchomionym portalu."]], K.zolc),
     { x: M, y: 4.4, w: 11.2, h: 1.7, fontSize: 15, color: K.bialy });
 }
 

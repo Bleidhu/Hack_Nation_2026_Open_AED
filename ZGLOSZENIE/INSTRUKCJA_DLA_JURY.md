@@ -178,6 +178,6 @@ Lokalny interfejs: `python integrator/ui/serwer.py`, adres `http://127.0.0.1:876
 
 ### 16. Użycie sztucznej inteligencji
 
-Zespół korzystał z asystentów AI (Claude, Cursor) do analizy kodu portalu, pisania kodu i testów według własnego planu, redakcji dokumentów, automatyzacji zrzutów ekranu oraz generowania plików znaku, księgi znaku i prezentacji ze skryptów (`branding/build_branding.py`, `prezentacja/build_prezentacja.js`).
+Zespół korzystał z asystentów AI (Claude, Cursor) do wsparcia analizy kodu portalu, pisania kodu i implementacji testów oraz do wsparcia tworzenia księgi znaku i plików znaku (skrypt `branding/build_branding.py`). Asystenci pomagali też w redakcji dokumentów, automatyzacji zrzutów ekranu i składaniu prezentacji (`prezentacja/build_prezentacja.js`).
 
 Kierunek rozwiązania wybrał i zweryfikował zespół: przeróbka DGA zamiast osobnej aplikacji, oznaczenie przez „Pola niestandardowe”, struktura danych, zasady licencji i ochrony danych oraz nazwa akcji, hasło i koncepcja znaku. Każdą zmianę zespół przejrzał i sprawdził testami oraz w uruchomionym portalu. Uzasadnienie decyzji: [`format_danych/UZASADNIENIE.md`](../format_danych/UZASADNIENIE.md).
