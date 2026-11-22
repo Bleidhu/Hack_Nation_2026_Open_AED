@@ -14,6 +14,8 @@ Otwórz `demo/index.html` w przeglądarce, bez instalacji i bez sieci. Siedem kr
 
 Zrzuty pochodzą z działającego portalu (`zrzuty/`, podpisy w `zrzuty/README.md`). Tabela i mapa korzystają dokładnie z `wynik/zestawienie_aed.csv`, a przycisk pobierania zwraca ten plik bajt w bajt.
 
+Film z nagraniem działającego portalu i tego prototypu: `wideo/dane_przezycie_wykaz_aed.mp4` (opis w `wideo/README.md`, źródła w `../video/`).
+
 Strona jest generowana i nie edytuje się jej ręcznie. Po zmianie szablonu albo wyników zbuduj ją ponownie (biblioteka standardowa i git):
 
 ```bash

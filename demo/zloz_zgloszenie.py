@@ -17,7 +17,7 @@ ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "ZGLOSZENIE"
 ORIGINAL_COMMIT = "a1adc22"
 GENERATED = ["INSTRUKCJA_DLA_JURY.md", "ZMIANY_W_PORTALU.md", "prototyp", "wzorcowy_zakres_danych.xlsx", "kod", "dane",
-             "prezentacja", "logotyp", "ksiega_znaku.pdf"]
+             "prezentacja", "logotyp", "ksiega_znaku.pdf", "wideo"]
 LOGOTYPY = ["dane-przezycie_logo_poziome", "dane-przezycie_logo_poziome_haslo", "dane-przezycie_logo_pionowe",
             "dane-przezycie_znak", "dane-przezycie_sygnet"]
 
@@ -73,6 +73,8 @@ def main():
         for ext in ("jpg", "png", "pdf", "svg"):
             shutil.copy2(ROOT / "branding" / "logo" / f"{name}.{ext}", OUT / "logotyp")
     shutil.copy2(ROOT / "branding" / "ksiega_znaku.pdf", OUT / "ksiega_znaku.pdf")
+    (OUT / "wideo").mkdir()  # film z nagraniem portalu i prototypu (źródła: video/)
+    shutil.copy2(ROOT / "demo" / "wideo" / "dane_przezycie_wykaz_aed.mp4", OUT / "wideo")
     files = sorted(p.relative_to(OUT).as_posix() for p in OUT.rglob("*") if p.is_file())
     print(f"ZGLOSZENIE/: {len(files)} plików")
 

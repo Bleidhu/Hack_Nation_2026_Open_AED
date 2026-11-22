@@ -2,7 +2,7 @@
 
 Każde wymaganie zadania „Misja AED – Dane na ratunek” ma osobny krok: który plik otworzyć, co w nim zobaczyć i czego to dowodzi. Wszystkie dowody są plikami w repozytorium. Nie jest potrzebne logowanie, instalacja ani połączenie z serwerami zespołu. Pliki do zgłoszenia zebrano w [`ZGLOSZENIE/`](../ZGLOSZENIE/README.md).
 
-**Najkrótsza ścieżka (5 minut):** krok 1 (prototyp), potem krok 2 (zmiany w portalu).
+**Najkrótsza ścieżka (5 minut):** krok 1 (prototyp), potem krok 2 (zmiany w portalu). Jeszcze szybciej: film [`demo/wideo/dane_przezycie_wykaz_aed.mp4`](../demo/wideo/dane_przezycie_wykaz_aed.mp4) (1 min 49 s) z nagraniem działającego portalu i prototypu (krok 4).
 
 ## Krok 0: otwarcie paczki
 
@@ -24,7 +24,7 @@ Każde wymaganie zadania „Misja AED – Dane na ratunek” ma osobny krok: kt�
 | §5 zgodność z zasadami portalu | 2, 8 | [`format_danych/UZASADNIENIE.md`](../format_danych/UZASADNIENIE.md), [`ZMIANY_W_PORTALU.md`](../ZMIANY_W_PORTALU.md) |
 | §5 WCAG, responsywność, UX | 9 | [`demo/index.html`](../demo/index.html) |
 | §5 użycie AI | 16 | krok 16 |
-| §6 uruchomienie i weryfikacja | 3, 4, 5 | [`demo/wynik/testy.txt`](../demo/wynik/testy.txt), [`demo/zrzuty/`](../demo/zrzuty/README.md), [`demo/agreguj.py`](../demo/agreguj.py) |
+| §6 uruchomienie i weryfikacja | 3, 4, 5 | [`demo/wynik/testy.txt`](../demo/wynik/testy.txt), [`demo/zrzuty/`](../demo/zrzuty/README.md), [`demo/wideo/`](../demo/wideo/README.md), [`demo/agreguj.py`](../demo/agreguj.py) |
 | §2 integracja danych wielu dysponentów w jednym zbiorze | 2, 4, 5 | [`demo/wynik/raport_agregacji.txt`](../demo/wynik/raport_agregacji.txt) |
 | §2 nazwa akcji, logotyp, hasło | 10 | [`branding/AKCJA_DANE_PRZEZYCIE.md`](../branding/AKCJA_DANE_PRZEZYCIE.md) |
 | §8 kryteria oceny | 11 | krok 11 |
@@ -64,6 +64,7 @@ Każde wymaganie zadania „Misja AED – Dane na ratunek” ma osobny krok: kt�
 1. [`demo/zrzuty/README.md`](../demo/zrzuty/README.md): podpis każdego zrzutu mówi, co widać i czego dowodzi.
 2. Zrzuty w kolejności: [01](../demo/zrzuty/01_formularz_zbioru_standard_aed.png) formularz zbioru z `standard = AED`, [02](../demo/zrzuty/02_zasoby_dostawcow.png) zasoby dostawców, [03](../demo/zrzuty/03_komenda_wykaz_statystyki.png) budowa wykazu, [04](../demo/zrzuty/04_wykaz_tabela.png) tabela, [05](../demo/zrzuty/05_wykaz_mapa.png) mapa, [06](../demo/zrzuty/06_api_aed_aggregated.png) `/aed-aggregated`, [07](../demo/zrzuty/07_api_dane_zasobu.png) dane w API z atrybucją, [09](../demo/zrzuty/09_testy.png) testy.
 3. Pełny log budowy wykazu: [`demo/wynik/komenda_create_main_aed_resource.txt`](../demo/wynik/komenda_create_main_aed_resource.txt). Statystyki: [`demo/wynik/statystyki_agregacji.json`](../demo/wynik/statystyki_agregacji.json).
+4. Film [`demo/wideo/dane_przezycie_wykaz_aed.mp4`](../demo/wideo/dane_przezycie_wykaz_aed.mp4) (1 min 49 s, bez dźwięku, opis: [`demo/wideo/README.md`](../demo/wideo/README.md)) pokazuje te same ekrany w ruchu: panel dostawcy z `standard = AED`, zasób zbiorczy we froncie (tabela, mapa), odpowiedź `/aed-aggregated` i prototyp offline. Skrócone fragmenty są oznaczone na ekranie.
 
 **Dowodzi:** portal z modyfikacjami uruchomiono w Dockerze (backend, API, Celery, frontend) i sprawdzono w praktyce. Zasób zbiorczy ma tabelę, mapę i API portalu bez nowego frontendu.
 

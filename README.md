@@ -7,6 +7,7 @@ Rozwiązanie zadania „Misja AED – Dane na ratunek” (HackNation 2026, Minis
 **Zacznij tutaj:**
 - [`INSTRUKCJA_DLA_JURY.md`](INSTRUKCJA_DLA_JURY.md): każde wymaganie zadania w ponumerowanych krokach;
 - [`demo/index.html`](demo/index.html): klikalny prototyp całego procesu, działa offline;
+- [`demo/wideo/dane_przezycie_wykaz_aed.mp4`](demo/wideo/dane_przezycie_wykaz_aed.mp4): film (1 min 49 s) z nagraniem działającego portalu i prototypu;
 - [`prezentacja/dane_przezycie_prezentacja.pdf`](prezentacja/dane_przezycie_prezentacja.pdf): prezentacja (14 slajdów);
 - [`ZMIANY_W_PORTALU.md`](ZMIANY_W_PORTALU.md): opis zmian w kodzie portalu;
 - [`ZGLOSZENIE/`](ZGLOSZENIE/README.md): pliki do zgłoszenia zebrane w jednym miejscu.
@@ -71,7 +72,8 @@ Nazwa czyta się na dwa sposoby: „dane przeżycie” i „dane życie”, a �
 |---|---|---|
 | **Modyfikacja portalu** | [`portal/backend/`](portal/backend/), [`portal/frontend/`](portal/frontend/) | główny rezultat: Wykaz AED |
 | Wzorcowy zakres danych | [`format_danych/`](format_danych/README.md) | kontrakt kolumn dla dostawców i agregacji |
-| Prototyp i dowody | [`demo/`](demo/README.md) | klikalny prototyp offline, zrzuty z portalu, testy, wynik agregacji |
+| Prototyp i dowody | [`demo/`](demo/README.md) | klikalny prototyp offline, zrzuty z portalu, film, testy, wynik agregacji |
+| Źródła filmu | [`video/`](video/README.md) | skrypty nagrań (Playwright) i kompozycja (Remotion) filmu z `demo/wideo/` |
 | Prezentacja | [`prezentacja/`](prezentacja/README.md) | 14 slajdów, PPTX i PDF |
 | Akcja „Dane (prze)życie” | [`branding/`](branding/README.md) | logotyp, księga znaku, materiały, opis akcji |
 | Integrator danych | [`integrator/`](integrator/README.md) | dodatek (zalążek) dla dostawców bez wzorcowego formatu |

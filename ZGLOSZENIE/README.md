@@ -9,7 +9,7 @@ Tu są pliki do przekazania organizatorowi. To kopie: oryginały zostają w repo
 - **Zawiera:**
   - modyfikację portalu dane.gov.pl, czyli Wykaz AED na wzór wykazu DGA, z testami i bez migracji;
   - prototyp offline, wzorcowy zakres danych XLSX i wynik agregacji;
-  - dowody z portalu uruchomionego we własnym środowisku;
+  - dowody z portalu uruchomionego we własnym środowisku, także jako film (1 min 49 s);
   - prezentację;
   - akcję "Dane (prze)życie": nazwę, hasło, logotyp i księgę znaku.
 - **Dodatek (nie główny rezultat):** integrator danych dla dostawców bez wzorcowego formatu (`../integrator/`): mapowanie na wzorzec v2, walidacja, duplikaty, porównanie z OSM, adaptery Warszawy i Gdańska, lokalne UI, 87 testów. Przykładowe wyniki w [`prototyp/integrator/`](prototyp/integrator/README.md); portal nie wymaga integratora do działania.
@@ -28,7 +28,7 @@ Tu są pliki do przekazania organizatorowi. To kopie: oryginały zostają w repo
 | §4 księga znaku (.pdf) | [`ksiega_znaku.pdf`](ksiega_znaku.pdf) | jest |
 | §2 nazwa akcji i hasło | „Dane (prze)życie”, „Twoje dane – czyjeś życie.”; opis: [`../branding/AKCJA_DANE_PRZEZYCIE.md`](../branding/AKCJA_DANE_PRZEZYCIE.md) | jest |
 | §5 format odczytywalny maszynowo | [`dane/wykaz_aed_wynik_agregacji.csv`](dane/wykaz_aed_wynik_agregacji.csv) (CSV, 51 kolumn); schematy: [`../format_danych/schemat/`](../format_danych/schemat/) | jest |
-| Portal uruchomiony we własnym środowisku | [`prototyp/zrzuty/`](prototyp/zrzuty/README.md), [`prototyp/wynik/testy.txt`](prototyp/wynik/testy.txt) | jest |
+| Portal uruchomiony we własnym środowisku | [`prototyp/zrzuty/`](prototyp/zrzuty/README.md), [`prototyp/wynik/testy.txt`](prototyp/wynik/testy.txt), film [`wideo/dane_przezycie_wykaz_aed.mp4`](wideo/dane_przezycie_wykaz_aed.mp4) | jest |
 | §5 WCAG, responsywność, UX | prototyp; podglądy 1440 i 390 px: [`../demo/wynik/`](../demo/wynik/) | jest |
 | Zakres użycia AI (`regulamin_zadania.pdf` §2 ust. 8) | instrukcja, krok 16; prezentacja, slajd 15 | jest |
 | Integrator danych (dodatek, krok 2) | instrukcja, krok 14; wyniki: [`prototyp/integrator/`](prototyp/integrator/README.md); kod: `../integrator/` | jest (dodatek) |
