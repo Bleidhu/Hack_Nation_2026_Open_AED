@@ -22,6 +22,7 @@ from adaptery.osm import tagi_bez_odpowiednika, wczytaj as osm_wczytaj  # noqa: 
 from rdzen.duplikaty import PROMIEN_DOMYSLNY, znajdz_kandydatow  # noqa: E402
 from rdzen.licencje import LicencjaBlad, sprawdz, wczytaj_konfiguracje  # noqa: E402
 from rdzen.mapowanie import PRESETS, apply_mapping, suggest_mapping  # noqa: E402
+from rdzen.porownanie import porownaj  # noqa: E402
 from rdzen.walidacja import validate  # noqa: E402
 from rdzen.wejscie import read_input  # noqa: E402
 from rdzen.zapis import to_csv, to_geojson  # noqa: E402,F401
@@ -69,10 +70,27 @@ def main():
     ap.add_argument("--wyjscie", type=Path, help="CSV wynikowy (tylko poprawne rekordy)")
     ap.add_argument("--raport", type=Path, help="raport walidacji JSON")
     ap.add_argument("--duplikaty", type=Path, help="raport kandydatów na duplikaty JSON (tylko flaguje, bez scalania)")
+    ap.add_argument("--porownaj-z-osm", type=Path, metavar="PLIK",
+                    help="porównaj `plik` (wykaz AED z portalu) z PLIKiem OSM; raport JSON wymaga --raport")
     ap.add_argument("--promien", type=float, default=PROMIEN_DOMYSLNY, help="promień dopasowania w metrach (do --duplikaty)")
     ap.add_argument("--podpowiedz", action="store_true", help="wypisz podpowiedź mapowania i zakończ")
     a = ap.parse_args()
     data = a.plik.read_bytes()
+    if a.porownaj_z_osm:
+        if not a.raport:
+            sys.exit("--porownaj-z-osm wymaga --raport (ścieżka raportu porównania JSON)")
+        _, wykaz_rows, _ = read_input(data, a.plik.name)
+        osm_rows, _ = osm_wczytaj(a.porownaj_z_osm.read_bytes(), a.porownaj_z_osm.name)
+        rap = porownaj(wykaz_rows, apply_mapping(osm_rows, PRESETS["osm"]), promien=a.promien)
+        a.raport.write_text(json.dumps(rap, ensure_ascii=False, indent=2), "utf-8")
+        s = rap["podsumowanie"]
+        print(f"porównanie z OSM ({a.porownaj_z_osm.name}, promień {rap['promien_m']} m): "
+              f"w obu {s['w_obu']} · tylko w wykazie {s['tylko_w_wykazie']} · tylko w OSM {s['tylko_w_osm']}")
+        if s["pary_do_sprawdzenia"]:
+            print(f"  pary do sprawdzenia (różna kondygnacja): {s['pary_do_sprawdzenia']}")
+        print(f"  ! {rap['oznaczenie']}")
+        print(f"zapisano {a.raport}")
+        return
     if a.podpowiedz:
         h, _, fmt = read_input(data, a.plik.name)
         print(json.dumps(PRESETS["osm"] if fmt == "osm" else suggest_mapping(h), ensure_ascii=False, indent=2))

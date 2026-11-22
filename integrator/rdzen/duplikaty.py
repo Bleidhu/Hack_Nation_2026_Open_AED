@@ -17,7 +17,7 @@ PROG_PODOBIENSTWA = 0.6
 META = 111320.0  # metry na stopę szerokości geograficznej
 
 
-def _wspolrzedne(r: dict):
+def wspolrzedne(r: dict):
     """(lat, lon) w granicach Polski albo None (wiersz bez współrzędnych nie bierze udziału)."""
     try:
         la = float(r.get("szerokosc_geograficzna", ""))
@@ -71,7 +71,7 @@ def znajdz_kandydatow(rekordy: list, *, promien: float = PROMIEN_DOMYSLNY,
     grid = defaultdict(list)
     punkty = 0
     for i, r in enumerate(rekordy):
-        c = _wspolrzedne(r)
+        c = wspolrzedne(r)
         if c:
             punkty += 1
             grid[(int(c[0] // cell_lat), int(c[1] // cell_lon))].append(i)
@@ -90,7 +90,7 @@ def znajdz_kandydatow(rekordy: list, *, promien: float = PROMIEN_DOMYSLNY,
         a, b = rekordy[i], rekordy[j]
         if _zrodlo(a) == _zrodlo(b) and a.get("id_zrodlowe") and a.get("id_zrodlowe") == b.get("id_zrodlowe"):
             continue
-        ca, cb = _wspolrzedne(a), _wspolrzedne(b)
+        ca, cb = wspolrzedne(a), wspolrzedne(b)
         d = haversine(ca[0], ca[1], cb[0], cb[1])
         if d > promien:
             continue

@@ -24,12 +24,14 @@ nocne zadanie portalu (krok 1) → krajowy zasób zbiorczy AED
   - presety `wzorzec` i `osm`;
   - automatyczną podpowiedź mapowania;
   - normalizacje: przecinek dziesiętny, `TAK`/`NIE` → `true`/`false`, daty `dd.mm.rrrr` → ISO, kody pocztowe, telefony, zamienione współrzędne;
-  - raport kandydatów na duplikaty: `--duplikaty raport.json` (pary w promieniu `--promien` m, domyślnie 25, o podobnej nazwie lub opisie; raport tylko flaguje, niczego nie scala i nie usuwa).
+  - raport kandydatów na duplikaty: `--duplikaty raport.json` (pary w promieniu `--promien` m, domyślnie 25, o podobnej nazwie lub opisie; raport tylko flaguje, niczego nie scala i nie usuwa);
+  - porównanie wykazu z OSM: `--porownaj-z-osm plik.json` (w obu / tylko w wykazie / tylko w OSM; raport ma oznaczenie licencyjne ODbL i służy tylko lokalnie).
 
   Uruchomienie:
   ```bash
   python integrator/importer.py plik.csv --mapowanie mapowanie.json --wyjscie wynik.csv --raport raport.json
   python integrator/importer.py plik.csv --podpowiedz     # propozycja mapowania kolumn
+  python integrator/importer.py wykaz.csv --porownaj-z-osm osm.json --raport porownanie.json
   ```
 - `openapi.yaml`: szkic API integratora z poprzedniego demonstratora (import, aktualizacje stanu, organizacje, AED obszarowe). Traktuj go jako propozycję, a nie działającą usługę w tym repo.
 
