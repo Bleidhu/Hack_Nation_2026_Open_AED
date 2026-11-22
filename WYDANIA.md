@@ -1,12 +1,17 @@
 # Wydania
 
-## Niewydane (gałąź `ksiega-znaku-dane-przezycie`): materiały do zgłoszenia
+## v1.5.0 (22.11.2026): wstępne materiały do zgłoszenia, z księgą znaku
+
+Wersja wstępna. Zawiera komplet materiałów, które zamierzamy przesłać, razem z księgą znaku akcji „Dane (prze)życie”. To jeszcze nie wersja ostateczna: lista autorów, licencja kodu portalu i kolizje nazwy akcji (UPRP, EUIPO, domeny) czekają na decyzję zespołu. Kod portalu jest taki sam jak w v1.0.0.
+
+### Co dochodzi względem v1.0.0
 
 - **Akcja „Dane (prze)życie”** zamiast roboczej „Otwórz AED” (archiwum: `branding/archiwum/otworz_aed/`). Hasło: „Twoje dane – czyjeś życie.”
 - **Znak finalny:** migotanie komór i rytm zatokowy spotykają się na środku znaku, w środku nałożonego folderu z danymi.
 - **Logotyp** w JPG, PNG, PDF i SVG oraz **księga znaku** (12 stron): `branding/`.
-- **Prezentacja** (14 slajdów, PPTX i PDF): `prezentacja/`.
+- **Prezentacja** (14 slajdów, PPTX i PDF): `prezentacja/`. Slajdy mają zróżnicowane układy i krój Atkinson Hyperlegible.
 - **README** z tytułem i szczegółowym opisem; instrukcja dla jury, prototyp i `ZGLOSZENIE/` zaktualizowane.
+- **Redakcja** tekstów, księgi znaku, prezentacji i prototypu, żeby mniej przypominały tekst generowany automatycznie.
 
 ## v1.0.0 (22.11.2026): działająca integracja danych AED w portalu
 
