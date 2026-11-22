@@ -32,7 +32,13 @@ nocne zadanie portalu (krok 1) → krajowy zasób zbiorczy AED
   python integrator/importer.py plik.csv --mapowanie mapowanie.json --wyjscie wynik.csv --raport raport.json
   python integrator/importer.py plik.csv --podpowiedz     # propozycja mapowania kolumn
   python integrator/importer.py wykaz.csv --porownaj-z-osm osm.json --raport porownanie.json
+  python integrator/importer.py dodaj aed.csv --nazwa_lokalizacji "Apteka" --miejscowosc "Legionowo" \
+      --opis_lokalizacji "Przy kasie" --typ_dostepu publiczny --dostepny_24_7 true \
+      --szerokosc_geograficzna 52.4011 --dlugosc_geograficzna 20.9284 --prefiks-id LEG
   ```
+  Podkomenda `dodaj` (dla małych dostawców bez własnego systemu): flagi odpowiadają kolumnom
+  wzorca v2; brakujący `id_zrodlowe` dostaje kolejny wolny numer z prefiksem dostawcy; przed
+  zapisem walidacja i kontrola duplikatów (zapis mimo kandydatów dopiero z `--tak`).
 - `openapi.yaml`: szkic API integratora z poprzedniego demonstratora (import, aktualizacje stanu, organizacje, AED obszarowe). Traktuj go jako propozycję, a nie działającą usługę w tym repo.
 
 Przykładowe pliki dostawców wraz z mapowaniami są w `dane_przykladowe/` (bank, sieć sklepów, OSM, gmina, przewoźnik, kolej, serwis, ZRM). Adaptery Warszawy i Gdańska czytają realne pliki z `../references/dane_gov_pl_aed/` (odpowiedź API Warszawy, baza pojazdów ZTM Gdańska) – oba źródła nie dają dziś tabeli w portalu.

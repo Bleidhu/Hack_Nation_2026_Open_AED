@@ -25,8 +25,10 @@ from rdzen.duplikaty import PROMIEN_DOMYSLNY, znajdz_kandydatow  # noqa: E402
 from rdzen.licencje import LicencjaBlad, sprawdz, wczytaj_konfiguracje  # noqa: E402
 from rdzen.mapowanie import PRESETS, apply_mapping, suggest_mapping  # noqa: E402
 from rdzen.porownanie import porownaj  # noqa: E402
+from rdzen.rekord import RekordBlad, dopisz, sprawdz_rekord, wczytaj_istniejace, zbuduj  # noqa: E402
 from rdzen.walidacja import validate  # noqa: E402
 from rdzen.wejscie import read_input  # noqa: E402
+from rdzen.wzorzec import SCHEMA  # noqa: E402
 from rdzen.zapis import to_csv, to_geojson  # noqa: E402,F401
 
 ADAPTERY = {"osm": osm_wczytaj, "warszawa": warszawa_wczytaj, "gdansk": gdansk_wczytaj}
@@ -64,10 +66,47 @@ def run(data: bytes, filename: str, mapping: dict = None, *, preset: str = None,
             "licencja_zrodla": pochodzenie["licencja"], "pochodzenie": raport["pochodzenie"]}
 
 
+def _dodaj(argv) -> None:
+    """Podkomenda `dodaj`: dopisz jeden rekord AED do pliku CSV zgodnego ze wzorcem v2."""
+    ap = argparse.ArgumentParser(prog="importer.py dodaj",
+                                 description="Dopisz jeden rekord AED do pliku CSV wzorca v2 "
+                                             "(dla dostawców bez własnego systemu). Pola = kolumny wzorca.")
+    ap.add_argument("plik", type=Path)
+    for f in SCHEMA["fields"]:
+        opis = (f.get("description") or "").split("–")[0].strip()
+        ap.add_argument("--" + f["name"], help=opis or None)
+    ap.add_argument("--prefiks-id", default="AED", help="prefiks propozycji id_zrodlowe, gdy --id_zrodlowe puste")
+    ap.add_argument("--tak", action="store_true", help="zapisz mimo kandydatów na duplikaty (raport i tak ich nie scala)")
+    a = ap.parse_args(argv)
+    sciezka = a.plik
+    istniejace = wczytaj_istniejace(sciezka)
+    pola = {f["name"]: getattr(a, f["name"]) for f in SCHEMA["fields"] if getattr(a, f["name"]) is not None}
+    try:
+        rec = zbuduj(pola, prefiks=a.prefiks_id, istniejace_id={r.get("id_zrodlowe", "") for r in istniejace})
+    except RekordBlad as e:
+        sys.exit(f"Błąd: {e}")
+    wynik = sprawdz_rekord(rec, istniejace)
+    for e in wynik["bledy"]:
+        print(f"  ✗ {e['pole']}: {e['komunikat']} ({e['wartosc']!r})")
+    for p in wynik["kandydaci"]:
+        q = p["pochodzenie_a"]
+        print(f"  ? możliwy duplikat: {q['id_zrodlowe'] or ('wiersz ' + str(q['wiersz']))} "
+              f"({p['odleglosc_m']} m, podobieństwo {p['podobienstwo']}, pewność: {p['pewnosc']})")
+    if wynik["bledy"]:
+        sys.exit("rekord odrzucony – popraw pola i uruchom ponownie")
+    if wynik["kandydaci"] and not a.tak:
+        sys.exit("sprawdź kandydatów powyżej; aby zapisać mimo to, dodaj --tak")
+    nowy_plik = not sciezka.exists()
+    dopisz(sciezka, rec)
+    print(f"dopisano {rec['id_zrodlowe']} do {sciezka}" + (" (plik utworzony z nagłówkiem)" if nowy_plik else ""))
+
+
 def main():
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8", errors="replace")
         sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+    if len(sys.argv) > 1 and sys.argv[1] == "dodaj":
+        return _dodaj(sys.argv[2:])
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("plik", type=Path)
     ap.add_argument("--mapowanie", type=Path)
