@@ -1,0 +1,60 @@
+{
+  "zrodlo": "demo/agreguj.py (bez bazy): migawka dane.gov.pl, przykład wzorca i plik dostawcy z opisem XML",
+  "data_agregacji": "2026-11-22T09:27:40",
+  "zasoby_przyjete": 3,
+  "zasoby_pominiete": [
+    {
+      "resource_id": 54632,
+      "powod": "brak kolumn: miejscowosc"
+    },
+    {
+      "resource_id": 62092,
+      "powod": "format nietabelaryczny (xml)"
+    },
+    {
+      "resource_id": 62093,
+      "powod": "format nietabelaryczny (geojson)"
+    },
+    {
+      "resource_id": 62094,
+      "powod": "format nietabelaryczny (json)"
+    },
+    {
+      "resource_id": 62095,
+      "powod": "brak kolumn: szerokosc_geograficzna, dlugosc_geograficzna"
+    },
+    {
+      "resource_id": 62424,
+      "powod": "format nietabelaryczny (xml)"
+    },
+    {
+      "resource_id": 68353,
+      "powod": "brak kolumn: nazwa_lokalizacji, miejscowosc, szerokosc_geograficzna, dlugosc_geograficzna"
+    },
+    {
+      "resource_id": 68355,
+      "powod": "brak kolumn: nazwa_lokalizacji, miejscowosc, szerokosc_geograficzna, dlugosc_geograficzna"
+    },
+    {
+      "resource_id": 2512040,
+      "powod": "format nietabelaryczny (json)"
+    },
+    {
+      "resource_id": 2631129,
+      "powod": "brak lokalnej kopii pliku w references/dane_gov_pl_aed/"
+    }
+  ],
+  "wiersze": 38,
+  "wiersze_pominiete": 0,
+  "wiersze_zdeduplikowane": 1,
+  "duplikaty": [
+    {
+      "zachowany": "PL-AED-7e649367c1b8",
+      "pominiety": "PL-AED-a129c4f1cf35",
+      "powod": "numer_seryjny"
+    }
+  ],
+  "wiersze_przed_deduplikacja": 39,
+  "wiersze_dostawcy": 7,
+  "kolumny": 52
+}

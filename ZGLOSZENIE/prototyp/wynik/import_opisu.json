@@ -1,0 +1,176 @@
+{
+  "opis": "Wynik demo/sprawdz.py: kroki importu opisu zbioru (XSD, md5, kontrola CSV) wykonane funkcjami portalu z aed_opis.py, deduplikacja funkcją aed_dedup.deduplicate_rows i odpowiedzi serwera dostawcy demo/serwer_zewnetrzny.py. Czasy odpowiedzi zależą od komputera.",
+  "data_agregacji": "2026-11-22T04:15:00",
+  "opisy": {
+    "opis_poprawny.xml": {
+      "plik": "format_danych/przyklady/opis/opis_poprawny.xml",
+      "xsd": {
+        "valid": true,
+        "records": 1,
+        "errors": []
+      },
+      "md5_w_opisie": "f093977df25274d89fff1ac82b592380",
+      "md5_csv": "f093977df25274d89fff1ac82b592380",
+      "md5_zgodne": true,
+      "kontrola_csv": {
+        "wiersze": 7,
+        "przyjete": 7,
+        "pominiete": 0,
+        "duplikaty": []
+      },
+      "opis": {
+        "tytul": "Defibrylatory AED – Miejski Zakład Przykład (PRZYKŁAD)",
+        "opis": "Lokalizacje defibrylatorów AED dysponenta (dane fikcyjne do demonstracji). Dane w pliku CSV zgodnym ze wzorcem AED v2.",
+        "dysponent_nazwa": "Miejski Zakład Przykład (PRZYKŁAD)",
+        "dysponent_regon": "123456785",
+        "kontakt_email": "aed@dostawca.example.pl",
+        "licencja": "CC BY 4.0",
+        "czestotliwosc_aktualizacji": "daily",
+        "data_aktualizacji": "2026-11-22T06:00:00"
+      },
+      "zasob": {
+        "tytul": "Lokalizacje AED (CSV)",
+        "link_csv": "https://dostawca.example.pl/aed.csv",
+        "format": "csv",
+        "md5": "f093977df25274d89fff1ac82b592380",
+        "liczba_rekordow": "7"
+      },
+      "wynik": "przyjęty",
+      "powod": ""
+    },
+    "opis_bledny_md5.xml": {
+      "plik": "format_danych/przyklady/opis/opis_bledny_md5.xml",
+      "xsd": {
+        "valid": true,
+        "records": 1,
+        "errors": []
+      },
+      "md5_w_opisie": "00000000000000000000000000000000",
+      "md5_csv": "f093977df25274d89fff1ac82b592380",
+      "md5_zgodne": false,
+      "kontrola_csv": null,
+      "wynik": "odrzucony",
+      "powod": "suma md5 pliku CSV różni się od sumy w opisie"
+    },
+    "opis_bledny_xsd.xml": {
+      "plik": "format_danych/przyklady/opis/opis_bledny_xsd.xml",
+      "xsd": {
+        "valid": false,
+        "records": 0,
+        "errors": [
+          {
+            "line": 7,
+            "field": "licencja",
+            "message": "Element 'licencja': [facet 'enumeration'] The value 'CC BY-SA 4.0' is not an element of the set {'CC0 1.0', 'CC BY 4.0'}."
+          },
+          {
+            "line": 12,
+            "field": "link_csv",
+            "message": "Element 'link_csv': [facet 'pattern'] The value 'http://dostawca.example.pl/aed.csv' is not accepted by the pattern 'https://[^\\s]+'."
+          },
+          {
+            "line": 2,
+            "field": "tytul",
+            "message": "brak wymaganego pola: tytul"
+          }
+        ]
+      },
+      "md5_w_opisie": null,
+      "md5_csv": "f093977df25274d89fff1ac82b592380",
+      "md5_zgodne": null,
+      "kontrola_csv": null,
+      "wynik": "odrzucony",
+      "powod": "opis zbioru niezgodny z XSD (3 błędy)"
+    }
+  },
+  "deduplikacja": {
+    "zrodla": [
+      {
+        "plik": "format_danych/przyklady/aed_punkty_przyklad.csv",
+        "wydawca": "Gmina Przykładowa (dane fikcyjne)",
+        "licencja": "CC0 1.0",
+        "id_zasobu": 900102,
+        "wiersze": 8,
+        "pominiete": 0
+      },
+      {
+        "plik": "format_danych/przyklady/opis/aed_dostawcy.csv",
+        "wydawca": "Miejski Zakład Przykład (PRZYKŁAD)",
+        "licencja": "CC BY 4.0",
+        "id_zasobu": 900103,
+        "wiersze": 7,
+        "pominiete": 0
+      }
+    ],
+    "wiersze_przed": 15,
+    "wiersze_po": 14,
+    "duplikaty": [
+      {
+        "powod": "numer_seryjny",
+        "zachowany": {
+          "id_aed": "PL-AED-aace38683603",
+          "id_zrodlowe": "CT-01",
+          "nazwa_lokalizacji": "Centrum targowe – hala A, wejście główne",
+          "miejscowosc": "Bydgoszcz",
+          "producent": "Philips",
+          "model": "HeartStart FRx",
+          "numer_seryjny": "FRX-2026-0001",
+          "poziom_weryfikacji": "zweryfikowany_przez_dysponenta",
+          "wydawca_zasobu": "Gmina Przykładowa (dane fikcyjne)",
+          "licencja_zasobu": "CC0 1.0"
+        },
+        "pominiety": {
+          "id_aed": "PL-AED-a129c4f1cf35",
+          "id_zrodlowe": "BYD-HALA-A",
+          "nazwa_lokalizacji": "Hala A – Centrum Targowe (zgłoszenie dostawcy)",
+          "miejscowosc": "Bydgoszcz",
+          "producent": "Philips",
+          "model": "HeartStart FRx",
+          "numer_seryjny": "FRX-2026-0001",
+          "poziom_weryfikacji": "niezweryfikowany",
+          "wydawca_zasobu": "Miejski Zakład Przykład (PRZYKŁAD)",
+          "licencja_zasobu": "CC BY 4.0"
+        }
+      }
+    ],
+    "unikalne_id_aed": true,
+    "kolumny": 52
+  },
+  "serwer": {
+    "adres": "http://127.0.0.1:<port>",
+    "zadania": [
+      {
+        "sciezka": "/opis.xml",
+        "kod": 200,
+        "czas_ms": 2.5,
+        "bajty": 851
+      },
+      {
+        "sciezka": "/aed.csv",
+        "kod": 200,
+        "czas_ms": 1.4,
+        "bajty": 2919
+      },
+      {
+        "sciezka": "/opis_bledny_md5.xml",
+        "kod": 200,
+        "czas_ms": 1.3,
+        "bajty": 851
+      },
+      {
+        "sciezka": "/opis_bledny_xsd.xml",
+        "kod": 200,
+        "czas_ms": 1.1,
+        "bajty": 776
+      }
+    ],
+    "link_csv_z_opisu": "https://127.0.0.1:<port>/aed.csv",
+    "link_na_ten_sam_serwer": true,
+    "md5_w_opisie": "f093977df25274d89fff1ac82b592380",
+    "md5_pobranego_csv": "f093977df25274d89fff1ac82b592380",
+    "md5_zgodne": true,
+    "csv_identyczny_z_repo": true,
+    "opis_bledny_md5_odrzucony": true,
+    "opis_bledny_xsd_odrzucony": true
+  }
+}

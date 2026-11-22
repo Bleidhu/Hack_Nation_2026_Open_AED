@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<opis_zbioru>
+  <opis>Lokalizacje defibrylatorów AED dysponenta (dane fikcyjne do demonstracji). Dane w pliku CSV zgodnym ze wzorcem AED v2.</opis>
+  <dysponent_nazwa>Miejski Zakład Przykład (PRZYKŁAD)</dysponent_nazwa>
+  <dysponent_regon>123456785</dysponent_regon>
+  <kontakt_email>aed@dostawca.example.pl</kontakt_email>
+  <licencja>CC BY-SA 4.0</licencja>
+  <czestotliwosc_aktualizacji>daily</czestotliwosc_aktualizacji>
+  <data_aktualizacji>2026-11-22T06:00:00</data_aktualizacji>
+  <zasob>
+    <tytul>Lokalizacje AED (CSV)</tytul>
+    <link_csv>http://dostawca.example.pl/aed.csv</link_csv>
+    <format>csv</format>
+    <md5>f093977df25274d89fff1ac82b592380</md5>
+    <liczba_rekordow>7</liczba_rekordow>
+  </zasob>
+</opis_zbioru>

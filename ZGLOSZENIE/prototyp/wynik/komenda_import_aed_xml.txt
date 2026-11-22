@@ -1,0 +1,35 @@
+Import opisu zbioru AED w XML do portalu dane.gov.pl (lokalny Docker, 22.11.2026)
+Serwer dostawcy: python demo/serwer_zewnetrzny.py --https --port 8098 (z kontenera: https://host.docker.internal:8098;
+port 8098, bo 8099 zajmowała wtedy starsza kopia serwera). Instytucja dostawcy: 2843 (dane fikcyjne).
+Kolejno: sprawdzenie bez zapisu (--dry-run), opis z błędną sumą md5, opis niezgodny z XSD (oba odrzucone, nic nie
+zapisano), import poprawnego opisu (utworzono zbiór 4251 i zasób CSV 40253), powtórny import (ta sama suma md5: bez zmian).
+Pominięto linie diagnostyczne sygnałów portalu (DEBUG) i ostrzeżenie rejestru serializerów.
+
+$ docker exec mcod-admin python manage.py import_aed_xml https://host.docker.internal:8098/opis.xml --dry-run
+Opis zbioru: zgodny z XSD.
+Suma md5 pliku CSV zgodna z opisem: f093977df25274d89fff1ac82b592380.
+CSV: wiersze 7, do wykazu 7, pominięte 0, duplikaty w pliku 0.
+(kod wyjścia: 0)
+
+$ docker exec mcod-admin python manage.py import_aed_xml https://host.docker.internal:8098/opis_bledny_md5.xml --organizacja 2843
+CommandError: Import odrzucony, nic nie zapisano: suma md5 pliku CSV (f093977df25274d89fff1ac82b592380) różni się od sumy w opisie (00000000000000000000000000000000)
+(kod wyjścia: 1)
+
+$ docker exec mcod-admin python manage.py import_aed_xml https://host.docker.internal:8098/opis_bledny_xsd.xml --organizacja 2843
+CommandError: Import odrzucony, nic nie zapisano: opis zbioru niezgodny z XSD: XML niezgodny z XSD (3 błędów): linia 7: Element 'licencja': [facet 'enumeration'] The value 'CC BY-SA 4.0' is not an element of the set {'CC0 1.0', 'CC BY 4.0'}.
+(kod wyjścia: 1)
+
+$ docker exec mcod-admin python manage.py import_aed_xml https://host.docker.internal:8098/opis.xml --organizacja 2843 --uzytkownik admin@mcod.local
+Opis zbioru: zgodny z XSD.
+Suma md5 pliku CSV zgodna z opisem: f093977df25274d89fff1ac82b592380.
+CSV: wiersze 7, do wykazu 7, pominięte 0, duplikaty w pliku 0.
+2026-11-22 09:27:20,261 mcod         INFO     Import AED utworzono: zbiór 4251, zasób 40253, md5 f093977df25274d89fff1ac82b592380
+Wynik: utworzono, zbiór: 4251, zasób: 40253
+(kod wyjścia: 0)
+
+$ docker exec mcod-admin python manage.py import_aed_xml https://host.docker.internal:8098/opis.xml --organizacja 2843
+Opis zbioru: zgodny z XSD.
+Suma md5 pliku CSV zgodna z opisem: f093977df25274d89fff1ac82b592380.
+CSV: wiersze 7, do wykazu 7, pominięte 0, duplikaty w pliku 0.
+Wynik: bez_zmian, zbiór: 4251, zasób: 40253
+(kod wyjścia: 0)

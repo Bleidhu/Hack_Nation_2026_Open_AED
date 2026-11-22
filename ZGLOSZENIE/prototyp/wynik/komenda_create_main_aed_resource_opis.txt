@@ -1,0 +1,31 @@
+Budowa Wykazu AED po imporcie opisu XML (lokalny Docker, 22.11.2026): create_main_aed_resource --eager
+Źródła: CSV z opisu XML (zasób 40253), wzorzec v2.1 z numerem seryjnym (40208), Legionowo (40207), rekordy w XML (40250);
+pominięte z powodem: XML niezgodny z XSD (40251), Krosno (40210), Marki (40209).
+Deduplikacja: 45 wierszy przed, 38 po (7 duplikatów). Para z przykładów: BYD-HALA-A (CSV z opisu XML) i CT-01 (wzorzec)
+to ten sam Philips HeartStart FRx o numerze FRX-2026-0001 (powód: numer_seryjny). Sześć pozostałych to te same
+urządzenia tego samego dostawcy podane dwa razy: w zasobie z rekordami XML (40250) i w CSV z opisu (40253), stąd ten sam
+id_aed po obu stronach (powód: nazwa_i_lokalizacja; w XML brak producenta, więc decyduje nazwa i odległość do 10 m).
+Pominięto linie diagnostyczne sygnałów portalu (DEBUG).
+
+$ docker exec mcod-admin python manage.py create_main_aed_resource --eager
+2026-11-22 09:39:29,345 mcod         ERROR    Pomijam zasób źródłowy AED 40251, bo nie da się go odczytać: XML niezgodny z XSD (3 błędów): linia 23: brak wymaganego pola: typ_dostepu
+2026-11-22 09:39:29,400 mcod         WARNING  Pomijam zasób źródłowy AED 40210: brak kolumn: miejscowosc
+2026-11-22 09:39:29,450 mcod         WARNING  Pomijam zasób źródłowy AED 40209: brak kolumn: nazwa_lokalizacji, miejscowosc, szerokosc_geograficzna, dlugosc_geograficzna
+2026-11-22 09:39:29,457 mcod         INFO     Duplikat w Wykazie AED: PL-AED-8c94410246b8 pominięty, bo to samo urządzenie co PL-AED-8c94410246b8 (nazwa_i_lokalizacja).
+2026-11-22 09:39:29,457 mcod         INFO     Duplikat w Wykazie AED: PL-AED-f52e7c3c06cd pominięty, bo to samo urządzenie co PL-AED-f52e7c3c06cd (nazwa_i_lokalizacja).
+2026-11-22 09:39:29,457 mcod         INFO     Duplikat w Wykazie AED: PL-AED-5b684f1f0dce pominięty, bo to samo urządzenie co PL-AED-5b684f1f0dce (nazwa_i_lokalizacja).
+2026-11-22 09:39:29,457 mcod         INFO     Duplikat w Wykazie AED: PL-AED-fc09f4071c01 pominięty, bo to samo urządzenie co PL-AED-fc09f4071c01 (nazwa_i_lokalizacja).
+2026-11-22 09:39:29,457 mcod         INFO     Duplikat w Wykazie AED: PL-AED-543cc007ccc4 pominięty, bo to samo urządzenie co PL-AED-543cc007ccc4 (nazwa_i_lokalizacja).
+2026-11-22 09:39:29,458 mcod         INFO     Duplikat w Wykazie AED: PL-AED-57473964d4f1 pominięty, bo to samo urządzenie co PL-AED-57473964d4f1 (nazwa_i_lokalizacja).
+2026-11-22 09:39:29,458 mcod         INFO     Duplikat w Wykazie AED: PL-AED-e7f864440251 pominięty, bo to samo urządzenie co PL-AED-94891bb2df6c (numer_seryjny).
+2026-11-22 09:39:29,458 mcod         INFO     Wykaz AED: przyjęte zasoby 4, pominięte 3, wiersze 38, pominięte wiersze 0, zdeduplikowane wiersze 7.
+2026-11-22 09:39:29,466 mcod         INFO     Created main AED file /usr/src/mcod_backend/media/main_aed/Wykaz defibrylatorów AED – wykaz zbiorczy 20261122.csv; stats: {'zasoby_przyjete': 4, 'zasoby_pominiete': [{'resource_id': 40251, 'powod': 'XML niezgodny z XSD (3 błędów): linia 23: brak wymaganego pola: typ_dostepu'}, {'resource_id': 40210, 'powod': 'brak kolumn: miejscowosc'}, {'resource_id': 40209, 'powod': 'brak kolumn: nazwa_lokalizacji, miejscowosc, szerokosc_geograficzna, dlugosc_geograficzna'}], 'wiersze': 38, 'wiersze_pominiete': 0, 'wiersze_zdeduplikowane': 7, 'duplikaty': [{'zachowany': 'PL-AED-8c94410246b8', 'pominiety': 'PL-AED-8c94410246b8', 'powod': 'nazwa_i_lokalizacja'}, {'zachowany': 'PL-AED-f52e7c3c06cd', 'pominiety': 'PL-AED-f52e7c3c06cd', 'powod': 'nazwa_i_lokalizacja'}, {'zachowany': 'PL-AED-5b684f1f0dce', 'pominiety': 'PL-AED-5b684f1f0dce', 'powod': 'nazwa_i_lokalizacja'}, {'zachowany': 'PL-AED-fc09f4071c01', 'pominiety': 'PL-AED-fc09f4071c01', 'powod': 'nazwa_i_lokalizacja'}, {'zachowany': 'PL-AED-543cc007ccc4', 'pominiety': 'PL-AED-543cc007ccc4', 'powod': 'nazwa_i_lokalizacja'}, {'zachowany': 'PL-AED-57473964d4f1', 'pominiety': 'PL-AED-57473964d4f1', 'powod': 'nazwa_i_lokalizacja'}, {'zachowany': 'PL-AED-94891bb2df6c', 'pominiety': 'PL-AED-e7f864440251', 'powod': 'numer_seryjny'}]}
+2026-11-22 09:39:29,615 mcod         INFO     Starting clean up process after main AED Resource creation.
+2026-11-22 09:39:29,624 mcod         INFO     File /usr/src/mcod_backend/media/main_aed/Wykaz defibrylatorów AED – wykaz zbiorczy 20261122.csv has been deleted successfully.
+2026-11-22 09:39:29,625 mcod         INFO     Clean up completed.
+2026-11-22 09:39:29,681 mcod         INFO     Running update_dataset_archive signal
+2026-11-22 09:39:29,706 mcod         INFO     Previous Main AED Resource 40257 deleted.
+Zbiór: 4216
+Zasób: 40258
+Wiersze: 38
+(kod wyjścia: 0)

@@ -1,8 +1,8 @@
 diff --git a/portal/backend/CHANGELOG.md b/portal/backend/CHANGELOG.md
-index 7120eb2..6d1d1f4 100644
+index 7120eb2..72e8c52 100644
 --- a/portal/backend/CHANGELOG.md
 +++ b/portal/backend/CHANGELOG.md
-@@ -6,10 +6,35 @@ ______________________________________________________________________
+@@ -6,10 +6,53 @@ ______________________________________________________________________
  
  ### New
  
@@ -19,6 +19,19 @@ index 7120eb2..6d1d1f4 100644
 +- Dodano zadanie Celery `create_main_aed_resource_task` budujące codziennie zasób zbiorczy Wykazu AED - AED-07
 +- Dodano komendę `create_main_aed_resource` (opcje `--eager`, `--dry-run`) do ręcznego budowania Wykazu AED - AED-07
 +- Dodano endpoint API `/aed-aggregated` zwracający identyfikatory zbioru i zasobu zbiorczego Wykazu AED wraz z dokumentacją OpenAPI - AED-08
++- Dodano moduł `aed_xml` (walidacja pliku XML schematem XSD wzorca AED i zamiana na ramkę o kolumnach wzorca, bez zewnętrznych encji) oraz schemat `aed_punkty.xsd` - AED-11
++- Dodano źródło XML w Wykazie AED: zasób z linkiem do zewnętrznego serwera dostawcy (format `xml`, typ `api`) jest pobierany przy budowie wykazu, walidowany XSD i scalany z pozostałymi źródłami; plik niezgodny z XSD jest pomijany z powodem w statystykach - AED-12
++- Dodano komendę `import_aed_xml` zaczytującą zewnętrzne dane AED w XML (walidacja XSD, utworzenie zbioru `standard = AED` i zasobu z linkiem, opcja `--dry-run`) - AED-13
++- Dodano testy `test_aed_xml`, `test_aed_xml_source` i `test_aed_import_xml_command` - AED-11, AED-12, AED-13
++- Dodano opcjonalną kolumnę `numer_seryjny` (po `model`) do wzorca dostawcy (42 kolumny) i zasobu zbiorczego Wykazu AED (52 kolumny), z aliasami nagłówków `nr_seryjny`, `serial`, `serial_number`, `sn` (wzorzec 2.1.0) - AED-14
++- Dodano moduł `aed_dedup` (bez Django i ORM) usuwający duplikaty urządzeń przy budowie Wykazu AED: klucz mocny to numer seryjny (o ile producenci się nie wykluczają), klucz słaby tylko między różnymi zasobami to producent lub model i odległość do 30 m albo, gdy brakuje producenta, ta sama nazwa lokalizacji i odległość do 10 m; różne numery seryjne, producenci, modele lub kondygnacje wykluczają połączenie - AED-14
++- Dodano statystyki `wiersze_zdeduplikowane` i `duplikaty` (pary zachowany, pominięty, powód) oraz wpis w logu dla każdego duplikatu w `create_main_aed_df` - AED-14
++- Dodano testy `test_aed_dedup` - AED-14
++- Dodano schemat `aed_opis_zbioru.xsd` (opis zbioru: metadane, link https do CSV, suma md5) i moduł `aed_opis` (walidacja opisu XSD, odczyt, kontrola md5, kontrola kolumn i duplikatów w CSV, bez Django) - AED-15
++- Dodano moduł `aed_import`: import zbioru z opisu XML (kod 200, tylko https, walidacja XSD, pobranie CSV, zgodność md5, kontrola kolumn) do zbioru z polami niestandardowymi `standard`, `opis_xml` i `md5` oraz zasobu CSV z linkiem; ta sama suma md5 nic nie zmienia, nowa suma zastępuje zasób; przy błędzie nic nie jest zapisywane - AED-15
++- Dodano testy `test_aed_opis` - AED-15
++- Dodano funkcję `aed_import.refresh_imported_datasets` (ponowny import wszystkich zbiorów z polem niestandardowym `opis_xml`; odrzucony import zostawia zbiór bez zmian), wspólną dla `import_aed_xml --odswiez` i zadania nocnego - AED-16
++- Dodano zadanie Celery `refresh_aed_opis_task` odświeżające co noc zbiory AED zaczytane z opisu XML (opis, XSD, CSV, md5; nowa suma md5 zastępuje zasób), wyłączane przez `AED_AGGREGATION_ENABLED` - AED-16
 +
  ### Changes
  
@@ -29,6 +42,11 @@ index 7120eb2..6d1d1f4 100644
 +- Zarejestrowano schemat `AggregatedAEDInfo` i ścieżkę `/aed-aggregated` w specyfikacji OpenAPI - AED-08
 +- Dodano serializer `AggregatedAEDInfoApiResponse`, widok `AggregatedAEDInfoView` i trasę `/aed-aggregated` - AED-08
 +- Dodano podpowiedź (help_text) przy polu „Pola niestandardowe” formularza zbioru opisującą oznaczenie zbioru do Wykazu AED (`standard` = `AED`) - AED-09
++- Zmieniono komendę `import_aed_xml`: przyjmuje adres opisu zbioru w XML zamiast pliku z rekordami, tworzy lub aktualizuje zbiór i zasób CSV przez `aed_import`; nowe opcje `--odswiez` (ponowny import wszystkich zbiorów z polem `opis_xml`) i raport duplikatów w `--dry-run`; zasób z linkiem do XML z rekordami nadal można dodać w panelu - AED-15
++- Uogólniono `aed_xml._required_fields` (pola wymagane dla podanego elementu), żeby komunikaty walidacji działały także dla schematu opisu zbioru - AED-15
++- Zaktualizowano testy `test_aed_import_xml_command`, `test_aed_constants`, `test_aed_sources` i `test_main_aed_resource` (opis zbioru, md5, 42 i 52 kolumny) - AED-14, AED-15
++- Dodano do harmonogramu Celery Beat wpis `aed_opis_refresh` (codziennie 4:05, przed budową Wykazu AED o 4:15, tylko gdy `AED_AGGREGATION_ENABLED`), trasę kolejki `resources` dla `refresh_aed_opis_task` i eksport zadania w `mcod.resources.tasks` - AED-16
++- Zaktualizowano testy `test_aed_task` (harmonogram, eksport, routing, wyłącznik zadania odświeżania) i `test_aed_import_xml_command` (`refresh_imported_datasets`, `--odswiez` bez zbiorów) - AED-16
 +
  ### Fixes
  
@@ -60,34 +78,34 @@ index 0000000..2dc6748
 +Pliki z dane.gov.pl są zapisane bez zmian. Atrybucja danych CC BY 4.0: Urząd Miasta Marki, dane.gov.pl, zasób 68353.
 diff --git a/portal/backend/data/test_samples/aed/aed_punkty_przyklad.csv b/portal/backend/data/test_samples/aed/aed_punkty_przyklad.csv
 new file mode 100644
-index 0000000..daf49fa
+index 0000000..e39d59d
 --- /dev/null
 +++ b/portal/backend/data/test_samples/aed/aed_punkty_przyklad.csv
 @@ -0,0 +1,9 @@
-+id_zrodlowe,nazwa_lokalizacji,wojewodztwo,powiat,gmina,kod_terc,miejscowosc,kod_simc,kod_pocztowy,cecha_ulicy,nazwa_ulicy,kod_ulic,numer_budynku,numer_lokalu,adres_uniwersalny,szerokosc_geograficzna,dlugosc_geograficzna,opis_lokalizacji,wewnatrz_budynku,kondygnacja,typ_dostepu,dostepny_24_7,godziny_dostepnosci,zabezpieczenie,instrukcja_dostepu,status_urzadzenia,producent,model,elektrody_pediatryczne,data_waznosci_elektrod,data_waznosci_baterii,data_ostatniego_przegladu,poziom_weryfikacji,data_weryfikacji,dysponent_nazwa,dysponent_regon,telefon_kontaktowy,email_kontaktowy,zrodlo_danych,zrodlo_url,data_aktualizacji
-+CT-01,"Centrum targowe – hala A, wejście główne",kujawsko-pomorskie,Bydgoszcz,Bydgoszcz,0461011,Bydgoszcz,,85-001,ul.,Przykładowa,,187,,,53.150120,18.017350,"Parter, ściana po lewej od wejścia głównego, zielona szafka z alarmem",true,0,ograniczony,false,Mo-Su 07:00-22:00,szafka_z_alarmem,W godzinach otwarcia – bez ograniczeń; poza nimi ochrona obiektu,sprawny,,,true,2027-09-30,2029-03-31,2026-11-02,zweryfikowany_przez_dysponenta,2026-11-15,Centrum Targowe Przykład Sp. z o.o.,,525550101,aed@centrum-przyklad.example,dysponent,,2026-11-21T10:15:00
-+UM-RYN-1,"Stary Rynek – ratusz, wejście od rynku",kujawsko-pomorskie,Bydgoszcz,Bydgoszcz,0461011,Bydgoszcz,,85-002,rynek,Stary Rynek,,1,,,53.122640,17.999870,"Na zewnątrz, elewacja przy drzwiach głównych, podświetlana szafka",false,0,publiczny,true,,szafka_z_alarmem,,sprawny,,,true,2028-01-31,2030-06-30,2026-11-10,zweryfikowany_w_terenie,2026-11-10,Gmina Przykładowa,000000000,525550102,,dysponent,https://gmina-przyklad.example/aed,2026-11-20T08:00:00
-+SP99-1,Szkoła Podstawowa nr 99 – sala gimnastyczna,kujawsko-pomorskie,Bydgoszcz,Bydgoszcz,0461011,Bydgoszcz,,85-003,ul.,Szkolna,,5A,,,53.131870,18.034410,"Parter, korytarz przy wejściu do sali gimnastycznej",true,0,ograniczony,false,Mo-Fr 07:00-17:00,zamkniety_na_klucz,Klucz w sekretariacie szkoły,sprawny,,,true,2026-12-31,2028-08-31,2026-09-01,zweryfikowany_przez_dysponenta,2026-09-01,Szkoła Podstawowa nr 99 (przykład),,,,dysponent,,2026-09-01T12:00:00
-+SP99-2,Szkoła Podstawowa nr 99 – pokój nauczycielski,kujawsko-pomorskie,Bydgoszcz,Bydgoszcz,0461011,Bydgoszcz,,85-003,ul.,Szkolna,,5A,,,53.131870,18.034410,"I piętro, pokój nauczycielski, szafka przy drzwiach",true,1,ograniczony,false,Mo-Fr 07:00-17:00,szafka_otwarta,,sprawny,,,true,2027-06-30,2029-06-30,2026-09-01,zweryfikowany_przez_dysponenta,2026-09-01,Szkoła Podstawowa nr 99 (przykład),,,,dysponent,,2026-09-01T12:00:00
-+OSP-PRZ-1,OSP Przykładowo – remiza,kujawsko-pomorskie,Bydgoszcz,Bydgoszcz,0461011,Bydgoszcz,,85-004,ul.,Strażacka,,12,,,53.105530,18.069920,"Na zewnątrz, ściana boczna remizy od strony parkingu",false,0,publiczny,true,,szafka_na_kod,Kod do szafki podaje dyspozytor 112,w_serwisie,,,false,2027-02-28,2027-02-28,2026-11-18,zweryfikowany_przez_dysponenta,2026-11-18,Ochotnicza Straż Pożarna Przykładowo,,,,dysponent,,2026-11-18T19:30:00
-+ZOO-2,Park miejski – pawilon kasowy,kujawsko-pomorskie,Bydgoszcz,Bydgoszcz,0461011,Bydgoszcz,,85-005,al.,Parkowa,,2,,,53.140210,17.977560,"Wewnątrz pawilonu kasowego, za ladą – poprosić kasjera",true,0,ograniczony,false,Apr-Oct: Mo-Su 09:00-19:00; Nov-Mar: Mo-Su 09:00-16:00,brak,Dostępny przez personel kasy,niesprawny,,,false,2026-08-31,2028-05-31,2026-04-15,zweryfikowany_przez_dysponenta,2026-10-20,Zarząd Terenów Zieleni (przykład),,,,rejestr_publiczny,,2026-10-20T09:00:00
-+ZGL-2026-0017,Pływalnia osiedlowa – recepcja,kujawsko-pomorskie,Bydgoszcz,Bydgoszcz,0461011,Bydgoszcz,,85-006,ul.,Sportowa,,8,,,53.114470,18.006780,"Recepcja, na ścianie za ladą",true,0,ograniczony,false,"Mo-Fr 06:00-22:00; Sa,Su 08:00-20:00",brak,,,,,,,,,,,,,,,zgloszenie_obywatelskie,,2026-11-19T21:12:00
-+UNI-B-3,"Uczelnia – budynek B, portiernia",kujawsko-pomorskie,Bydgoszcz,Bydgoszcz,0461011,Bydgoszcz,,85-007,ul.,Akademicka,,3,,,53.127990,18.011230,"Parter, portiernia całodobowa, szafka obok okienka",true,0,publiczny,true,,szafka_otwarta,Budynek otwarty całą dobę – portier na miejscu,sprawny,Przykładowy Producent,AED-1000,true,2027-11-30,2030-01-31,2026-11-05,zweryfikowany_w_terenie,2026-11-05,Uczelnia Przykładowa,,,bhp@uczelnia.example,dysponent,,2026-11-05T14:40:00
++id_zrodlowe,nazwa_lokalizacji,wojewodztwo,powiat,gmina,kod_terc,miejscowosc,kod_simc,kod_pocztowy,cecha_ulicy,nazwa_ulicy,kod_ulic,numer_budynku,numer_lokalu,adres_uniwersalny,szerokosc_geograficzna,dlugosc_geograficzna,opis_lokalizacji,wewnatrz_budynku,kondygnacja,typ_dostepu,dostepny_24_7,godziny_dostepnosci,zabezpieczenie,instrukcja_dostepu,status_urzadzenia,producent,model,numer_seryjny,elektrody_pediatryczne,data_waznosci_elektrod,data_waznosci_baterii,data_ostatniego_przegladu,poziom_weryfikacji,data_weryfikacji,dysponent_nazwa,dysponent_regon,telefon_kontaktowy,email_kontaktowy,zrodlo_danych,zrodlo_url,data_aktualizacji
++CT-01,"Centrum targowe – hala A, wejście główne",kujawsko-pomorskie,Bydgoszcz,Bydgoszcz,0461011,Bydgoszcz,,85-001,ul.,Przykładowa,,187,,,53.150120,18.017350,"Parter, ściana po lewej od wejścia głównego, zielona szafka z alarmem",true,0,ograniczony,false,Mo-Su 07:00-22:00,szafka_z_alarmem,W godzinach otwarcia – bez ograniczeń; poza nimi ochrona obiektu,sprawny,Philips,HeartStart FRx,FRX-2026-0001,true,2027-09-30,2029-03-31,2026-11-02,zweryfikowany_przez_dysponenta,2026-11-15,Centrum Targowe Przykład Sp. z o.o.,,525550101,aed@centrum-przyklad.example,dysponent,,2026-11-21T10:15:00
++UM-RYN-1,"Stary Rynek – ratusz, wejście od rynku",kujawsko-pomorskie,Bydgoszcz,Bydgoszcz,0461011,Bydgoszcz,,85-002,rynek,Stary Rynek,,1,,,53.122640,17.999870,"Na zewnątrz, elewacja przy drzwiach głównych, podświetlana szafka",false,0,publiczny,true,,szafka_z_alarmem,,sprawny,Zoll,AED Plus,ZP-2026-0002,true,2028-01-31,2030-06-30,2026-11-10,zweryfikowany_w_terenie,2026-11-10,Gmina Przykładowa,000000000,525550102,,dysponent,https://gmina-przyklad.example/aed,2026-11-20T08:00:00
++SP99-1,Szkoła Podstawowa nr 99 – sala gimnastyczna,kujawsko-pomorskie,Bydgoszcz,Bydgoszcz,0461011,Bydgoszcz,,85-003,ul.,Szkolna,,5A,,,53.131870,18.034410,"Parter, korytarz przy wejściu do sali gimnastycznej",true,0,ograniczony,false,Mo-Fr 07:00-17:00,zamkniety_na_klucz,Klucz w sekretariacie szkoły,sprawny,Defibtech,Lifeline AED,DL-2026-0003,true,2026-12-31,2028-08-31,2026-09-01,zweryfikowany_przez_dysponenta,2026-09-01,Szkoła Podstawowa nr 99 (przykład),,,,dysponent,,2026-09-01T12:00:00
++SP99-2,Szkoła Podstawowa nr 99 – pokój nauczycielski,kujawsko-pomorskie,Bydgoszcz,Bydgoszcz,0461011,Bydgoszcz,,85-003,ul.,Szkolna,,5A,,,53.131870,18.034410,"I piętro, pokój nauczycielski, szafka przy drzwiach",true,1,ograniczony,false,Mo-Fr 07:00-17:00,szafka_otwarta,,sprawny,Defibtech,Lifeline AED,DL-2026-0004,true,2027-06-30,2029-06-30,2026-09-01,zweryfikowany_przez_dysponenta,2026-09-01,Szkoła Podstawowa nr 99 (przykład),,,,dysponent,,2026-09-01T12:00:00
++OSP-PRZ-1,OSP Przykładowo – remiza,kujawsko-pomorskie,Bydgoszcz,Bydgoszcz,0461011,Bydgoszcz,,85-004,ul.,Strażacka,,12,,,53.105530,18.069920,"Na zewnątrz, ściana boczna remizy od strony parkingu",false,0,publiczny,true,,szafka_na_kod,Kod do szafki podaje dyspozytor 112,w_serwisie,Physio-Control,LIFEPAK CR2,LP-2026-0005,false,2027-02-28,2027-02-28,2026-11-18,zweryfikowany_przez_dysponenta,2026-11-18,Ochotnicza Straż Pożarna Przykładowo,,,,dysponent,,2026-11-18T19:30:00
++ZOO-2,Park miejski – pawilon kasowy,kujawsko-pomorskie,Bydgoszcz,Bydgoszcz,0461011,Bydgoszcz,,85-005,al.,Parkowa,,2,,,53.140210,17.977560,"Wewnątrz pawilonu kasowego, za ladą – poprosić kasjera",true,0,ograniczony,false,Apr-Oct: Mo-Su 09:00-19:00; Nov-Mar: Mo-Su 09:00-16:00,brak,Dostępny przez personel kasy,niesprawny,,,,false,2026-08-31,2028-05-31,2026-04-15,zweryfikowany_przez_dysponenta,2026-10-20,Zarząd Terenów Zieleni (przykład),,,,rejestr_publiczny,,2026-10-20T09:00:00
++ZGL-2026-0017,Pływalnia osiedlowa – recepcja,kujawsko-pomorskie,Bydgoszcz,Bydgoszcz,0461011,Bydgoszcz,,85-006,ul.,Sportowa,,8,,,53.114470,18.006780,"Recepcja, na ścianie za ladą",true,0,ograniczony,false,"Mo-Fr 06:00-22:00; Sa,Su 08:00-20:00",brak,,,,,,,,,,,,,,,,zgloszenie_obywatelskie,,2026-11-19T21:12:00
++UNI-B-3,"Uczelnia – budynek B, portiernia",kujawsko-pomorskie,Bydgoszcz,Bydgoszcz,0461011,Bydgoszcz,,85-007,ul.,Akademicka,,3,,,53.127990,18.011230,"Parter, portiernia całodobowa, szafka obok okienka",true,0,publiczny,true,,szafka_otwarta,Budynek otwarty całą dobę – portier na miejscu,sprawny,Przykładowy Producent,AED-1000,,true,2027-11-30,2030-01-31,2026-11-05,zweryfikowany_w_terenie,2026-11-05,Uczelnia Przykładowa,,,bhp@uczelnia.example,dysponent,,2026-11-05T14:40:00
 diff --git a/portal/backend/data/test_samples/aed/aed_zestawienie_przyklad.csv b/portal/backend/data/test_samples/aed/aed_zestawienie_przyklad.csv
 new file mode 100644
-index 0000000..22efc12
+index 0000000..6eb0b18
 --- /dev/null
 +++ b/portal/backend/data/test_samples/aed/aed_zestawienie_przyklad.csv
 @@ -0,0 +1,9 @@
-+id_aed,id_zrodlowe,nazwa_lokalizacji,wojewodztwo,powiat,gmina,kod_terc,miejscowosc,kod_simc,kod_pocztowy,cecha_ulicy,nazwa_ulicy,kod_ulic,numer_budynku,numer_lokalu,adres_uniwersalny,szerokosc_geograficzna,dlugosc_geograficzna,opis_lokalizacji,wewnatrz_budynku,kondygnacja,typ_dostepu,dostepny_24_7,godziny_dostepnosci,zabezpieczenie,instrukcja_dostepu,status_urzadzenia,producent,model,elektrody_pediatryczne,data_waznosci_elektrod,data_waznosci_baterii,data_ostatniego_przegladu,poziom_weryfikacji,data_weryfikacji,dysponent_nazwa,dysponent_regon,telefon_kontaktowy,email_kontaktowy,zrodlo_danych,zrodlo_url,data_aktualizacji,wymaga_przegladu,dysponent_z_wydawcy,przetworzenie,wydawca_zasobu,licencja_zasobu,id_zasobu_zrodlowego,url_zasobu_zrodlowego,data_danych_zasobu,data_agregacji
-+PL-AED-7e649367c1b8,CT-01,"Centrum targowe – hala A, wejście główne",kujawsko-pomorskie,Bydgoszcz,Bydgoszcz,0461011,Bydgoszcz,,85-001,ul.,Przykładowa,,187,,,53.150120,18.017350,"Parter, ściana po lewej od wejścia głównego, zielona szafka z alarmem",true,0,ograniczony,false,Mo-Su 07:00-22:00,szafka_z_alarmem,W godzinach otwarcia – bez ograniczeń; poza nimi ochrona obiektu,sprawny,,,true,2027-09-30,2029-03-31,2026-11-02,zweryfikowany_przez_dysponenta,2026-11-15,Centrum Targowe Przykład Sp. z o.o.,,525550101,aed@centrum-przyklad.example,dysponent,,2026-11-21T10:15:00,false,false,,Gmina Przykładowa (PRZYKŁAD),CC0 1.0,900001,https://dane.gov.pl/pl/dataset/1/resource/900001,2026-11-20,2026-11-22T04:15:00
-+PL-AED-65383850a61c,UM-RYN-1,"Stary Rynek – ratusz, wejście od rynku",kujawsko-pomorskie,Bydgoszcz,Bydgoszcz,0461011,Bydgoszcz,,85-002,rynek,Stary Rynek,,1,,,53.122640,17.999870,"Na zewnątrz, elewacja przy drzwiach głównych, podświetlana szafka",false,0,publiczny,true,,szafka_z_alarmem,,sprawny,,,true,2028-01-31,2030-06-30,2026-11-10,zweryfikowany_w_terenie,2026-11-10,Gmina Przykładowa,000000000,525550102,,dysponent,https://gmina-przyklad.example/aed,2026-11-20T08:00:00,false,false,,Gmina Przykładowa (PRZYKŁAD),CC0 1.0,900001,https://dane.gov.pl/pl/dataset/1/resource/900001,2026-11-20,2026-11-22T04:15:00
-+PL-AED-fa27645d35c8,SP99-1,Szkoła Podstawowa nr 99 – sala gimnastyczna,kujawsko-pomorskie,Bydgoszcz,Bydgoszcz,0461011,Bydgoszcz,,85-003,ul.,Szkolna,,5A,,,53.131870,18.034410,"Parter, korytarz przy wejściu do sali gimnastycznej",true,0,ograniczony,false,Mo-Fr 07:00-17:00,zamkniety_na_klucz,Klucz w sekretariacie szkoły,sprawny,,,true,2026-12-31,2028-08-31,2026-09-01,zweryfikowany_przez_dysponenta,2026-09-01,Szkoła Podstawowa nr 99 (przykład),,,,dysponent,,2026-09-01T12:00:00,false,false,,Gmina Przykładowa (PRZYKŁAD),CC0 1.0,900001,https://dane.gov.pl/pl/dataset/1/resource/900001,2026-11-20,2026-11-22T04:15:00
-+PL-AED-ab85f7fc510a,SP99-2,Szkoła Podstawowa nr 99 – pokój nauczycielski,kujawsko-pomorskie,Bydgoszcz,Bydgoszcz,0461011,Bydgoszcz,,85-003,ul.,Szkolna,,5A,,,53.131870,18.034410,"I piętro, pokój nauczycielski, szafka przy drzwiach",true,1,ograniczony,false,Mo-Fr 07:00-17:00,szafka_otwarta,,sprawny,,,true,2027-06-30,2029-06-30,2026-09-01,zweryfikowany_przez_dysponenta,2026-09-01,Szkoła Podstawowa nr 99 (przykład),,,,dysponent,,2026-09-01T12:00:00,false,false,,Gmina Przykładowa (PRZYKŁAD),CC0 1.0,900001,https://dane.gov.pl/pl/dataset/1/resource/900001,2026-11-20,2026-11-22T04:15:00
-+PL-AED-9f808a3622dd,OSP-PRZ-1,OSP Przykładowo – remiza,kujawsko-pomorskie,Bydgoszcz,Bydgoszcz,0461011,Bydgoszcz,,85-004,ul.,Strażacka,,12,,,53.105530,18.069920,"Na zewnątrz, ściana boczna remizy od strony parkingu",false,0,publiczny,true,,szafka_na_kod,Kod do szafki podaje dyspozytor 112,w_serwisie,,,false,2027-02-28,2027-02-28,2026-11-18,zweryfikowany_przez_dysponenta,2026-11-18,Ochotnicza Straż Pożarna Przykładowo,,,,dysponent,,2026-11-18T19:30:00,false,false,,Gmina Przykładowa (PRZYKŁAD),CC0 1.0,900001,https://dane.gov.pl/pl/dataset/1/resource/900001,2026-11-20,2026-11-22T04:15:00
-+PL-AED-8816bdaddea4,ZOO-2,Park miejski – pawilon kasowy,kujawsko-pomorskie,Bydgoszcz,Bydgoszcz,0461011,Bydgoszcz,,85-005,al.,Parkowa,,2,,,53.140210,17.977560,"Wewnątrz pawilonu kasowego, za ladą – poprosić kasjera",true,0,ograniczony,false,Apr-Oct: Mo-Su 09:00-19:00; Nov-Mar: Mo-Su 09:00-16:00,brak,Dostępny przez personel kasy,niesprawny,,,false,2026-08-31,2028-05-31,2026-04-15,zweryfikowany_przez_dysponenta,2026-10-20,Zarząd Terenów Zieleni (przykład),,,,rejestr_publiczny,,2026-10-20T09:00:00,true,false,,Gmina Przykładowa (PRZYKŁAD),CC0 1.0,900001,https://dane.gov.pl/pl/dataset/1/resource/900001,2026-11-20,2026-11-22T04:15:00
-+PL-AED-60706a121134,ZGL-2026-0017,Pływalnia osiedlowa – recepcja,kujawsko-pomorskie,Bydgoszcz,Bydgoszcz,0461011,Bydgoszcz,,85-006,ul.,Sportowa,,8,,,53.114470,18.006780,"Recepcja, na ścianie za ladą",true,0,ograniczony,false,"Mo-Fr 06:00-22:00; Sa,Su 08:00-20:00",brak,,nieznany,,,,,,,niezweryfikowany,,Gmina Przykładowa (PRZYKŁAD),,,,zgloszenie_obywatelskie,,2026-11-19T21:12:00,,true,domyslne;dysponent_z_wydawcy,Gmina Przykładowa (PRZYKŁAD),CC0 1.0,900001,https://dane.gov.pl/pl/dataset/1/resource/900001,2026-11-20,2026-11-22T04:15:00
-+PL-AED-2f3b76fdceb2,UNI-B-3,"Uczelnia – budynek B, portiernia",kujawsko-pomorskie,Bydgoszcz,Bydgoszcz,0461011,Bydgoszcz,,85-007,ul.,Akademicka,,3,,,53.127990,18.011230,"Parter, portiernia całodobowa, szafka obok okienka",true,0,publiczny,true,,szafka_otwarta,Budynek otwarty całą dobę – portier na miejscu,sprawny,Przykładowy Producent,AED-1000,true,2027-11-30,2030-01-31,2026-11-05,zweryfikowany_w_terenie,2026-11-05,Uczelnia Przykładowa,,,,dysponent,,2026-11-05T14:40:00,false,false,kontakt_usuniety,Starostwo Powiatowe Przykład (PRZYKŁAD),CC BY 4.0,900002,https://dane.gov.pl/pl/dataset/2/resource/900002,2026-11-19,2026-11-22T04:15:00
++id_aed,id_zrodlowe,nazwa_lokalizacji,wojewodztwo,powiat,gmina,kod_terc,miejscowosc,kod_simc,kod_pocztowy,cecha_ulicy,nazwa_ulicy,kod_ulic,numer_budynku,numer_lokalu,adres_uniwersalny,szerokosc_geograficzna,dlugosc_geograficzna,opis_lokalizacji,wewnatrz_budynku,kondygnacja,typ_dostepu,dostepny_24_7,godziny_dostepnosci,zabezpieczenie,instrukcja_dostepu,status_urzadzenia,producent,model,numer_seryjny,elektrody_pediatryczne,data_waznosci_elektrod,data_waznosci_baterii,data_ostatniego_przegladu,poziom_weryfikacji,data_weryfikacji,dysponent_nazwa,dysponent_regon,telefon_kontaktowy,email_kontaktowy,zrodlo_danych,zrodlo_url,data_aktualizacji,wymaga_przegladu,dysponent_z_wydawcy,przetworzenie,wydawca_zasobu,licencja_zasobu,id_zasobu_zrodlowego,url_zasobu_zrodlowego,data_danych_zasobu,data_agregacji
++PL-AED-7e649367c1b8,CT-01,"Centrum targowe – hala A, wejście główne",kujawsko-pomorskie,Bydgoszcz,Bydgoszcz,0461011,Bydgoszcz,,85-001,ul.,Przykładowa,,187,,,53.150120,18.017350,"Parter, ściana po lewej od wejścia głównego, zielona szafka z alarmem",true,0,ograniczony,false,Mo-Su 07:00-22:00,szafka_z_alarmem,W godzinach otwarcia – bez ograniczeń; poza nimi ochrona obiektu,sprawny,Philips,HeartStart FRx,FRX-2026-0001,true,2027-09-30,2029-03-31,2026-11-02,zweryfikowany_przez_dysponenta,2026-11-15,Centrum Targowe Przykład Sp. z o.o.,,525550101,aed@centrum-przyklad.example,dysponent,,2026-11-21T10:15:00,false,false,,Gmina Przykładowa (PRZYKŁAD),CC0 1.0,900001,https://dane.gov.pl/pl/dataset/1/resource/900001,2026-11-20,2026-11-22T04:15:00
++PL-AED-65383850a61c,UM-RYN-1,"Stary Rynek – ratusz, wejście od rynku",kujawsko-pomorskie,Bydgoszcz,Bydgoszcz,0461011,Bydgoszcz,,85-002,rynek,Stary Rynek,,1,,,53.122640,17.999870,"Na zewnątrz, elewacja przy drzwiach głównych, podświetlana szafka",false,0,publiczny,true,,szafka_z_alarmem,,sprawny,Zoll,AED Plus,ZP-2026-0002,true,2028-01-31,2030-06-30,2026-11-10,zweryfikowany_w_terenie,2026-11-10,Gmina Przykładowa,000000000,525550102,,dysponent,https://gmina-przyklad.example/aed,2026-11-20T08:00:00,false,false,,Gmina Przykładowa (PRZYKŁAD),CC0 1.0,900001,https://dane.gov.pl/pl/dataset/1/resource/900001,2026-11-20,2026-11-22T04:15:00
++PL-AED-fa27645d35c8,SP99-1,Szkoła Podstawowa nr 99 – sala gimnastyczna,kujawsko-pomorskie,Bydgoszcz,Bydgoszcz,0461011,Bydgoszcz,,85-003,ul.,Szkolna,,5A,,,53.131870,18.034410,"Parter, korytarz przy wejściu do sali gimnastycznej",true,0,ograniczony,false,Mo-Fr 07:00-17:00,zamkniety_na_klucz,Klucz w sekretariacie szkoły,sprawny,Defibtech,Lifeline AED,DL-2026-0003,true,2026-12-31,2028-08-31,2026-09-01,zweryfikowany_przez_dysponenta,2026-09-01,Szkoła Podstawowa nr 99 (przykład),,,,dysponent,,2026-09-01T12:00:00,false,false,,Gmina Przykładowa (PRZYKŁAD),CC0 1.0,900001,https://dane.gov.pl/pl/dataset/1/resource/900001,2026-11-20,2026-11-22T04:15:00
++PL-AED-ab85f7fc510a,SP99-2,Szkoła Podstawowa nr 99 – pokój nauczycielski,kujawsko-pomorskie,Bydgoszcz,Bydgoszcz,0461011,Bydgoszcz,,85-003,ul.,Szkolna,,5A,,,53.131870,18.034410,"I piętro, pokój nauczycielski, szafka przy drzwiach",true,1,ograniczony,false,Mo-Fr 07:00-17:00,szafka_otwarta,,sprawny,Defibtech,Lifeline AED,DL-2026-0004,true,2027-06-30,2029-06-30,2026-09-01,zweryfikowany_przez_dysponenta,2026-09-01,Szkoła Podstawowa nr 99 (przykład),,,,dysponent,,2026-09-01T12:00:00,false,false,,Gmina Przykładowa (PRZYKŁAD),CC0 1.0,900001,https://dane.gov.pl/pl/dataset/1/resource/900001,2026-11-20,2026-11-22T04:15:00
++PL-AED-9f808a3622dd,OSP-PRZ-1,OSP Przykładowo – remiza,kujawsko-pomorskie,Bydgoszcz,Bydgoszcz,0461011,Bydgoszcz,,85-004,ul.,Strażacka,,12,,,53.105530,18.069920,"Na zewnątrz, ściana boczna remizy od strony parkingu",false,0,publiczny,true,,szafka_na_kod,Kod do szafki podaje dyspozytor 112,w_serwisie,Physio-Control,LIFEPAK CR2,LP-2026-0005,false,2027-02-28,2027-02-28,2026-11-18,zweryfikowany_przez_dysponenta,2026-11-18,Ochotnicza Straż Pożarna Przykładowo,,,,dysponent,,2026-11-18T19:30:00,false,false,,Gmina Przykładowa (PRZYKŁAD),CC0 1.0,900001,https://dane.gov.pl/pl/dataset/1/resource/900001,2026-11-20,2026-11-22T04:15:00
++PL-AED-8816bdaddea4,ZOO-2,Park miejski – pawilon kasowy,kujawsko-pomorskie,Bydgoszcz,Bydgoszcz,0461011,Bydgoszcz,,85-005,al.,Parkowa,,2,,,53.140210,17.977560,"Wewnątrz pawilonu kasowego, za ladą – poprosić kasjera",true,0,ograniczony,false,Apr-Oct: Mo-Su 09:00-19:00; Nov-Mar: Mo-Su 09:00-16:00,brak,Dostępny przez personel kasy,niesprawny,,,,false,2026-08-31,2028-05-31,2026-04-15,zweryfikowany_przez_dysponenta,2026-10-20,Zarząd Terenów Zieleni (przykład),,,,rejestr_publiczny,,2026-10-20T09:00:00,true,false,,Gmina Przykładowa (PRZYKŁAD),CC0 1.0,900001,https://dane.gov.pl/pl/dataset/1/resource/900001,2026-11-20,2026-11-22T04:15:00
++PL-AED-60706a121134,ZGL-2026-0017,Pływalnia osiedlowa – recepcja,kujawsko-pomorskie,Bydgoszcz,Bydgoszcz,0461011,Bydgoszcz,,85-006,ul.,Sportowa,,8,,,53.114470,18.006780,"Recepcja, na ścianie za ladą",true,0,ograniczony,false,"Mo-Fr 06:00-22:00; Sa,Su 08:00-20:00",brak,,nieznany,,,,,,,,niezweryfikowany,,Gmina Przykładowa (PRZYKŁAD),,,,zgloszenie_obywatelskie,,2026-11-19T21:12:00,,true,domyslne;dysponent_z_wydawcy,Gmina Przykładowa (PRZYKŁAD),CC0 1.0,900001,https://dane.gov.pl/pl/dataset/1/resource/900001,2026-11-20,2026-11-22T04:15:00
++PL-AED-2f3b76fdceb2,UNI-B-3,"Uczelnia – budynek B, portiernia",kujawsko-pomorskie,Bydgoszcz,Bydgoszcz,0461011,Bydgoszcz,,85-007,ul.,Akademicka,,3,,,53.127990,18.011230,"Parter, portiernia całodobowa, szafka obok okienka",true,0,publiczny,true,,szafka_otwarta,Budynek otwarty całą dobę – portier na miejscu,sprawny,Przykładowy Producent,AED-1000,,true,2027-11-30,2030-01-31,2026-11-05,zweryfikowany_w_terenie,2026-11-05,Uczelnia Przykładowa,,,,dysponent,,2026-11-05T14:40:00,false,false,kontakt_usuniety,Starostwo Powiatowe Przykład (PRZYKŁAD),CC BY 4.0,900002,https://dane.gov.pl/pl/dataset/2/resource/900002,2026-11-19,2026-11-22T04:15:00
 diff --git a/portal/backend/data/test_samples/aed/krosno_54632.csv b/portal/backend/data/test_samples/aed/krosno_54632.csv
 new file mode 100644
 index 0000000..f03db39
@@ -191,7 +209,7 @@ index 0000000..545fa84
 +764;Defibrylator (AED 7639) Grunwaldzka 81 (Szkoła Podstawowa Nr 16 w Przemyslu);Defibrylator AED (Automated External Defibrillator) to przenośne urządzenie medyczne, które zostało zaprojektowane w celu ratowania życia osobom z nagłym zatrzymaniem akcji serca (NZK). AED jest łatwy w użyciu, dzięki czemu mogą z niego korzystać osoby bez specjalistycznego wykształcenia medycznego. Po włączeniu urządzenia użytkownik jest prowadzony krok po kroku poprzez instrukcje głosowe oraz wizualne, które pomagają prawidłowo przeprowadzić resuscytację. Defibrylator AED analizuje rytm serca poszkodowanego i automatycznie określa, czy konieczne jest wykonanie defibrylacji, czyli impulsu elektrycznego mającego na celu przywrócenie prawidłowego rytmu serca. W przypadku, gdy defibrylacja jest potrzebna, AED wydaje polecenie naciśnięcia przycisku, który wyzwala impuls elektryczny. Urządzenie posiada wbudowane zabezpieczenia, które uniemożliwiają wykonanie defibrylacji, jeśli rytm serca nie wymaga takiej interwencji, co zwiększa bezpieczeństwo użytkownika. Defibrylatory AED są często instalowane w miejscach publicznych, takich jak lotniska, centra handlowe, dworce, oraz w miejscach pracy, aby zapewnić szybki dostęp do sprzętu ratującego życie w sytuacjach nagłego zatrzymania krążenia.;Defibrylatory AED;Przemyśl;Grunwaldzka;81;37-700;;;;;;{"type":"Point","coordinates":{"lat":"49.7844038","long":"22.7549412"}};[1][url:https://przemysl.skycms.com.pl/download/156869/defibrylator-aed-7639-grunwaldzka-81-szkola-podstawowa-nr-16-w-przemyslu-][thumbUrl:https://przemysl.skycms.com.pl/download/thumbnailCustom/156869/auto/120/defibrylator-aed-7639-grunwaldzka-81-szkola-podstawowa-nr-16-w-przemyslu-][thumbUrlMedium:https://przemysl.skycms.com.pl/download/thumbnailCustom/156869/300/auto/defibrylator-aed-7639-grunwaldzka-81-szkola-podstawowa-nr-16-w-przemyslu-];;
 +765;Defibrylator (AED 7649) Bpa. Jakuba Glazera 44 (II Liceum Ogólnoksztalcące w Przemyślu);Defibrylator AED (Automated External Defibrillator) to przenośne urządzenie medyczne, które zostało zaprojektowane w celu ratowania życia osobom z nagłym zatrzymaniem akcji serca (NZK). AED jest łatwy w użyciu, dzięki czemu mogą z niego korzystać osoby bez specjalistycznego wykształcenia medycznego. Po włączeniu urządzenia użytkownik jest prowadzony krok po kroku poprzez instrukcje głosowe oraz wizualne, które pomagają prawidłowo przeprowadzić resuscytację. Defibrylator AED analizuje rytm serca poszkodowanego i automatycznie określa, czy konieczne jest wykonanie defibrylacji, czyli impulsu elektrycznego mającego na celu przywrócenie prawidłowego rytmu serca. W przypadku, gdy defibrylacja jest potrzebna, AED wydaje polecenie naciśnięcia przycisku, który wyzwala impuls elektryczny. Urządzenie posiada wbudowane zabezpieczenia, które uniemożliwiają wykonanie defibrylacji, jeśli rytm serca nie wymaga takiej interwencji, co zwiększa bezpieczeństwo użytkownika. Defibrylatory AED są często instalowane w miejscach publicznych, takich jak lotniska, centra handlowe, dworce, oraz w miejscach pracy, aby zapewnić szybki dostęp do sprzętu ratującego życie w sytuacjach nagłego zatrzymania krążenia.;Defibrylatory AED;Przemyśl;Bpa. Jakuba Glazera;44;37-700;;;;;;{"type":"Point","coordinates":{"lat":"49.7916725","long":"22.7531132"}};[1][url:https://przemysl.skycms.com.pl/download/156869/defibrylator-aed-7649-bpa-jakuba-glazera-44-ii-liceum-ogolnoksztalcace-w-przemyslu-][thumbUrl:https://przemysl.skycms.com.pl/download/thumbnailCustom/156869/auto/120/defibrylator-aed-7649-bpa-jakuba-glazera-44-ii-liceum-ogolnoksztalcace-w-przemyslu-][thumbUrlMedium:https://przemysl.skycms.com.pl/download/thumbnailCustom/156869/300/auto/defibrylator-aed-7649-bpa-jakuba-glazera-44-ii-liceum-ogolnoksztalcace-w-przemyslu-];;
 diff --git a/portal/backend/mcod/celeryapp.py b/portal/backend/mcod/celeryapp.py
-index 7e5ddce..0066b62 100644
+index 7e5ddce..a766977 100644
 --- a/portal/backend/mcod/celeryapp.py
 +++ b/portal/backend/mcod/celeryapp.py
 @@ -47,7 +47,10 @@ def update_beat_schedule(beat_schedule_to_update: dict, update_data: str) -> boo
@@ -206,13 +224,18 @@ index 7e5ddce..0066b62 100644
  ) -> dict:
      """Create a schedule for Celery Beat, with monthly reports
      if `enable_monthly_reports` is `True`.
-@@ -165,6 +168,17 @@ def get_beat_schedule(
+@@ -165,6 +168,22 @@ def get_beat_schedule(
              }
          )
  
 +    if enable_aed_aggregation:
 +        beat_schedule.update(
 +            {
++                "aed_opis_refresh": {
++                    "task": "mcod.resources.tasks.refresh_aed_opis_task",
++                    "options": default_options,
++                    "schedule": crontab(minute=5, hour=4),
++                },
 +                "aed_main_resource_creation": {
 +                    "task": "mcod.resources.tasks.create_main_aed_resource_task",
 +                    "options": default_options,
@@ -224,7 +247,7 @@ index 7e5ddce..0066b62 100644
      if update_beat_schedule_data:
          update_beat_schedule(beat_schedule, update_beat_schedule_data)
  
-@@ -175,4 +189,5 @@ app.conf.beat_schedule = get_beat_schedule(
+@@ -175,4 +194,5 @@ app.conf.beat_schedule = get_beat_schedule(
      enable_monthly_reports=settings.ENABLE_MONTHLY_REPORTS,
      enable_create_xml_metadata_report=settings.ENABLE_CREATE_XML_METADATA_REPORT,
      update_beat_schedule_data=settings.UPDATE_TASKS_CELERY_BEAT_TIME,
@@ -633,16 +656,16 @@ index 0000000..f2c0194
 +    return buffer.getvalue().encode("utf-8")
 diff --git a/portal/backend/mcod/resources/aed_constants.py b/portal/backend/mcod/resources/aed_constants.py
 new file mode 100644
-index 0000000..959c2d0
+index 0000000..779300e
 --- /dev/null
 +++ b/portal/backend/mcod/resources/aed_constants.py
-@@ -0,0 +1,131 @@
+@@ -0,0 +1,136 @@
 +from typing import Dict, List, Tuple
 +
 +# Stałe dodatku „Zestawienie AED”. Plik importuje wyłącznie `typing`, bo korzysta z niego
 +# również czysta logika agregacji (`aed_aggregation.py`) uruchamiana poza Django.
 +#
-+# Kolejność kolumn jest kontraktem: wzorzec dostawcy v2 (41 kolumn) i zasób zbiorczy (51 kolumn)
++# Kolejność kolumn jest kontraktem: wzorzec dostawcy v2 (42 kolumny) i zasób zbiorczy (52 kolumny)
 +# muszą odpowiadać schematom `format_danych/schemat/aed_punkty.tableschema.json`
 +# i `format_danych/schemat/aed_zestawienie.tableschema.json`.
 +
@@ -675,6 +698,7 @@ index 0000000..959c2d0
 +    "status_urzadzenia",
 +    "producent",
 +    "model",
++    "numer_seryjny",
 +    "elektrody_pediatryczne",
 +    "data_waznosci_elektrod",
 +    "data_waznosci_baterii",
@@ -734,6 +758,10 @@ index 0000000..959c2d0
 +    "e_mail": "email_kontaktowy",
 +    "id": "id_zrodlowe",
 +    "numer_id": "id_zrodlowe",
++    "nr_seryjny": "numer_seryjny",
++    "serial": "numer_seryjny",
++    "serial_number": "numer_seryjny",
++    "sn": "numer_seryjny",
 +}
 +
 +# Wartości zwracane przez `Dataset.license_name`. ODbL i licencje „share-alike” nie wchodzą do zestawienia.
@@ -768,12 +796,578 @@ index 0000000..959c2d0
 +LON_RANGE: Tuple[float, float] = (14.1, 24.2)
 +
 +AED_ID_PREFIX = "PL-AED-"
+diff --git a/portal/backend/mcod/resources/aed_dedup.py b/portal/backend/mcod/resources/aed_dedup.py
+new file mode 100644
+index 0000000..3759165
+--- /dev/null
++++ b/portal/backend/mcod/resources/aed_dedup.py
+@@ -0,0 +1,192 @@
++"""
++Deduplikacja wierszy Wykazu AED: to samo urządzenie zgłoszone przez dwóch dostawców (albo dwa razy w jednym pliku)
++ma trafić do wykazu raz.
++
++Moduł nie importuje Django ani ORM: przyjmuje i zwraca `DataFrame` (kolumny zasobu zbiorczego), więc działa też
++w `demo/sprawdz.py`. Reguły (kolejność ma znaczenie):
++
++1. **Klucz mocny: numer seryjny.** Ten sam znormalizowany numer seryjny oznacza to samo urządzenie, chyba że oba wiersze
++   podają producenta i producenci się różnią (numery seryjne różnych firm mogą się powtarzać).
++2. **Klucz słaby, tylko między różnymi zasobami:** punkty w odległości do 30 m, bez sprzeczności
++   (różne numery seryjne, różni producenci, różne modele albo różne kondygnacje oznaczają różne urządzenia) i z zgodnością:
++   - ten sam producent albo ten sam model (marka), albo
++   - gdy brakuje marki: odległość do 10 m i ta sama znormalizowana nazwa lokalizacji.
++   W obrębie jednego pliku dwa AED w jednym miejscu bez numerów seryjnych to dwa urządzenia, więc nie są łączone.
++3. **Który wiersz zostaje:** wyższy poziom weryfikacji, potem nowsza `data_aktualizacji`, potem wcześniejszy w kolejności.
++   Puste `producent`, `model` i `numer_seryjny` zachowanego wiersza uzupełniamy z duplikatów.
++
++Wynik zawiera listę par (`zachowany`, `pominiety`, `powod`), którą portal zapisuje w statystykach i logu.
++"""
++
++import math
++import re
++import unicodedata
++from typing import Any, Dict, List, Optional, Tuple
++
++import pandas as pd
++
++SERIAL_PLACEHOLDERS = {"brak", "nieznany", "nieznane", "nd", "na", "none", "null", "unknown", "bd"}
++MIN_SERIAL_LENGTH = 4
++WEAK_DISTANCE_M = 30.0
++NAME_DISTANCE_M = 10.0
++VERIFICATION_RANK = {"zweryfikowany_w_terenie": 2, "zweryfikowany_przez_dysponenta": 1}
++FILL_COLUMNS = ("producent", "model", "numer_seryjny")
++REASON_SERIAL = "numer_seryjny"
++REASON_BRAND = "marka_model_i_lokalizacja"
++REASON_NAME = "nazwa_i_lokalizacja"
++
++
++def _plain(value: Any) -> str:
++    text = unicodedata.normalize("NFKD", str(value if value is not None else "").replace("ł", "l").replace("Ł", "L"))
++    return re.sub(r"[^a-z0-9]", "", "".join(c for c in text if not unicodedata.combining(c)).lower())
++
++
++def normalize_serial(value: Any) -> str:
++    """Znormalizowany numer seryjny albo pusty tekst, gdy to brak danych (np. „brak”, „-”, za krótki)."""
++    serial = _plain(value)
++    if serial in SERIAL_PLACEHOLDERS or len(serial) < MIN_SERIAL_LENGTH or len(set(serial)) == 1:
++        return ""
++    return serial
++
++
++def _float(value: Any) -> Optional[float]:
++    try:
++        return float(str(value).strip())
++    except ValueError:
++        return None
++
++
++def distance_m(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
++    p1, p2 = math.radians(lat1), math.radians(lat2)
++    a = math.sin((p2 - p1) / 2) ** 2 + math.cos(p1) * math.cos(p2) * math.sin(math.radians(lon2 - lon1) / 2) ** 2
++    return 12742000.0 * math.asin(math.sqrt(a))
++
++
++class _Row:
++    def __init__(self, index: int, record: Dict[str, Any]):
++        self.index = index
++        self.record = record
++        self.serial = normalize_serial(record.get("numer_seryjny"))
++        self.brand = _plain(record.get("producent"))
++        self.model = _plain(record.get("model"))
++        self.name = _plain(record.get("nazwa_lokalizacji"))
++        self.floor = str(record.get("kondygnacja") or "").strip()
++        self.resource = str(record.get("id_zasobu_zrodlowego") or "")
++        self.lat = _float(record.get("szerokosc_geograficzna"))
++        self.lon = _float(record.get("dlugosc_geograficzna"))
++        self.rank = VERIFICATION_RANK.get(str(record.get("poziom_weryfikacji") or ""), 0)
++        self.updated = str(record.get("data_aktualizacji") or "")
++
++    @property
++    def best_key(self) -> Tuple[int, str, int]:
++        return self.rank, self.updated, -self.index
++
++
++def _conflict(a: str, b: str) -> bool:
++    return bool(a) and bool(b) and a != b
++
++
++def _strong_match(a: _Row, b: _Row) -> bool:
++    return bool(a.serial) and a.serial == b.serial and not _conflict(a.brand, b.brand)
++
++
++def _weak_match(a: _Row, b: _Row) -> Optional[str]:
++    if a.resource == b.resource or None in (a.lat, a.lon, b.lat, b.lon):
++        return None
++    if _conflict(a.serial, b.serial) or _conflict(a.brand, b.brand) or _conflict(a.model, b.model) or _conflict(a.floor, b.floor):
++        return None
++    meters = distance_m(a.lat, a.lon, b.lat, b.lon)
++    if meters > WEAK_DISTANCE_M:
++        return None
++    if (a.brand and a.brand == b.brand) or (a.model and a.model == b.model):
++        return REASON_BRAND
++    if not (a.brand and b.brand) and meters <= NAME_DISTANCE_M and a.name and a.name == b.name:
++        return REASON_NAME
++    return None
++
++
++def _serial_pairs(rows: List[_Row]) -> set:
++    by_serial: Dict[str, List[_Row]] = {}
++    for row in rows:
++        if row.serial:
++            by_serial.setdefault(row.serial, []).append(row)
++    return {(a.index, b.index) for group in by_serial.values() for i, a in enumerate(group) for b in group[i + 1 :]}
++
++
++def _grid_pairs(rows: List[_Row]) -> set:
++    """Pary z sąsiednich komórek siatki ~100 m, żeby nie porównywać wszystkich ze wszystkimi."""
++    grid: Dict[Tuple[int, int], List[_Row]] = {}
++    for row in rows:
++        if row.lat is not None and row.lon is not None:
++            grid.setdefault((int(row.lat * 1000), int(row.lon * 1000)), []).append(row)
++    pairs = set()
++    for (cx, cy), group in grid.items():
++        near = [r for dx in (-1, 0, 1) for dy in (-1, 0, 1) for r in grid.get((cx + dx, cy + dy), [])]
++        pairs.update((a.index, b.index) for a in group for b in near if a.index < b.index)
++    return pairs
++
++
++def _candidate_pairs(rows: List[_Row]):
++    for i, j in sorted(_serial_pairs(rows) | _grid_pairs(rows)):
++        yield rows[i], rows[j]
++
++
++def _group_rows(rows: List[_Row]) -> Tuple[Dict[int, List[_Row]], Dict[int, Tuple[int, str]]]:
++    """Grupy tego samego urządzenia (union-find) i powód połączenia każdego wiersza."""
++    parent = list(range(len(rows)))
++    edges: Dict[int, Tuple[int, str]] = {}
++
++    def find(x: int) -> int:
++        while parent[x] != x:
++            parent[x] = parent[parent[x]]
++            x = parent[x]
++        return x
++
++    for a, b in _candidate_pairs(rows):
++        reason = REASON_SERIAL if _strong_match(a, b) else _weak_match(a, b)
++        if reason and find(a.index) != find(b.index):
++            parent[find(b.index)] = find(a.index)
++            edges[b.index] = (a.index, reason)
++            edges.setdefault(a.index, (b.index, reason))
++    groups: Dict[int, List[_Row]] = {}
++    for row in rows:
++        groups.setdefault(find(row.index), []).append(row)
++    return groups, edges
++
++
++def _fill_values(keeper: _Row, members: List[_Row]) -> Dict[str, Any]:
++    fill = {}
++    for column in FILL_COLUMNS:
++        if not str(keeper.record.get(column) or "").strip():
++            donor = next((m.record.get(column) for m in members if str(m.record.get(column) or "").strip()), None)
++            if donor:
++                fill[column] = donor
++    return fill
++
++
++def deduplicate_rows(df: pd.DataFrame) -> Tuple[pd.DataFrame, List[Dict[str, str]]]:
++    """Zwraca ramkę bez duplikatów (kolejność zachowanych wierszy bez zmian) i listę usuniętych duplikatów."""
++    if df.empty:
++        return df, []
++    rows = [_Row(i, rec) for i, rec in enumerate(df.to_dict("records"))]
++    groups, edges = _group_rows(rows)
++    drop, duplicates = set(), []
++    result = df.copy()
++    for members in groups.values():
++        if len(members) == 1:
++            continue
++        keeper = max(members, key=lambda r: r.best_key)
++        for column, value in _fill_values(keeper, members).items():
++            result.iat[keeper.index, result.columns.get_loc(column)] = value
++        for member in members:
++            if member is not keeper:
++                drop.add(member.index)
++                reason = edges.get(member.index, (0, REASON_SERIAL))[1]
++                duplicates.append(
++                    {
++                        "zachowany": str(keeper.record.get("id_aed", keeper.index)),
++                        "pominiety": str(member.record.get("id_aed", member.index)),
++                        "powod": reason,
++                    }
++                )
++    return result.drop(index=result.index[sorted(drop)]).reset_index(drop=True), duplicates
+diff --git a/portal/backend/mcod/resources/aed_import.py b/portal/backend/mcod/resources/aed_import.py
+new file mode 100644
+index 0000000..a470abf
+--- /dev/null
++++ b/portal/backend/mcod/resources/aed_import.py
+@@ -0,0 +1,159 @@
++"""
++Import zewnętrznych danych AED do portalu: opis zbioru w XML → walidacja XSD → CSV → zgodność md5 → zbiór i zasób.
++
++Warstwa portalu (ORM) nad czystą logiką z `aed_opis.py`. Zbiór rozpoznajemy po `customfields` (bez migracji):
++`standard = AED`, `opis_xml` = adres opisu, `md5` = suma CSV z ostatniego importu. Powtórny import tego samego opisu
++nic nie zmienia, gdy md5 jest takie samo; gdy się zmieniło, zasób CSV jest zastępowany nowym.
++"""
++
++import datetime
++import logging
++from typing import Any, Dict, List, Optional
++
++import requests
++from django.apps import apps
++from django.db import transaction
++
++from mcod.resources.aed_constants import (
++    AED_CUSTOMFIELD_STANDARD_KEY,
++    AED_CUSTOMFIELD_STANDARD_VALUE,
++)
++from mcod.resources.aed_opis import AEDCsvInvalid, inspect_csv, md5_hex, parse_opis, verify_md5
++from mcod.resources.aed_xml import AEDXmlInvalid
++from mcod.resources.dga_utils import request_remote_dga
++
++logger = logging.getLogger("mcod")
++CUSTOMFIELD_OPIS = "opis_xml"
++CUSTOMFIELD_MD5 = "md5"
++
++
++class AEDImportError(Exception):
++    """Import odrzucony; nic nie zostało zapisane w portalu."""
++
++
++def fetch_bytes(url: str, what: str) -> bytes:
++    """Pobranie pliku od dostawcy: wymagany https i kod 200, brak odpowiedzi to błąd z powodem, a nie wyjątek sieciowy."""
++    if not url.startswith("https://"):
++        raise AEDImportError(f"{what}: portal przyjmuje tylko adresy https ({url})")
++    try:
++        response = request_remote_dga(url)
++    except requests.exceptions.RequestException as exc:
++        raise AEDImportError(f"{what}: serwer dostawcy nie odpowiada ({exc})") from exc
++    if response.status_code != 200:
++        raise AEDImportError(f"{what}: serwer dostawcy zwrócił kod {response.status_code}")
++    return response.content
++
++
++def prepare_import(opis_url: str, aggregated_at: Optional[str] = None) -> Dict[str, Any]:
++    """Kroki bez zapisu: opis, XSD, CSV, md5, kontrola kolumn i duplikatów. Zwraca opis, CSV i raport kontroli."""
++    try:
++        opis = parse_opis(fetch_bytes(opis_url, "opis zbioru"))
++    except AEDXmlInvalid as exc:
++        raise AEDImportError(f"opis zbioru niezgodny z XSD: {exc}") from exc
++    resource = opis["zasob"]
++    csv_content = fetch_bytes(resource["link_csv"], "plik CSV")
++    if not verify_md5(csv_content, resource["md5"]):
++        raise AEDImportError(f"suma md5 pliku CSV ({md5_hex(csv_content)}) różni się od sumy w opisie ({resource['md5']})")
++    source = {
++        "institution_id": 0,
++        "publisher": opis["dysponent_nazwa"],
++        "license": opis["licencja"],
++        "resource_id": 0,
++        "url": opis_url,
++        "data_date": opis["data_aktualizacji"][:10],
++        "personal_data": False,
++    }
++    try:
++        report = inspect_csv(csv_content, source, aggregated_at or datetime.datetime.now().replace(microsecond=0).isoformat())
++    except AEDCsvInvalid as exc:
++        raise AEDImportError(str(exc)) from exc
++    return {"opis": opis, "md5": resource["md5"], "kontrola": report}
++
++
++def _find_dataset(opis_url: str):
++    Dataset = apps.get_model("datasets", "Dataset")
++    return Dataset.objects.filter(customfields__contains={CUSTOMFIELD_OPIS: opis_url}).first()
++
++
++def _create_resource(dataset, opis: Dict[str, Any], user):
++    Resource = apps.get_model("resources", "Resource")
++    zasob = opis["zasob"]
++    return Resource.objects.create(
++        title=zasob["tytul"],
++        description=f"{zasob['tytul']}. Plik CSV zgodny ze wzorcem AED, suma md5 {zasob['md5']} sprawdzona przy imporcie.",
++        dataset=dataset,
++        link=zasob["link_csv"],
++        type="file",
++        status="published",
++        data_date=datetime.date.fromisoformat(opis["data_aktualizacji"][:10]),
++        has_dynamic_data=False,
++        has_high_value_data=False,
++        has_high_value_data_from_ec_list=False,
++        has_research_data=False,
++        created_by=user,
++    )
++
++
++def import_dataset(opis_url: str, organization, user=None) -> Dict[str, Any]:
++    """Pełny import. Zwraca {"status": utworzono|zaktualizowano|bez_zmian, "zbior", "zasob", "kontrola"}."""
++    Dataset = apps.get_model("datasets", "Dataset")
++    Category = apps.get_model("categories", "Category")
++    prepared = prepare_import(opis_url)
++    opis, md5 = prepared["opis"], prepared["md5"]
++    customfields = {
++        AED_CUSTOMFIELD_STANDARD_KEY: AED_CUSTOMFIELD_STANDARD_VALUE,
++        CUSTOMFIELD_OPIS: opis_url,
++        CUSTOMFIELD_MD5: md5,
++    }
++    license_chosen = Dataset.LICENSE_CC0 if opis["licencja"] == "CC0 1.0" else Dataset.LICENSE_CC_BY
++    with transaction.atomic():
++        dataset = _find_dataset(opis_url)
++        if dataset is not None and (dataset.customfields or {}).get(CUSTOMFIELD_MD5) == md5:
++            current = dataset.resources.order_by("-pk").values_list("pk", flat=True).first()
++            return {"status": "bez_zmian", "zbior": dataset.pk, "zasob": current, "kontrola": prepared["kontrola"]}
++        status = "zaktualizowano" if dataset is not None else "utworzono"
++        if dataset is None:
++            dataset = Dataset.objects.create(
++                title=opis["tytul"],
++                notes=opis["opis"],
++                organization=organization,
++                customfields=customfields,
++                license_chosen=license_chosen,
++                update_frequency=opis["czestotliwosc_aktualizacji"],
++                status="published",
++                created_by=user,
++            )
++            category = Category.objects.filter(title="Zdrowie").first()
++            if category:
++                dataset.categories.add(category)
++        else:
++            for old in dataset.resources.all():
++                old.delete()
++            dataset.title, dataset.notes, dataset.license_chosen = opis["tytul"], opis["opis"], license_chosen
++            dataset.update_frequency = opis["czestotliwosc_aktualizacji"]
++            dataset.customfields = customfields
++            dataset.save()
++        resource = _create_resource(dataset, opis, user)
++    logger.info("Import AED %s: zbiór %s, zasób %s, md5 %s", status, dataset.pk, resource.pk, md5)
++    return {"status": status, "zbior": dataset.pk, "zasob": resource.pk, "kontrola": prepared["kontrola"]}
++
++
++def refresh_imported_datasets() -> List[Dict[str, Any]]:
++    """
++    Ponowny import wszystkich zbiorów zaczytanych wcześniej z opisu XML (`customfields.opis_xml`): opis, XSD, CSV, md5.
++    Ta sama suma md5 nic nie zmienia, nowa zastępuje zasób; odrzucony import zostawia zbiór bez zmian.
++    Wspólna logika komendy `import_aed_xml --odswiez` i nocnego zadania `refresh_aed_opis_task`.
++    Zwraca listę {"url", "status", "zbior", "zasob"}; przy odrzuceniu status to „odrzucono”, a powód jest w "blad".
++    """
++    Dataset = apps.get_model("datasets", "Dataset")
++    results = []
++    for dataset in Dataset.objects.filter(customfields__has_key=CUSTOMFIELD_OPIS).order_by("pk"):
++        url = dataset.customfields[CUSTOMFIELD_OPIS]
++        try:
++            result = import_dataset(url, dataset.organization)
++        except AEDImportError as exc:
++            logger.warning("Odświeżenie opisu AED %s odrzucone, zbiór %s bez zmian: %s", url, dataset.pk, exc)
++            results.append({"url": url, "status": "odrzucono", "zbior": dataset.pk, "zasob": None, "blad": str(exc)})
++            continue
++        results.append({"url": url, "status": result["status"], "zbior": result["zbior"], "zasob": result["zasob"]})
++    return results
+diff --git a/portal/backend/mcod/resources/aed_opis.py b/portal/backend/mcod/resources/aed_opis.py
+new file mode 100644
+index 0000000..0de6d33
+--- /dev/null
++++ b/portal/backend/mcod/resources/aed_opis.py
+@@ -0,0 +1,74 @@
++"""
++Opis zbioru AED w XML (struktura opisu datasetu + link do CSV + suma md5): walidacja, parsowanie i kontrola pliku CSV.
++
++Moduł nie importuje Django ani ORM, więc działa też w `demo/sprawdz.py`. Kolejność importu (wykonuje ją
++komenda `import_aed_xml`): opis → walidacja XSD → pobranie CSV → zgodność md5 → kontrola kolumn i duplikatów → zapis.
++Schemat `aed_opis_zbioru.xsd` jest kopią `format_danych/schemat/aed_opis_zbioru.xsd` (pilnuje tego test).
++"""
++
++import hashlib
++from pathlib import Path
++from typing import Any, Dict
++
++from mcod.resources.aed_aggregation import (
++    build_aggregate_rows,
++    missing_minimum_columns,
++    read_tabular_bytes,
++    rename_with_aliases,
++)
++from mcod.resources.aed_dedup import deduplicate_rows
++from mcod.resources.aed_xml import AEDXmlInvalid, _parse, validate_aed_xml
++
++OPIS_XSD_PATH = Path(__file__).resolve().parent / "aed_opis_zbioru.xsd"
++
++
++class AEDCsvInvalid(Exception):
++    pass
++
++
++def validate_opis_xml(content: bytes) -> Dict[str, Any]:
++    """Raport walidacji opisu: {"valid", "errors": [{"line", "field", "message"}]} (pola jak w `validate_aed_xml`)."""
++    report = validate_aed_xml(content, str(OPIS_XSD_PATH))
++    report["records"] = 1 if report["valid"] else 0
++    return report
++
++
++def parse_opis(content: bytes) -> Dict[str, Any]:
++    """Wartości opisu jako słownik (`zasob` zagnieżdżony). Niezgodny z XSD: AEDXmlInvalid."""
++    report = validate_opis_xml(content)
++    if not report["valid"]:
++        raise AEDXmlInvalid(report["errors"])
++    root = _parse(content).getroot()
++    result: Dict[str, Any] = {}
++    for child in root:
++        if child.tag == "zasob":
++            result["zasob"] = {item.tag: (item.text or "").strip() for item in child}
++        else:
++            result[child.tag] = (child.text or "").strip()
++    result["zasob"]["md5"] = result["zasob"]["md5"].lower()
++    return result
++
++
++def md5_hex(content: bytes) -> str:
++    return hashlib.md5(content).hexdigest()  # noqa: S303 suma kontrolna pliku, nie zabezpieczenie kryptograficzne
++
++
++def verify_md5(content: bytes, expected: str) -> bool:
++    return md5_hex(content) == expected.strip().lower()
++
++
++def inspect_csv(content: bytes, source: Dict[str, Any], aggregated_at: str) -> Dict[str, Any]:
++    """
++    Kontrola CSV przed zapisem: czy ma kolumny minimum wzorca i ile wierszy przejdzie agregację oraz deduplikację.
++    Zwraca {"wiersze", "przyjete", "pominiete", "duplikaty": [...]}; brak kolumn minimum: AEDCsvInvalid.
++    """
++    try:
++        df = read_tabular_bytes(content, "csv")
++    except Exception as exc:
++        raise AEDCsvInvalid(f"nie można odczytać CSV: {exc}") from exc
++    missing = missing_minimum_columns(rename_with_aliases(df)[0].columns)
++    if missing:
++        raise AEDCsvInvalid(f"w CSV brakuje kolumn: {', '.join(missing)}")
++    rows, skipped = build_aggregate_rows(df, source, aggregated_at)
++    deduplicated, duplicates = deduplicate_rows(rows)
++    return {"wiersze": len(df), "przyjete": len(deduplicated), "pominiete": len(skipped), "duplikaty": duplicates}
+diff --git a/portal/backend/mcod/resources/aed_opis_zbioru.xsd b/portal/backend/mcod/resources/aed_opis_zbioru.xsd
+new file mode 100644
+index 0000000..f108371
+--- /dev/null
++++ b/portal/backend/mcod/resources/aed_opis_zbioru.xsd
+@@ -0,0 +1,56 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
++  <!-- Opis zbioru AED wystawiany przez dostawcę (struktura opisu datasetu: metadane zbioru i link do CSV z sumą md5).
++       Dane (rekordy AED) są w pliku CSV zgodnym ze wzorcem (aed_punkty.tableschema.json), a nie w tym XML.
++       Portal pobiera opis, waliduje go tym schematem, pobiera CSV, porównuje md5 i dopiero wtedy zaciąga dane. -->
++  <xs:simpleType name="tekst">
++    <xs:restriction base="xs:string"><xs:minLength value="1"/><xs:maxLength value="2000"/></xs:restriction>
++  </xs:simpleType>
++  <xs:simpleType name="adres_https">
++    <xs:restriction base="xs:string"><xs:pattern value="https://[^\s]+"/></xs:restriction>
++  </xs:simpleType>
++  <xs:simpleType name="suma_md5">
++    <xs:restriction base="xs:string"><xs:pattern value="[0-9a-fA-F]{32}"/></xs:restriction>
++  </xs:simpleType>
++  <xs:element name="opis_zbioru">
++    <xs:complexType>
++      <xs:all>
++        <xs:element name="tytul" type="tekst"/>
++        <xs:element name="opis" type="tekst"/>
++        <xs:element name="dysponent_nazwa" type="tekst"/>
++        <xs:element name="dysponent_regon" minOccurs="0">
++          <xs:simpleType><xs:restriction base="xs:string"><xs:pattern value="(\d{9}|\d{14})"/></xs:restriction></xs:simpleType>
++        </xs:element>
++        <xs:element name="kontakt_email" type="tekst" minOccurs="0"/>
++        <xs:element name="licencja">
++          <xs:simpleType><xs:restriction base="xs:string">
++            <xs:enumeration value="CC0 1.0"/><xs:enumeration value="CC BY 4.0"/>
++          </xs:restriction></xs:simpleType>
++        </xs:element>
++        <xs:element name="czestotliwosc_aktualizacji">
++          <xs:simpleType><xs:restriction base="xs:string">
++            <xs:enumeration value="daily"/><xs:enumeration value="weekly"/><xs:enumeration value="monthly"/>
++            <xs:enumeration value="quarterly"/><xs:enumeration value="everyHalfYear"/><xs:enumeration value="yearly"/>
++            <xs:enumeration value="irregular"/>
++          </xs:restriction></xs:simpleType>
++        </xs:element>
++        <xs:element name="data_aktualizacji">
++          <xs:simpleType><xs:restriction base="xs:string"><xs:pattern value="\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}"/></xs:restriction></xs:simpleType>
++        </xs:element>
++        <xs:element name="zasob">
++          <xs:complexType>
++            <xs:all>
++              <xs:element name="tytul" type="tekst"/>
++              <xs:element name="link_csv" type="adres_https"/>
++              <xs:element name="format">
++                <xs:simpleType><xs:restriction base="xs:string"><xs:enumeration value="csv"/></xs:restriction></xs:simpleType>
++              </xs:element>
++              <xs:element name="md5" type="suma_md5"/>
++              <xs:element name="liczba_rekordow" type="xs:nonNegativeInteger" minOccurs="0"/>
++            </xs:all>
++          </xs:complexType>
++        </xs:element>
++      </xs:all>
++    </xs:complexType>
++  </xs:element>
++</xs:schema>
+diff --git a/portal/backend/mcod/resources/aed_punkty.xsd b/portal/backend/mcod/resources/aed_punkty.xsd
+new file mode 100644
+index 0000000..614322f
+--- /dev/null
++++ b/portal/backend/mcod/resources/aed_punkty.xsd
+@@ -0,0 +1,55 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
++  <!-- Wzorcowy zakres danych o defibrylatorach AED – plik dostawcy, wersja 2.1.0. Plik generowany z aed_punkty.tableschema.json przez format_danych/narzedzia/generuj_xsd.py. -->
++  <xs:element name="wykaz">
++    <xs:complexType><xs:sequence>
++      <xs:element name="aed" minOccurs="1" maxOccurs="unbounded">
++        <xs:complexType><xs:all>
++          <xs:element name="id_zrodlowe" minOccurs="1"><xs:simpleType><xs:restriction base="xs:string"></xs:restriction></xs:simpleType></xs:element>
++          <xs:element name="nazwa_lokalizacji" minOccurs="1"><xs:simpleType><xs:restriction base="xs:string"></xs:restriction></xs:simpleType></xs:element>
++          <xs:element name="wojewodztwo" minOccurs="0"><xs:simpleType><xs:restriction base="xs:string"></xs:restriction></xs:simpleType></xs:element>
++          <xs:element name="powiat" minOccurs="0"><xs:simpleType><xs:restriction base="xs:string"></xs:restriction></xs:simpleType></xs:element>
++          <xs:element name="gmina" minOccurs="0"><xs:simpleType><xs:restriction base="xs:string"></xs:restriction></xs:simpleType></xs:element>
++          <xs:element name="kod_terc" minOccurs="0"><xs:simpleType><xs:restriction base="xs:string"><xs:pattern value="\d{7}"/></xs:restriction></xs:simpleType></xs:element>
++          <xs:element name="miejscowosc" minOccurs="1"><xs:simpleType><xs:restriction base="xs:string"></xs:restriction></xs:simpleType></xs:element>
++          <xs:element name="kod_simc" minOccurs="0"><xs:simpleType><xs:restriction base="xs:string"><xs:pattern value="\d{7}"/></xs:restriction></xs:simpleType></xs:element>
++          <xs:element name="kod_pocztowy" minOccurs="0"><xs:simpleType><xs:restriction base="xs:string"><xs:pattern value="\d{2}-\d{3}"/></xs:restriction></xs:simpleType></xs:element>
++          <xs:element name="cecha_ulicy" minOccurs="0"><xs:simpleType><xs:restriction base="xs:string"><xs:enumeration value="ul."/><xs:enumeration value="al."/><xs:enumeration value="pl."/><xs:enumeration value="skwer"/><xs:enumeration value="bulw."/><xs:enumeration value="rondo"/><xs:enumeration value="park"/><xs:enumeration value="rynek"/><xs:enumeration value="szosa"/><xs:enumeration value="droga"/><xs:enumeration value="os."/><xs:enumeration value="ogród"/><xs:enumeration value="wyspa"/><xs:enumeration value="wyb."/><xs:enumeration value="inne"/></xs:restriction></xs:simpleType></xs:element>
++          <xs:element name="nazwa_ulicy" minOccurs="0"><xs:simpleType><xs:restriction base="xs:string"></xs:restriction></xs:simpleType></xs:element>
++          <xs:element name="kod_ulic" minOccurs="0"><xs:simpleType><xs:restriction base="xs:string"><xs:pattern value="\d{5}"/></xs:restriction></xs:simpleType></xs:element>
++          <xs:element name="numer_budynku" minOccurs="0"><xs:simpleType><xs:restriction base="xs:string"></xs:restriction></xs:simpleType></xs:element>
++          <xs:element name="numer_lokalu" minOccurs="0"><xs:simpleType><xs:restriction base="xs:string"></xs:restriction></xs:simpleType></xs:element>
++          <xs:element name="adres_uniwersalny" minOccurs="0"><xs:simpleType><xs:restriction base="xs:string"></xs:restriction></xs:simpleType></xs:element>
++          <xs:element name="szerokosc_geograficzna" minOccurs="1"><xs:simpleType><xs:restriction base="xs:decimal"><xs:minInclusive value="49.0"/><xs:maxInclusive value="54.9"/></xs:restriction></xs:simpleType></xs:element>
++          <xs:element name="dlugosc_geograficzna" minOccurs="1"><xs:simpleType><xs:restriction base="xs:decimal"><xs:minInclusive value="14.1"/><xs:maxInclusive value="24.2"/></xs:restriction></xs:simpleType></xs:element>
++          <xs:element name="opis_lokalizacji" minOccurs="1"><xs:simpleType><xs:restriction base="xs:string"></xs:restriction></xs:simpleType></xs:element>
++          <xs:element name="wewnatrz_budynku" minOccurs="0"><xs:simpleType><xs:restriction base="xs:boolean"/></xs:simpleType></xs:element>
++          <xs:element name="kondygnacja" minOccurs="0"><xs:simpleType><xs:restriction base="xs:integer"></xs:restriction></xs:simpleType></xs:element>
++          <xs:element name="typ_dostepu" minOccurs="1"><xs:simpleType><xs:restriction base="xs:string"><xs:enumeration value="publiczny"/><xs:enumeration value="ograniczony"/><xs:enumeration value="prywatny"/></xs:restriction></xs:simpleType></xs:element>
++          <xs:element name="dostepny_24_7" minOccurs="1"><xs:simpleType><xs:restriction base="xs:boolean"/></xs:simpleType></xs:element>
++          <xs:element name="godziny_dostepnosci" minOccurs="0"><xs:simpleType><xs:restriction base="xs:string"></xs:restriction></xs:simpleType></xs:element>
++          <xs:element name="zabezpieczenie" minOccurs="0"><xs:simpleType><xs:restriction base="xs:string"><xs:enumeration value="brak"/><xs:enumeration value="szafka_otwarta"/><xs:enumeration value="szafka_z_alarmem"/><xs:enumeration value="szafka_na_kod"/><xs:enumeration value="zamkniety_na_klucz"/></xs:restriction></xs:simpleType></xs:element>
++          <xs:element name="instrukcja_dostepu" minOccurs="0"><xs:simpleType><xs:restriction base="xs:string"></xs:restriction></xs:simpleType></xs:element>
++          <xs:element name="status_urzadzenia" minOccurs="0"><xs:simpleType><xs:restriction base="xs:string"><xs:enumeration value="sprawny"/><xs:enumeration value="niesprawny"/><xs:enumeration value="w_serwisie"/><xs:enumeration value="wycofany"/><xs:enumeration value="nieznany"/></xs:restriction></xs:simpleType></xs:element>
++          <xs:element name="producent" minOccurs="0"><xs:simpleType><xs:restriction base="xs:string"></xs:restriction></xs:simpleType></xs:element>
++          <xs:element name="model" minOccurs="0"><xs:simpleType><xs:restriction base="xs:string"></xs:restriction></xs:simpleType></xs:element>
++          <xs:element name="numer_seryjny" minOccurs="0"><xs:simpleType><xs:restriction base="xs:string"></xs:restriction></xs:simpleType></xs:element>
++          <xs:element name="elektrody_pediatryczne" minOccurs="0"><xs:simpleType><xs:restriction base="xs:boolean"/></xs:simpleType></xs:element>
++          <xs:element name="data_waznosci_elektrod" minOccurs="0"><xs:simpleType><xs:restriction base="xs:date"/></xs:simpleType></xs:element>
++          <xs:element name="data_waznosci_baterii" minOccurs="0"><xs:simpleType><xs:restriction base="xs:date"/></xs:simpleType></xs:element>
++          <xs:element name="data_ostatniego_przegladu" minOccurs="0"><xs:simpleType><xs:restriction base="xs:date"/></xs:simpleType></xs:element>
++          <xs:element name="poziom_weryfikacji" minOccurs="0"><xs:simpleType><xs:restriction base="xs:string"><xs:enumeration value="zweryfikowany_w_terenie"/><xs:enumeration value="zweryfikowany_przez_dysponenta"/><xs:enumeration value="niezweryfikowany"/></xs:restriction></xs:simpleType></xs:element>
++          <xs:element name="data_weryfikacji" minOccurs="0"><xs:simpleType><xs:restriction base="xs:date"/></xs:simpleType></xs:element>
++          <xs:element name="dysponent_nazwa" minOccurs="0"><xs:simpleType><xs:restriction base="xs:string"></xs:restriction></xs:simpleType></xs:element>
++          <xs:element name="dysponent_regon" minOccurs="0"><xs:simpleType><xs:restriction base="xs:string"><xs:pattern value="(\d{9}|\d{14})"/></xs:restriction></xs:simpleType></xs:element>
++          <xs:element name="telefon_kontaktowy" minOccurs="0"><xs:simpleType><xs:restriction base="xs:string"><xs:pattern value="(\+\d{2})?\d{9}"/></xs:restriction></xs:simpleType></xs:element>
++          <xs:element name="email_kontaktowy" minOccurs="0"><xs:simpleType><xs:restriction base="xs:string"></xs:restriction></xs:simpleType></xs:element>
++          <xs:element name="zrodlo_danych" minOccurs="0"><xs:simpleType><xs:restriction base="xs:string"><xs:enumeration value="dysponent"/><xs:enumeration value="rejestr_publiczny"/><xs:enumeration value="baza_zewnetrzna"/><xs:enumeration value="openstreetmap"/><xs:enumeration value="zgloszenie_obywatelskie"/></xs:restriction></xs:simpleType></xs:element>
++          <xs:element name="zrodlo_url" minOccurs="0"><xs:simpleType><xs:restriction base="xs:string"></xs:restriction></xs:simpleType></xs:element>
++          <xs:element name="data_aktualizacji" minOccurs="1"><xs:simpleType><xs:restriction base="xs:string"><xs:pattern value="\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}"/></xs:restriction></xs:simpleType></xs:element>
++        </xs:all></xs:complexType>
++      </xs:element>
++    </xs:sequence></xs:complexType>
++    <xs:unique name="unikalny_id_zrodlowe"><xs:selector xpath="aed"/><xs:field xpath="id_zrodlowe"/></xs:unique>
++  </xs:element>
++</xs:schema>
 diff --git a/portal/backend/mcod/resources/aed_utils.py b/portal/backend/mcod/resources/aed_utils.py
 new file mode 100644
-index 0000000..cc96788
+index 0000000..58931d6
 --- /dev/null
 +++ b/portal/backend/mcod/resources/aed_utils.py
-@@ -0,0 +1,451 @@
+@@ -0,0 +1,507 @@
 +import datetime
 +import json
 +import logging
@@ -792,6 +1386,7 @@ index 0000000..cc96788
 +from django.core.exceptions import ObjectDoesNotExist
 +from django.core.files.uploadedfile import SimpleUploadedFile
 +from django.db import transaction
++from django.db.models import Q
 +
 +from mcod.resources.aed_aggregation import (
 +    LAT,
@@ -810,6 +1405,8 @@ index 0000000..cc96788
 +    AED_CUSTOMFIELD_STANDARD_VALUE,
 +    MAIN_AED_COLUMNS,
 +)
++from mcod.resources.aed_dedup import deduplicate_rows
++from mcod.resources.aed_xml import AEDXmlInvalid, aed_xml_to_df
 +from mcod.resources.dga_utils import request_remote_dga
 +
 +if TYPE_CHECKING:
@@ -858,12 +1455,16 @@ index 0000000..cc96788
 +    pliki zgodne ze wzorcem. Zgodność ze wzorcem sprawdza agregacja (kolumny, wartości, powód pominięcia).
 +    """
 +    Resource = apps.get_model("resources", "Resource")
++    # Zasób XML z linkiem do zewnętrznego serwera jest w portalu typem `api` (bez pliku), więc nie ma statusu
++    # zadań plikowych; wystarczy poprawny link. Pozostałe zasoby: jak dotąd.
++    ready = Q(file_tasks_last_status="SUCCESS", link_tasks_last_status="SUCCESS") | Q(
++        format="xml", link_tasks_last_status="SUCCESS"
++    )
 +    candidates = (
 +        Resource.objects.filter(
++            ready,
 +            status="published",
 +            dataset__status="published",
-+            file_tasks_last_status="SUCCESS",
-+            link_tasks_last_status="SUCCESS",
 +            dataset__customfields__isnull=False,
 +        )
 +        .select_related("dataset__organization")
@@ -877,13 +1478,17 @@ index 0000000..cc96788
 +        reason: Optional[str] = None
 +        if dataset.license_name not in AED_ALLOWED_LICENSES:
 +            reason = f"licencja {dataset.license_name} nie pozwala na włączenie do wykazu"
-+        elif not resource.has_tabular_format():
++        elif not (resource.has_tabular_format() or is_aed_xml_resource(resource)):
 +            reason = f"format {resource.format} nie jest tabelaryczny"
 +        if reason:
 +            logger.info("Pomijam zasób %s zbioru AED %s: %s", resource.pk, dataset.pk, reason)
 +            continue
 +        selected.append(resource)
 +    return selected
++
++
++def is_aed_xml_resource(resource: "Resource") -> bool:
++    return (resource.format or "").lower() == "xml"
 +
 +
 +def get_source_meta(resource: "Resource") -> Dict[str, Any]:
@@ -931,11 +1536,38 @@ index 0000000..cc96788
 +        raise AEDSourceReadError(f"nie można odczytać pliku {extension}: {exc}") from exc
 +
 +
++def _get_xml_aed_source_df(resource: "Resource") -> pd.DataFrame:
++    """XML dostawcy: pobierany spod `resource.link` przy każdym budowaniu wykazu (albo z pliku zasobu, gdy portal go ma)
++    i sprawdzany schematem XSD. Niezgodny plik jest pomijany z powodem, a nie zamieniany na dane."""
++    if resource.main_file:
++        try:
++            with open(resource.main_file.path, "rb") as source_file:
++                content = source_file.read()
++        except OSError as exc:
++            raise AEDSourceReadError(f"nie można odczytać pliku XML: {exc}") from exc
++    else:
++        if not resource.link:
++            raise AEDSourceReadError("zasób XML nie ma linku ani pliku")
++        try:
++            response = request_remote_dga(resource.link)
++        except requests.exceptions.RequestException as exc:
++            raise AEDSourceReadError(f"serwer dostawcy nie odpowiada: {exc}") from exc
++        if response.status_code != 200:
++            raise AEDSourceReadError(f"serwer dostawcy zwrócił kod {response.status_code}")
++        content = response.content
++    try:
++        return aed_xml_to_df(content)
++    except AEDXmlInvalid as exc:
++        raise AEDSourceReadError(str(exc)) from exc
++
++
 +def get_aed_source_df(resource: "Resource") -> pd.DataFrame:
 +    """
 +    Dane zasobu jako tekst; zasoby z CKAN pobierane spod `resource.link`, pozostałe z danych tabelarycznych
 +    portalu, a gdy ich brak (np. walidacja danych portalu odrzuciła zgadnięte typy), wprost z pliku zasobu.
 +    """
++    if is_aed_xml_resource(resource):
++        return _get_xml_aed_source_df(resource)
 +    if resource.is_imported_from_ckan:
 +        return _get_ckan_aed_source_df(resource)
 +    tabular_data = resource.tabular_data
@@ -953,7 +1585,14 @@ index 0000000..cc96788
 +    Buduje ramkę zasobu zbiorczego AED. Zasób, którego nie da się odczytać lub który nie ma kolumn minimum,
 +    jest pomijany z powodem w `stats` i nie przerywa agregacji.
 +    """
-+    stats: Dict[str, Any] = {"zasoby_przyjete": 0, "zasoby_pominiete": [], "wiersze": 0, "wiersze_pominiete": 0}
++    stats: Dict[str, Any] = {
++        "zasoby_przyjete": 0,
++        "zasoby_pominiete": [],
++        "wiersze": 0,
++        "wiersze_pominiete": 0,
++        "wiersze_zdeduplikowane": 0,
++        "duplikaty": [],
++    }
 +    parts: List[pd.DataFrame] = []
 +    for resource in resources:
 +        try:
@@ -979,13 +1618,24 @@ index 0000000..cc96788
 +        parts.append(rows)
 +
 +    main_df = pd.concat(parts, ignore_index=True) if parts else pd.DataFrame(columns=MAIN_AED_COLUMNS)
++    main_df, duplicates = deduplicate_rows(main_df)
++    for duplicate in duplicates:
++        logger.info(
++            "Duplikat w Wykazie AED: %s pominięty, bo to samo urządzenie co %s (%s).",
++            duplicate["pominiety"],
++            duplicate["zachowany"],
++            duplicate["powod"],
++        )
++    stats["duplikaty"] = duplicates
++    stats["wiersze_zdeduplikowane"] = len(duplicates)
 +    stats["wiersze"] = len(main_df)
 +    logger.info(
-+        "Wykaz AED: przyjęte zasoby %s, pominięte %s, wiersze %s, pominięte wiersze %s.",
++        "Wykaz AED: przyjęte zasoby %s, pominięte %s, wiersze %s, pominięte wiersze %s, zdeduplikowane wiersze %s.",
 +        stats["zasoby_przyjete"],
 +        len(stats["zasoby_pominiete"]),
 +        stats["wiersze"],
 +        stats["wiersze_pominiete"],
++        stats["wiersze_zdeduplikowane"],
 +    )
 +    return main_df, stats
 +
@@ -1024,7 +1674,7 @@ index 0000000..cc96788
 +    key_generator_callable=key_generator_for_create_main_aed_file,
 +)
 +def create_main_aed_file() -> Path:
-+    """Zapisuje CSV zasobu zbiorczego AED (51 kolumn, RFC 4180) i zwraca ścieżkę pliku."""
++    """Zapisuje CSV zasobu zbiorczego AED (52 kolumny, RFC 4180) i zwraca ścieżkę pliku."""
 +    aggregated_at = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
 +    main_df, stats = create_main_aed_df(get_aed_source_resources(), aggregated_at)
 +    file_path = get_or_create_main_aed_path()
@@ -1225,6 +1875,111 @@ index 0000000..cc96788
 +        cache.delete(clean_file_path_key)
 +
 +    logger.info("Clean up completed.")
+diff --git a/portal/backend/mcod/resources/aed_xml.py b/portal/backend/mcod/resources/aed_xml.py
+new file mode 100644
+index 0000000..457d771
+--- /dev/null
++++ b/portal/backend/mcod/resources/aed_xml.py
+@@ -0,0 +1,99 @@
++"""
++Źródło XML dla wykazu AED: walidacja plikiem XSD i zamiana na `DataFrame` o kolumnach wzorca v2.
++
++Moduł nie importuje Django ani ORM (jak `aed_aggregation.py`), więc działa też w `demo/sprawdz.py`.
++Schemat `aed_punkty.xsd` jest kopią `format_danych/schemat/aed_punkty.xsd` (generuje je
++`format_danych/narzedzia/generuj_xsd.py`; zgodność pilnuje test `test_aed_xml.py`).
++"""
++
++from functools import lru_cache
++from pathlib import Path
++from typing import Any, Dict, List, Optional
++
++import pandas as pd
++from lxml import etree
++
++from mcod.resources.aed_constants import AED_TEMPLATE_COLUMNS
++
++XSD_PATH = Path(__file__).resolve().parent / "aed_punkty.xsd"
++MAX_XML_BYTES = 20 * 1024 * 1024
++
++
++class AEDXmlInvalid(Exception):
++    def __init__(self, errors: List[Dict[str, Any]]):
++        self.errors = errors
++        first = errors[0] if errors else {}
++        super().__init__(f"XML niezgodny z XSD ({len(errors)} błędów): linia {first.get('line')}: {first.get('message')}")
++
++
++@lru_cache(maxsize=None)
++def load_schema(path: Optional[str] = None) -> etree.XMLSchema:
++    return etree.XMLSchema(etree.parse(str(path or XSD_PATH)))
++
++
++def _parse(content: bytes) -> etree._ElementTree:
++    # Bez DTD, zewnętrznych encji i sieci: plik pochodzi z zewnątrz i nie jest zaufany.
++    parser = etree.XMLParser(resolve_entities=False, no_network=True, load_dtd=False, dtd_validation=False)
++    return etree.fromstring(content, parser).getroottree()
++
++
++def _required_fields(node_tag: str, xsd_path: Optional[str] = None) -> List[str]:
++    """Nazwy elementów wymaganych (minOccurs=1 albo bez minOccurs) w typie złożonym elementu `node_tag`."""
++    ns = {"xs": "http://www.w3.org/2001/XMLSchema"}
++    tree = etree.parse(str(xsd_path or XSD_PATH))
++    query = "//xs:element[@name=$n]/xs:complexType/xs:all/xs:element[not(@minOccurs) or @minOccurs!='0']/@name"
++    return tree.xpath(query, namespaces=ns, n=node_tag)
++
++
++def _describe(error, tree, xsd_path: Optional[str] = None) -> Dict[str, Any]:
++    path = error.path or ""
++    message = error.message
++    field = path.rsplit("/", 1)[-1]
++    if "Missing child element" in message:
++        # xs:all wymienia w komunikacie pola opcjonalne, więc wskazujemy brakujące pole wymagane.
++        record = tree.xpath(path)
++        present = {child.tag for child in record[0]} if record else set()
++        missing = [name for name in _required_fields(record[0].tag, xsd_path) if name not in present] if record else []
++        if missing:
++            message = f"brak wymaganego pola: {', '.join(missing)}"
++            field = missing[0]
++    return {"line": error.line, "field": field, "message": message}
++
++
++def validate_aed_xml(content: bytes, xsd_path: Optional[str] = None) -> Dict[str, Any]:
++    """Raport: {"valid": bool, "records": int, "errors": [{"line", "field", "message"}]}."""
++    if not content or not content.strip():
++        return {"valid": False, "records": 0, "errors": [{"line": 0, "field": "", "message": "pusty plik"}]}
++    if len(content) > MAX_XML_BYTES:
++        return {"valid": False, "records": 0, "errors": [{"line": 0, "field": "", "message": "plik większy niż 20 MB"}]}
++    try:
++        tree = _parse(content)
++    except etree.XMLSyntaxError as exc:
++        return {
++            "valid": False,
++            "records": 0,
++            "errors": [{"line": exc.lineno or 0, "field": "", "message": f"niepoprawny XML: {exc.msg}"}],
++        }
++    if tree.docinfo.doctype or b"<!ENTITY" in content:
++        return {
++            "valid": False,
++            "records": 0,
++            "errors": [{"line": 0, "field": "", "message": "deklaracje DOCTYPE i ENTITY są niedozwolone"}],
++        }
++    schema = load_schema(xsd_path)
++    try:
++        valid = schema.validate(tree)
++    except etree.XMLSchemaValidateError as exc:
++        return {"valid": False, "records": 0, "errors": [{"line": 0, "field": "", "message": f"błąd walidacji: {exc}"}]}
++    errors = [_describe(e, tree, xsd_path) for e in schema.error_log]
++    return {"valid": bool(valid), "records": len(tree.getroot().findall("aed")), "errors": errors}
++
++
++def aed_xml_to_df(content: bytes, xsd_path: Optional[str] = None) -> pd.DataFrame:
++    """Ramka tekstowa (jak reszta agregacji) o kolumnach wzorca; brakujące pola to pusty tekst. Niezgodny XML: AEDXmlInvalid."""
++    report = validate_aed_xml(content, xsd_path)
++    if not report["valid"]:
++        raise AEDXmlInvalid(report["errors"])
++    root = _parse(content).getroot()
++    rows = [{col: (record.findtext(col) or "").strip() for col in AED_TEMPLATE_COLUMNS} for record in root.findall("aed")]
++    return pd.DataFrame(rows, columns=AED_TEMPLATE_COLUMNS)
 diff --git a/portal/backend/mcod/resources/management/commands/create_main_aed_resource.py b/portal/backend/mcod/resources/management/commands/create_main_aed_resource.py
 new file mode 100644
 index 0000000..2384a97
@@ -1296,6 +2051,80 @@ index 0000000..2384a97
 +
 +        create_main_aed_resource_task.delay()
 +        self.stdout.write("Zlecono zadanie create_main_aed_resource_task.")
+diff --git a/portal/backend/mcod/resources/management/commands/import_aed_xml.py b/portal/backend/mcod/resources/management/commands/import_aed_xml.py
+new file mode 100644
+index 0000000..66d9e19
+--- /dev/null
++++ b/portal/backend/mcod/resources/management/commands/import_aed_xml.py
+@@ -0,0 +1,68 @@
++from django.core.management.base import BaseCommand, CommandError
++
++from mcod.organizations.models import Organization
++from mcod.resources.aed_import import (
++    AEDImportError,
++    import_dataset,
++    prepare_import,
++    refresh_imported_datasets,
++)
++from mcod.users.models import User
++
++
++class Command(BaseCommand):
++    help = (
++        "Zaczytuje zewnętrzne dane AED: pobiera opis zbioru w XML (kod 200), waliduje go schematem XSD, pobiera CSV "
++        "spod linku z opisu, sprawdza sumę md5 i kontroluje kolumny oraz duplikaty. Dopiero potem tworzy zbiór "
++        "(standard = AED) i zasób CSV. Przy niezgodności nic nie zapisuje. --dry-run tylko sprawdza, "
++        "--odswiez ponawia import wszystkich zbiorów zaczytanych wcześniej z opisu XML (to samo robi co noc "
++        "zadanie refresh_aed_opis_task przed budową wykazu)."
++    )
++
++    def add_arguments(self, parser):
++        parser.add_argument("url", nargs="?", help="Adres https opisu zbioru (XML).")
++        parser.add_argument("--organizacja", type=int, help="Identyfikator instytucji dostawcy (wymagany bez --dry-run).")
++        parser.add_argument("--uzytkownik", help="E-mail użytkownika zapisanego jako autor (opcjonalnie).")
++        parser.add_argument("--dry-run", action="store_true", help="Tylko pobierz i sprawdź, bez zapisu w bazie.")
++        parser.add_argument("--odswiez", action="store_true", help="Ponów import wszystkich zbiorów z polem opis_xml.")
++
++    def handle(self, *args, **options):
++        if options["odswiez"]:
++            return self.refresh_all()
++        if not options["url"]:
++            raise CommandError("Podaj adres opisu zbioru (XML) albo użyj --odswiez.")
++        url = options["url"]
++        try:
++            prepared = prepare_import(url)
++        except AEDImportError as exc:
++            raise CommandError(f"Import odrzucony, nic nie zapisano: {exc}")
++        self.report(prepared["md5"], prepared["kontrola"])
++        if options["dry_run"]:
++            return
++        if not options["organizacja"]:
++            raise CommandError("Podaj --organizacja (identyfikator instytucji dostawcy).")
++        try:
++            organization = Organization.objects.get(pk=options["organizacja"])
++        except Organization.DoesNotExist:
++            raise CommandError(f"Nie ma instytucji o identyfikatorze {options['organizacja']}.")
++        user = User.objects.filter(email=options["uzytkownik"]).first() if options["uzytkownik"] else None
++        result = import_dataset(url, organization, user)
++        self.stdout.write(f"Wynik: {result['status']}, zbiór: {result['zbior']}, zasób: {result['zasob']}")
++
++    def report(self, md5, control):
++        self.stdout.write("Opis zbioru: zgodny z XSD.")
++        self.stdout.write(f"Suma md5 pliku CSV zgodna z opisem: {md5}.")
++        self.stdout.write(
++            f"CSV: wiersze {control['wiersze']}, do wykazu {control['przyjete']}, pominięte {control['pominiete']}, "
++            f"duplikaty w pliku {len(control['duplikaty'])}."
++        )
++
++    def refresh_all(self):
++        results = refresh_imported_datasets()
++        for result in results:
++            if result["status"] == "odrzucono":
++                self.stderr.write(f"{result['url']}: odrzucono, zbiór {result['zbior']} bez zmian ({result['blad']})")
++            else:
++                self.stdout.write(f"{result['url']}: {result['status']}, zbiór: {result['zbior']}, zasób: {result['zasob']}")
++        if not results:
++            self.stdout.write("Brak zbiorów zaczytanych z opisu XML (pole opis_xml).")
 diff --git a/portal/backend/mcod/resources/serializers.py b/portal/backend/mcod/resources/serializers.py
 index 556b15c..58bb021 100644
 --- a/portal/backend/mcod/resources/serializers.py
@@ -1312,36 +2141,38 @@ index 556b15c..58bb021 100644
 +    resource_id = fields.Int(attribute="id", data_key="resource_id")
 +    resource_slug = fields.Str(attribute="slug", data_key="resource_slug")
 diff --git a/portal/backend/mcod/resources/tasks/__init__.py b/portal/backend/mcod/resources/tasks/__init__.py
-index 3309d6b..ece7c57 100644
+index 3309d6b..7387367 100644
 --- a/portal/backend/mcod/resources/tasks/__init__.py
 +++ b/portal/backend/mcod/resources/tasks/__init__.py
 @@ -1,3 +1,4 @@
-+from mcod.resources.tasks.aed import create_main_aed_resource_task
++from mcod.resources.tasks.aed import create_main_aed_resource_task, refresh_aed_opis_task
  from mcod.resources.tasks.dga import clean_dga_temp_directory, create_main_dga_resource_task
  from mcod.resources.tasks.entrypoint_res import entrypoint_process_resource_validation_task
  from mcod.resources.tasks.entrypoint_res_file import (
-@@ -33,6 +34,7 @@ if is_enabled("S69_resource_link_validation_chunk"):
+@@ -33,6 +34,8 @@ if is_enabled("S69_resource_link_validation_chunk"):
      __all__ = (
          "clean_dga_temp_directory",
          "create_main_dga_resource_task",
 +        "create_main_aed_resource_task",
++        "refresh_aed_opis_task",
          "entrypoint_process_resource_validation_task",
          "entrypoint_process_resource_file_validation_task",
          "process_resource_res_file_task",
-@@ -60,6 +62,7 @@ else:
+@@ -60,6 +63,8 @@ else:
      __all__ = (
          "clean_dga_temp_directory",
          "create_main_dga_resource_task",
 +        "create_main_aed_resource_task",
++        "refresh_aed_opis_task",
          "entrypoint_process_resource_validation_task",
          "entrypoint_process_resource_file_validation_task",
          "process_resource_res_file_task",
 diff --git a/portal/backend/mcod/resources/tasks/aed.py b/portal/backend/mcod/resources/tasks/aed.py
 new file mode 100644
-index 0000000..524f30b
+index 0000000..f319cc9
 --- /dev/null
 +++ b/portal/backend/mcod/resources/tasks/aed.py
-@@ -0,0 +1,80 @@
+@@ -0,0 +1,98 @@
 +import logging
 +from pathlib import Path
 +
@@ -1349,6 +2180,7 @@ index 0000000..524f30b
 +from django.conf import settings
 +
 +from mcod.core.tasks import extended_shared_task
++from mcod.resources.aed_import import refresh_imported_datasets
 +from mcod.resources.aed_utils import (
 +    clean_up_after_main_aed_resource_creation,
 +    create_main_aed_file,
@@ -1422,6 +2254,23 @@ index 0000000..524f30b
 +        logger.error(f"Cleaning after main AED resource creation task due to unexpected error: {exc}")
 +        clean_up_after_main_aed_resource_creation(exception_occurred=True)
 +        raise
++
++
++@extended_shared_task(atomic=False, name="mcod.resources.tasks.refresh_aed_opis_task")
++def refresh_aed_opis_task() -> list:
++    """
++    Nocne odświeżenie zbiorów AED zaczytanych z opisu XML (harmonogram 4:05, przed budową wykazu o 4:15).
++
++    Dla każdego zbioru z `customfields.opis_xml`: pobranie opisu, XSD, pobranie CSV i porównanie md5. Ta sama suma nic
++    nie zmienia, nowa zastępuje zasób (potok portalu waliduje nowy plik), a odrzucony import zostawia zbiór bez zmian.
++    Ta sama logika co `import_aed_xml --odswiez`. Przy `AED_AGGREGATION_ENABLED = False` zadanie nic nie robi.
++    """
++    if not settings.AED_AGGREGATION_ENABLED:
++        logger.info("Wykaz AED wyłączony (AED_AGGREGATION_ENABLED=False), opisy XML nie są odświeżane.")
++        return []
++    results = refresh_imported_datasets()
++    logger.info("Odświeżenie opisów AED: %s", ", ".join(f"{r['zbior']}={r['status']}" for r in results) or "brak zbiorów")
++    return results
 diff --git a/portal/backend/mcod/resources/tests/test_aed_aggregation.py b/portal/backend/mcod/resources/tests/test_aed_aggregation.py
 new file mode 100644
 index 0000000..64e4d42
@@ -1893,7 +2742,7 @@ index 0000000..111b822
 +    assert "AggregatedAEDInfo" in resp.json["components"]["schemas"]
 diff --git a/portal/backend/mcod/resources/tests/test_aed_constants.py b/portal/backend/mcod/resources/tests/test_aed_constants.py
 new file mode 100644
-index 0000000..242f789
+index 0000000..88fecd3
 --- /dev/null
 +++ b/portal/backend/mcod/resources/tests/test_aed_constants.py
 @@ -0,0 +1,59 @@
@@ -1911,19 +2760,19 @@ index 0000000..242f789
 +
 +@pytest.mark.feat_main_aed
 +def test_template_columns_count_and_unique():
-+    assert len(AED_TEMPLATE_COLUMNS) == 41
-+    assert len(set(AED_TEMPLATE_COLUMNS)) == 41
++    assert len(AED_TEMPLATE_COLUMNS) == 42
++    assert len(set(AED_TEMPLATE_COLUMNS)) == 42
 +    assert AED_TEMPLATE_COLUMNS[0] == "id_zrodlowe"
 +    assert AED_TEMPLATE_COLUMNS[-1] == "data_aktualizacji"
 +
 +
 +@pytest.mark.feat_main_aed
 +def test_main_columns_count_order():
-+    assert len(MAIN_AED_COLUMNS) == 51
-+    assert len(set(MAIN_AED_COLUMNS)) == 51
++    assert len(MAIN_AED_COLUMNS) == 52
++    assert len(set(MAIN_AED_COLUMNS)) == 52
 +    assert MAIN_AED_COLUMNS[0] == "id_aed"
 +    assert MAIN_AED_COLUMNS[-1] == "data_agregacji"
-+    assert MAIN_AED_COLUMNS[1:42] == AED_TEMPLATE_COLUMNS
++    assert MAIN_AED_COLUMNS[1:43] == AED_TEMPLATE_COLUMNS
 +
 +
 +@pytest.mark.feat_main_aed
@@ -1956,6 +2805,506 @@ index 0000000..242f789
 +@pytest.mark.feat_main_aed
 +def test_allowed_licenses_exclude_share_alike():
 +    assert AED_ALLOWED_LICENSES == ("CC0 1.0", "CC BY 4.0")
+diff --git a/portal/backend/mcod/resources/tests/test_aed_dedup.py b/portal/backend/mcod/resources/tests/test_aed_dedup.py
+new file mode 100644
+index 0000000..0a1c30d
+--- /dev/null
++++ b/portal/backend/mcod/resources/tests/test_aed_dedup.py
+@@ -0,0 +1,170 @@
++"""Czyste testy (bez bazy) deduplikacji Wykazu AED: numer seryjny, marka, lokalizacja."""
++
++import pandas as pd
++import pytest
++
++from mcod.resources.aed_constants import MAIN_AED_COLUMNS
++from mcod.resources.aed_dedup import deduplicate_rows, distance_m, normalize_serial
++
++LAT, LON = 53.1500, 18.0100
++ONE_METER_LAT = 1 / 111000.0
++
++
++def row(aed_id, resource=1, **kwargs):
++    base = {column: "" for column in MAIN_AED_COLUMNS}
++    base.update(
++        id_aed=aed_id,
++        id_zasobu_zrodlowego=str(resource),
++        nazwa_lokalizacji="Hala A",
++        szerokosc_geograficzna=str(LAT),
++        dlugosc_geograficzna=str(LON),
++        data_aktualizacji="2026-11-01T10:00:00",
++    )
++    base.update(kwargs)
++    return base
++
++
++def run(*rows):
++    result, duplicates = deduplicate_rows(pd.DataFrame(list(rows), columns=MAIN_AED_COLUMNS))
++    return list(result["id_aed"]), duplicates
++
++
++@pytest.mark.parametrize(
++    ("value", "expected"),
++    [
++        ("FRX-2026-0001", "frx20260001"),
++        (" frx 2026 0001 ", "frx20260001"),
++        ("Brak", ""),
++        ("-", ""),
++        ("abc", ""),
++        ("0000000", ""),
++        (None, ""),
++    ],
++)
++def test_normalize_serial(value, expected):
++    assert normalize_serial(value) == expected
++
++
++def test_distance_is_in_meters():
++    assert 95 < distance_m(LAT, LON, LAT + 100 * ONE_METER_LAT, LON) < 105
++
++
++def test_same_serial_and_brand_from_two_providers_is_one_device():
++    ids, duplicates = run(
++        row("A", 1, producent="Philips", numer_seryjny="FRX-2026-0001"),
++        row(
++            "B", 2, producent="philips", numer_seryjny="frx 2026 0001", szerokosc_geograficzna="52.0", dlugosc_geograficzna="19.0"
++        ),
++    )
++    assert ids == ["A"] and duplicates == [{"zachowany": "A", "pominiety": "B", "powod": "numer_seryjny"}]
++
++
++def test_same_serial_inside_one_file_is_a_duplicate():
++    assert run(row("A", 1, numer_seryjny="SN-0001"), row("B", 1, numer_seryjny="SN-0001"))[0] == ["A"]
++
++
++def test_same_serial_but_different_brands_are_different_devices():
++    ids, _ = run(
++        row("A", 1, producent="Philips", numer_seryjny="SN-0001"),
++        row("B", 2, producent="Zoll", numer_seryjny="SN-0001"),
++    )
++    assert ids == ["A", "B"]
++
++
++def test_placeholder_serials_do_not_merge():
++    assert run(
++        row("A", 1, numer_seryjny="brak", szerokosc_geograficzna="51.0"),
++        row("B", 2, numer_seryjny="brak", szerokosc_geograficzna="52.0"),
++    )[0] == ["A", "B"]
++
++
++def test_same_brand_and_place_without_serial_across_resources_is_merged():
++    ids, duplicates = run(
++        row("A", 1, producent="Zoll", model="AED Plus"),
++        row("B", 2, producent="ZOLL", model="aed plus", szerokosc_geograficzna=str(LAT + 15 * ONE_METER_LAT)),
++    )
++    assert ids == ["A"] and duplicates[0]["powod"] == "marka_model_i_lokalizacja"
++
++
++def test_same_brand_and_place_inside_one_resource_is_two_devices():
++    assert run(row("A", 1, producent="Zoll"), row("B", 1, producent="Zoll"))[0] == ["A", "B"]
++
++
++def test_different_serials_at_one_place_are_two_devices():
++    ids, _ = run(
++        row("A", 1, producent="Zoll", numer_seryjny="SN-0001"),
++        row("B", 2, producent="Zoll", numer_seryjny="SN-0002"),
++    )
++    assert ids == ["A", "B"]
++
++
++def test_different_floors_are_two_devices():
++    assert run(row("A", 1, producent="Zoll", kondygnacja="0"), row("B", 2, producent="Zoll", kondygnacja="1"))[0] == ["A", "B"]
++
++
++def test_different_models_are_two_devices():
++    assert run(row("A", 1, producent="Zoll", model="AED Plus"), row("B", 2, producent="Zoll", model="AED 3"))[0] == ["A", "B"]
++
++
++def test_far_apart_points_are_not_merged():
++    far = str(LAT + 100 * ONE_METER_LAT)
++    assert run(row("A", 1, producent="Zoll"), row("B", 2, producent="Zoll", szerokosc_geograficzna=far))[0] == ["A", "B"]
++
++
++def test_without_brand_same_name_within_ten_meters_is_merged_and_other_name_is_not():
++    near = str(LAT + 5 * ONE_METER_LAT)
++    ids, duplicates = run(row("A", 1), row("B", 2, szerokosc_geograficzna=near))
++    assert ids == ["A"] and duplicates[0]["powod"] == "nazwa_i_lokalizacja"
++    assert run(row("A", 1), row("B", 2, nazwa_lokalizacji="Inna hala", szerokosc_geograficzna=near))[0] == ["A", "B"]
++
++
++def test_better_verified_row_is_kept_and_gaps_are_filled():
++    result, duplicates = deduplicate_rows(
++        pd.DataFrame(
++            [
++                row("A", 1, numer_seryjny="SN-0001", poziom_weryfikacji="niezweryfikowany"),
++                row(
++                    "B",
++                    2,
++                    numer_seryjny="SN-0001",
++                    poziom_weryfikacji="zweryfikowany_w_terenie",
++                    producent="Zoll",
++                    model="AED Plus",
++                ),
++            ],
++            columns=MAIN_AED_COLUMNS,
++        )
++    )
++    assert list(result["id_aed"]) == ["B"] and duplicates[0]["zachowany"] == "B"
++
++
++def test_newer_record_wins_and_missing_serial_is_filled_from_duplicate():
++    result, _ = deduplicate_rows(
++        pd.DataFrame(
++            [
++                row("A", 1, producent="Zoll", numer_seryjny="SN-0001", data_aktualizacji="2026-01-01T00:00:00"),
++                row("B", 2, producent="Zoll", data_aktualizacji="2026-11-01T00:00:00"),
++            ],
++            columns=MAIN_AED_COLUMNS,
++        )
++    )
++    assert list(result["id_aed"]) == ["B"] and result.loc[0, "numer_seryjny"] == "SN-0001"
++
++
++def test_order_of_kept_rows_is_preserved_and_empty_input_is_ok():
++    ids, _ = run(
++        row("A", 1, numer_seryjny="SN-0001", szerokosc_geograficzna="51.0"),
++        row("B", 1, numer_seryjny="SN-0002", szerokosc_geograficzna="52.0"),
++        row("C", 2, numer_seryjny="SN-0001", szerokosc_geograficzna="53.0"),
++    )
++    assert ids == ["A", "B"]
++    assert deduplicate_rows(pd.DataFrame(columns=MAIN_AED_COLUMNS))[1] == []
++
++
++def test_three_way_duplicate_collapses_to_one_row():
++    ids, duplicates = run(
++        row("A", 1, numer_seryjny="SN-0001", szerokosc_geograficzna="51.0"),
++        row("B", 2, numer_seryjny="SN-0001", szerokosc_geograficzna="52.0"),
++        row("C", 3, numer_seryjny="SN-0001", szerokosc_geograficzna="53.0"),
++    )
++    assert ids == ["A"] and len(duplicates) == 2
+diff --git a/portal/backend/mcod/resources/tests/test_aed_import_xml_command.py b/portal/backend/mcod/resources/tests/test_aed_import_xml_command.py
+new file mode 100644
+index 0000000..db5db4f
+--- /dev/null
++++ b/portal/backend/mcod/resources/tests/test_aed_import_xml_command.py
+@@ -0,0 +1,181 @@
++"""Import zewnętrznych danych AED (opis XML → XSD → CSV → md5 → zbiór i zasób): komenda `import_aed_xml`."""
++
++from io import StringIO
++from unittest.mock import MagicMock, patch
++
++import pytest
++import requests
++from django.core.management import call_command
++from django.core.management.base import CommandError
++
++from mcod.datasets.models import Dataset
++from mcod.organizations.factories import OrganizationFactory
++from mcod.resources.aed_import import refresh_imported_datasets
++from mcod.resources.aed_opis import md5_hex
++from mcod.resources.models import Resource
++from mcod.resources.tests.test_aed_opis import make_csv, make_opis
++
++REMOTE = "mcod.resources.aed_import.request_remote_dga"
++OPIS_URL = "https://dostawca.example.pl/opis.xml"
++CSV_URL = "https://dostawca.example.pl/aed.csv"
++CSV = make_csv({"producent": "Zoll", "numer_seryjny": "ZP-0001"}, {})
++
++
++def response(content: bytes, status_code: int = 200) -> MagicMock:
++    return MagicMock(status_code=status_code, content=content)
++
++
++def server(files):
++    def get(url):
++        value = files[url]
++        if isinstance(value, Exception):
++            raise value
++        return value if isinstance(value, MagicMock) else response(value)
++
++    return get
++
++
++def run(files, *args):
++    out = StringIO()
++    with patch(REMOTE, side_effect=server(files)):
++        call_command("import_aed_xml", *args, stdout=out, stderr=StringIO())
++    return out.getvalue()
++
++
++def good(csv=CSV):
++    return {OPIS_URL: make_opis(md5=md5_hex(csv), link=CSV_URL), CSV_URL: csv}
++
++
++@pytest.mark.feat_main_aed
++def test_import_creates_dataset_and_csv_resource_after_md5_check():
++    organization = OrganizationFactory.create()
++
++    output = run(good(), OPIS_URL, f"--organizacja={organization.pk}")
++
++    dataset = Dataset.objects.get(organization=organization)
++    resource = Resource.objects.get(dataset=dataset)
++    assert dataset.customfields == {"standard": "AED", "opis_xml": OPIS_URL, "md5": md5_hex(CSV)}
++    assert dataset.license_name == "CC BY 4.0" and dataset.title == "Defibrylatory AED"
++    assert resource.link == CSV_URL
++    assert "Wynik: utworzono" in output and "zgodna z opisem" in output
++
++
++@pytest.mark.feat_main_aed
++def test_second_import_with_same_md5_changes_nothing_and_new_md5_replaces_resource():
++    organization = OrganizationFactory.create()
++    run(good(), OPIS_URL, f"--organizacja={organization.pk}")
++    first = Resource.objects.get(dataset__organization=organization)
++
++    assert "bez_zmian" in run(good(), OPIS_URL, f"--organizacja={organization.pk}")
++    assert list(Resource.objects.filter(dataset__organization=organization)) == [first]
++
++    new_csv = make_csv({"producent": "Zoll", "numer_seryjny": "ZP-0002"})
++    assert "zaktualizowano" in run(good(new_csv), OPIS_URL, f"--organizacja={organization.pk}")
++    resources = Resource.objects.filter(dataset__organization=organization)
++    assert resources.count() == 1 and resources.get().pk != first.pk
++    assert Dataset.objects.get(organization=organization).customfields["md5"] == md5_hex(new_csv)
++
++
++@pytest.mark.feat_main_aed
++def test_wrong_md5_rejects_import_and_saves_nothing():
++    organization = OrganizationFactory.create()
++    files = {OPIS_URL: make_opis(md5="0" * 32, link=CSV_URL), CSV_URL: CSV}
++
++    with pytest.raises(CommandError, match="md5"):
++        run(files, OPIS_URL, f"--organizacja={organization.pk}")
++
++    assert not Dataset.objects.filter(organization=organization).exists()
++
++
++@pytest.mark.feat_main_aed
++@pytest.mark.parametrize(
++    ("files", "message"),
++    [
++        ({OPIS_URL: make_opis(title=None)}, "niezgodny z XSD"),
++        ({OPIS_URL: response(b"", 503)}, "kod 503"),
++        ({OPIS_URL: requests.exceptions.ConnectTimeout("limit czasu")}, "nie odpowiada"),
++        ({OPIS_URL: make_opis(md5=md5_hex(CSV), link=CSV_URL), CSV_URL: response(b"", 404)}, "kod 404"),
++        ({OPIS_URL: make_opis(md5=md5_hex(b"a\r\n"), link=CSV_URL), CSV_URL: b"a\r\n"}, "brakuje kolumn"),
++    ],
++)
++def test_import_is_rejected_with_reason(files, message):
++    organization = OrganizationFactory.create()
++
++    with pytest.raises(CommandError, match=message):
++        run(files, OPIS_URL, f"--organizacja={organization.pk}")
++
++    assert not Dataset.objects.filter(organization=organization).exists()
++
++
++@pytest.mark.feat_main_aed
++def test_dry_run_checks_but_saves_nothing_and_reports_duplicates():
++    csv = make_csv({"producent": "Zoll", "numer_seryjny": "ZP-0001"}, {"producent": "Zoll", "numer_seryjny": "ZP-0001"})
++
++    output = run(good(csv), OPIS_URL, "--dry-run")
++
++    assert "duplikaty w pliku 1" in output
++    assert not Dataset.objects.filter(customfields__contains={"standard": "AED"}).exists()
++
++
++@pytest.mark.feat_main_aed
++@pytest.mark.parametrize(
++    ("args", "message"),
++    [
++        (["http://dostawca.example.pl/opis.xml"], "https"),
++        ([OPIS_URL], "--organizacja"),
++        ([OPIS_URL, "--organizacja=999999999"], "Nie ma instytucji"),
++        ([], "Podaj adres"),
++    ],
++)
++def test_command_errors(args, message):
++    with pytest.raises(CommandError, match=message):
++        run(good(), *args)
++
++
++@pytest.mark.feat_main_aed
++def test_refresh_reimports_known_datasets():
++    organization = OrganizationFactory.create()
++    run(good(), OPIS_URL, f"--organizacja={organization.pk}")
++    resource = Resource.objects.get(dataset__organization=organization)
++
++    output = run(good(), "--odswiez")
++
++    assert f"{OPIS_URL}: bez_zmian, zbiór: {resource.dataset_id}, zasób: {resource.pk}" in output
++
++
++@pytest.mark.feat_main_aed
++def test_same_md5_reports_current_resource():
++    organization = OrganizationFactory.create()
++    run(good(), OPIS_URL, f"--organizacja={organization.pk}")
++    resource = Resource.objects.get(dataset__organization=organization)
++
++    output = run(good(), OPIS_URL, f"--organizacja={organization.pk}")
++
++    assert f"Wynik: bez_zmian, zbiór: {resource.dataset_id}, zasób: {resource.pk}" in output
++
++
++@pytest.mark.feat_main_aed
++def test_refresh_imported_datasets_replaces_changed_and_keeps_rejected():
++    first, second = OrganizationFactory.create(), OrganizationFactory.create()
++    other_url, other_csv_url = "https://inny.example.pl/opis.xml", "https://inny.example.pl/aed.csv"
++    other = {other_url: make_opis(md5=md5_hex(CSV), link=other_csv_url, title="Inne AED"), other_csv_url: CSV}
++    run(good(), OPIS_URL, f"--organizacja={first.pk}")
++    run(other, other_url, f"--organizacja={second.pk}")
++    kept = Resource.objects.get(dataset__organization=second)
++    new_csv = make_csv({"producent": "Zoll", "numer_seryjny": "ZP-0003"})
++    files = {**good(new_csv), other_url: make_opis(md5="0" * 32, link=other_csv_url, title="Inne AED"), other_csv_url: CSV}
++
++    with patch(REMOTE, side_effect=server(files)):
++        results = refresh_imported_datasets()
++
++    by_url = {r["url"]: r for r in results}
++    assert by_url[OPIS_URL]["status"] == "zaktualizowano"
++    assert by_url[OPIS_URL]["zasob"] == Resource.objects.get(dataset__organization=first).pk
++    assert by_url[other_url]["status"] == "odrzucono" and "md5" in by_url[other_url]["blad"]
++    assert list(Resource.objects.filter(dataset__organization=second)) == [kept]
++    assert Dataset.objects.get(organization=second).customfields["md5"] == md5_hex(CSV)
++
++
++@pytest.mark.feat_main_aed
++def test_refresh_without_imported_datasets():
++    assert "Brak zbiorów" in run({}, "--odswiez")
+diff --git a/portal/backend/mcod/resources/tests/test_aed_opis.py b/portal/backend/mcod/resources/tests/test_aed_opis.py
+new file mode 100644
+index 0000000..3e62999
+--- /dev/null
++++ b/portal/backend/mcod/resources/tests/test_aed_opis.py
+@@ -0,0 +1,131 @@
++"""Czyste testy (bez bazy) opisu zbioru AED w XML: walidacja XSD, md5, kontrola CSV."""
++
++import csv
++import hashlib
++import io
++import json
++from pathlib import Path
++
++import pytest
++
++from mcod.resources.aed_constants import AED_TEMPLATE_COLUMNS
++from mcod.resources.aed_opis import (
++    OPIS_XSD_PATH,
++    AEDCsvInvalid,
++    inspect_csv,
++    md5_hex,
++    parse_opis,
++    validate_opis_xml,
++    verify_md5,
++)
++from mcod.resources.aed_xml import AEDXmlInvalid
++
++REPO_SCHEMA = Path(__file__).resolve().parents[5] / "format_danych" / "schemat"
++SOURCE = {
++    "institution_id": 1,
++    "publisher": "Dostawca",
++    "license": "CC BY 4.0",
++    "resource_id": 1,
++    "url": "https://dostawca.example.pl/opis.xml",
++    "data_date": "2026-11-22",
++    "personal_data": False,
++}
++
++
++def make_csv(*rows, columns=None):
++    columns = columns or AED_TEMPLATE_COLUMNS
++    buf = io.StringIO(newline="")
++    writer = csv.DictWriter(buf, fieldnames=columns, lineterminator="\r\n")
++    writer.writeheader()
++    for index, row in enumerate(rows, 1):
++        base = {
++            "id_zrodlowe": f"X-{index}",
++            "nazwa_lokalizacji": f"Hala {index}",
++            "miejscowosc": "Olsztyn",
++            "szerokosc_geograficzna": f"53.{index}000",
++            "dlugosc_geograficzna": f"20.{index}000",
++        }
++        base.update(row)
++        writer.writerow({k: base.get(k, "") for k in columns})
++    return buf.getvalue().encode("utf-8")
++
++
++def make_opis(
++    md5="0" * 32, link="https://dostawca.example.pl/aed.csv", license_name="CC BY 4.0", title="Defibrylatory AED", **extra
++):
++    parts = {
++        "tytul": title,
++        "opis": "Opis zbioru",
++        "dysponent_nazwa": "Dostawca",
++        "licencja": license_name,
++        "czestotliwosc_aktualizacji": "daily",
++        "data_aktualizacji": "2026-11-22T06:00:00",
++    }
++    parts.update(extra)
++    body = "".join(f"<{k}>{v}</{k}>" for k, v in parts.items() if v is not None)
++    zasob = f"<zasob><tytul>CSV</tytul><link_csv>{link}</link_csv><format>csv</format><md5>{md5}</md5></zasob>"
++    return f'<?xml version="1.0" encoding="UTF-8"?><opis_zbioru>{body}{zasob}</opis_zbioru>'.encode("utf-8")
++
++
++def test_valid_opis_is_parsed():
++    opis = parse_opis(make_opis(md5="ABCDEF0123456789ABCDEF0123456789"))
++    assert opis["tytul"] == "Defibrylatory AED" and opis["licencja"] == "CC BY 4.0"
++    assert opis["zasob"]["link_csv"] == "https://dostawca.example.pl/aed.csv"
++    assert opis["zasob"]["md5"] == "abcdef0123456789abcdef0123456789"
++
++
++@pytest.mark.parametrize(
++    ("content", "field"),
++    [
++        (make_opis(title=None), "tytul"),
++        (make_opis(link="http://dostawca.example.pl/aed.csv"), "link_csv"),
++        (make_opis(license_name="CC BY-SA 4.0"), "licencja"),
++        (make_opis(md5="xyz"), "md5"),
++        (make_opis(czestotliwosc_aktualizacji="co_godzine"), "czestotliwosc_aktualizacji"),
++        (make_opis(data_aktualizacji="wczoraj"), "data_aktualizacji"),
++    ],
++)
++def test_invalid_opis_points_to_the_field(content, field):
++    report = validate_opis_xml(content)
++    assert not report["valid"] and field in [e["field"] for e in report["errors"]]
++    with pytest.raises(AEDXmlInvalid):
++        parse_opis(content)
++
++
++@pytest.mark.parametrize("content", [b"", b"<opis_zbioru>", b"nie xml"])
++def test_broken_opis(content):
++    assert not validate_opis_xml(content)["valid"]
++
++
++def test_doctype_is_rejected():
++    xml = b'<?xml version="1.0"?><!DOCTYPE x [<!ENTITY e SYSTEM "file:///etc/passwd">]><opis_zbioru>&e;</opis_zbioru>'
++    report = validate_opis_xml(xml)
++    assert not report["valid"] and "root:" not in json.dumps(report)
++
++
++def test_md5_is_verified_case_insensitively():
++    data = make_csv({})
++    assert md5_hex(data) == hashlib.md5(data).hexdigest()
++    assert verify_md5(data, md5_hex(data).upper()) and not verify_md5(data, "0" * 32)
++    assert not verify_md5(data + b"x", md5_hex(data))
++
++
++def test_inspect_csv_counts_rows_and_duplicates():
++    data = make_csv(
++        {"producent": "Zoll", "numer_seryjny": "ZP-0001", "szerokosc_geograficzna": "53.1", "dlugosc_geograficzna": "20.1"},
++        {"producent": "Zoll", "numer_seryjny": "zp 0001", "szerokosc_geograficzna": "53.2", "dlugosc_geograficzna": "20.2"},
++        {},
++    )
++    report = inspect_csv(data, SOURCE, "2026-11-22T04:15:00")
++    assert (report["wiersze"], report["przyjete"], len(report["duplikaty"])) == (3, 2, 1)
++    assert report["duplikaty"][0]["powod"] == "numer_seryjny"
++
++
++def test_inspect_csv_without_minimum_columns_is_rejected():
++    with pytest.raises(AEDCsvInvalid, match="brakuje kolumn"):
++        inspect_csv(make_csv({}, columns=["id_zrodlowe", "producent"]), SOURCE, "2026-11-22T04:15:00")
++
++
++@pytest.mark.skipif(not (REPO_SCHEMA / "aed_opis_zbioru.xsd").exists(), reason="brak katalogu format_danych w kontenerze")
++def test_portal_xsd_is_copy_of_repo_xsd():
++    assert OPIS_XSD_PATH.read_bytes() == (REPO_SCHEMA / "aed_opis_zbioru.xsd").read_bytes()
 diff --git a/portal/backend/mcod/resources/tests/test_aed_settings.py b/portal/backend/mcod/resources/tests/test_aed_settings.py
 new file mode 100644
 index 0000000..9786007
@@ -1994,10 +3343,10 @@ index 0000000..9786007
 +    assert route == {"queue": "resources"}
 diff --git a/portal/backend/mcod/resources/tests/test_aed_sources.py b/portal/backend/mcod/resources/tests/test_aed_sources.py
 new file mode 100644
-index 0000000..a7194bf
+index 0000000..4e66cbe
 --- /dev/null
 +++ b/portal/backend/mcod/resources/tests/test_aed_sources.py
-@@ -0,0 +1,243 @@
+@@ -0,0 +1,245 @@
 +import datetime
 +from pathlib import Path
 +from types import SimpleNamespace
@@ -2165,6 +3514,8 @@ index 0000000..a7194bf
 +        ],
 +        "wiersze": 1,
 +        "wiersze_pominiete": 1,
++        "wiersze_zdeduplikowane": 0,
++        "duplikaty": [],
 +    }
 +
 +
@@ -2243,10 +3594,10 @@ index 0000000..a7194bf
 +    assert df.loc[0, "kod_simc"] == "0920806"
 diff --git a/portal/backend/mcod/resources/tests/test_aed_task.py b/portal/backend/mcod/resources/tests/test_aed_task.py
 new file mode 100644
-index 0000000..f5a3278
+index 0000000..3b530ab
 --- /dev/null
 +++ b/portal/backend/mcod/resources/tests/test_aed_task.py
-@@ -0,0 +1,220 @@
+@@ -0,0 +1,261 @@
 +from io import StringIO
 +from pathlib import Path
 +from unittest import mock
@@ -2260,7 +3611,8 @@ index 0000000..f5a3278
 +import mcod.resources.tasks as resources_tasks
 +from mcod.celeryapp import get_beat_schedule
 +from mcod.resources.dga_utils import FailedValidationException, PendingValidationException
-+from mcod.resources.tasks import create_main_aed_resource_task
++from mcod.resources.tasks import create_main_aed_resource_task, refresh_aed_opis_task
++from mcod.settings import base as base_settings
 +
 +COMMAND_MODULE = "mcod.resources.management.commands.create_main_aed_resource"
 +
@@ -2372,10 +3724,50 @@ index 0000000..f5a3278
 +    enabled = get_beat_schedule(enable_monthly_reports=False, enable_create_xml_metadata_report=True, enable_aed_aggregation=True)
 +    disabled = get_beat_schedule(enable_monthly_reports=False, enable_create_xml_metadata_report=True)
 +
-+    assert "aed_main_resource_creation" not in disabled
++    assert "aed_main_resource_creation" not in disabled and "aed_opis_refresh" not in disabled
 +    enabled.pop("aed_main_resource_creation")
++    enabled.pop("aed_opis_refresh")
 +    assert enabled == disabled
 +    assert disabled["dga_main_resource_creation"]["schedule"] == crontab(minute=30, hour=3)
++
++
++@pytest.mark.feat_main_aed
++def test_beat_schedule_refreshes_opis_before_building_wykaz():
++    schedule = get_beat_schedule(
++        enable_monthly_reports=False, enable_create_xml_metadata_report=True, enable_aed_aggregation=True
++    )
++
++    entry = schedule["aed_opis_refresh"]
++    assert entry["task"] == "mcod.resources.tasks.refresh_aed_opis_task"
++    assert entry["options"] == {"queue": "periodic"}
++    assert entry["schedule"] == crontab(minute=5, hour=4)
++
++
++@pytest.mark.feat_main_aed
++def test_refresh_aed_opis_task_exported_and_routed():
++    assert resources_tasks.refresh_aed_opis_task is refresh_aed_opis_task
++    assert "refresh_aed_opis_task" in resources_tasks.__all__
++    assert refresh_aed_opis_task.name == "mcod.resources.tasks.refresh_aed_opis_task"
++    # test.py nadpisuje CELERY_TASK_ROUTES pustym słownikiem, więc trasę sprawdzamy w ustawieniach bazowych.
++    assert base_settings.CELERY_TASK_ROUTES["mcod.resources.tasks.refresh_aed_opis_task"] == {"queue": "resources"}
++
++
++@pytest.mark.feat_main_aed
++def test_refresh_aed_opis_task_uses_import_logic():
++    results = [{"url": "https://dostawca.example.pl/opis.xml", "status": "bez_zmian", "zbior": 1, "zasob": 2}]
++    with mock.patch("mcod.resources.tasks.aed.refresh_imported_datasets", return_value=results) as refresh:
++        assert refresh_aed_opis_task() == results
++
++    refresh.assert_called_once_with()
++
++
++@pytest.mark.feat_main_aed
++@override_settings(AED_AGGREGATION_ENABLED=False)
++def test_refresh_aed_opis_task_disabled_does_nothing():
++    with mock.patch("mcod.resources.tasks.aed.refresh_imported_datasets") as refresh:
++        assert refresh_aed_opis_task() == []
++
++    refresh.assert_not_called()
 +
 +
 +@pytest.mark.feat_main_aed
@@ -2467,9 +3859,238 @@ index 0000000..f5a3278
 +    create_file.assert_not_called()
 +    task.delay.assert_not_called()
 +    assert "Wykaz AED wyłączony" in output
+diff --git a/portal/backend/mcod/resources/tests/test_aed_xml.py b/portal/backend/mcod/resources/tests/test_aed_xml.py
+new file mode 100644
+index 0000000..240f458
+--- /dev/null
++++ b/portal/backend/mcod/resources/tests/test_aed_xml.py
+@@ -0,0 +1,103 @@
++"""Czyste testy (bez bazy) źródła XML wykazu AED: walidacja XSD i zamiana na ramkę."""
++
++import json
++from pathlib import Path
++
++import pytest
++
++from mcod.resources.aed_constants import AED_TEMPLATE_COLUMNS
++from mcod.resources.aed_xml import XSD_PATH, AEDXmlInvalid, aed_xml_to_df, validate_aed_xml
++
++REPO_SCHEMA = Path(__file__).resolve().parents[5] / "format_danych" / "schemat"  # poza kontenerem portalu może nie istnieć
++
++RECORD = {
++    "id_zrodlowe": "T-1",
++    "nazwa_lokalizacji": "Test – hol",
++    "miejscowosc": "Olsztyn",
++    "szerokosc_geograficzna": "53.778420",
++    "dlugosc_geograficzna": "20.480120",
++    "opis_lokalizacji": "Parter, hol",
++    "typ_dostepu": "publiczny",
++    "dostepny_24_7": "true",
++    "data_aktualizacji": "2026-11-20T08:00:00",
++}
++
++
++def make_xml(*records, drop=(), **override):
++    def one(rec):
++        fields = {**RECORD, **rec, **override}
++        for name in drop:
++            fields.pop(name, None)
++        return "<aed>" + "".join(f"<{k}>{v}</{k}>" for k, v in fields.items()) + "</aed>"
++
++    return ('<?xml version="1.0" encoding="UTF-8"?><wykaz>' + "".join(one(r) for r in records) + "</wykaz>").encode("utf-8")
++
++
++def test_valid_file():
++    report = validate_aed_xml(make_xml({}, {"id_zrodlowe": "T-2"}))
++    assert report == {"valid": True, "records": 2, "errors": []}
++
++
++def test_missing_required_field_names_the_field():
++    report = validate_aed_xml(make_xml({}, drop=("typ_dostepu",)))
++    assert not report["valid"]
++    assert report["errors"][0]["field"] == "typ_dostepu"
++    assert "brak wymaganego pola" in report["errors"][0]["message"]
++
++
++def test_value_outside_dictionary_and_wrong_type():
++    report = validate_aed_xml(
++        make_xml({"id_zrodlowe": "A", "status_urzadzenia": "dziala"}, {"id_zrodlowe": "B", "szerokosc_geograficzna": "abc"})
++    )
++    assert sorted(e["field"] for e in report["errors"]) == ["status_urzadzenia", "szerokosc_geograficzna"]
++    assert all(e["line"] >= 1 for e in report["errors"])
++
++
++def test_coordinates_outside_poland_rejected():
++    assert not validate_aed_xml(make_xml({}, szerokosc_geograficzna="10.0"))["valid"]
++
++
++def test_duplicate_source_id_rejected():
++    assert not validate_aed_xml(make_xml({}, {}))["valid"]
++
++
++@pytest.mark.parametrize("content", [b"", b"   ", b"<wykaz><aed>", b"nie xml"])
++def test_broken_or_empty_input(content):
++    report = validate_aed_xml(content)
++    assert not report["valid"] and report["errors"]
++
++
++def test_external_entities_are_not_resolved(tmp_path):
++    secret = tmp_path / "secret.txt"
++    secret.write_text("TAJNE")
++    doctype = f'<!DOCTYPE x [<!ENTITY e SYSTEM "file://{secret.as_posix()}">]>'
++    xml = f'<?xml version="1.0"?>{doctype}<wykaz><aed><id_zrodlowe>&e;</id_zrodlowe></aed></wykaz>'
++    report = validate_aed_xml(xml.encode())
++    assert not report["valid"] and "TAJNE" not in json.dumps(report)
++
++
++def test_dataframe_has_template_columns_and_text_values():
++    df = aed_xml_to_df(make_xml({}, kondygnacja="0"))
++    assert list(df.columns) == AED_TEMPLATE_COLUMNS
++    assert df.loc[0, "kondygnacja"] == "0" and df.loc[0, "powiat"] == ""
++
++
++def test_dataframe_rejects_invalid_xml():
++    with pytest.raises(AEDXmlInvalid) as exc:
++        aed_xml_to_df(make_xml({}, drop=("miejscowosc",)))
++    assert exc.value.errors[0]["field"] == "miejscowosc"
++
++
++def test_xsd_matches_template_columns():
++    names = XSD_PATH.read_text(encoding="utf-8")
++    assert all(f'name="{col}"' in names for col in AED_TEMPLATE_COLUMNS)
++
++
++@pytest.mark.skipif(not (REPO_SCHEMA / "aed_punkty.xsd").exists(), reason="brak katalogu format_danych w kontenerze")
++def test_portal_xsd_is_copy_of_repo_xsd_and_matches_table_schema():
++    assert XSD_PATH.read_bytes() == (REPO_SCHEMA / "aed_punkty.xsd").read_bytes()
++    schema = json.loads((REPO_SCHEMA / "aed_punkty.tableschema.json").read_text(encoding="utf-8"))
++    assert [f["name"] for f in schema["fields"]] == AED_TEMPLATE_COLUMNS
++    required = {f["name"] for f in schema["fields"] if f.get("constraints", {}).get("required")}
++    xsd = XSD_PATH.read_text(encoding="utf-8")
++    assert required == {c for c in AED_TEMPLATE_COLUMNS if f'<xs:element name="{c}" minOccurs="1">' in xsd}
+diff --git a/portal/backend/mcod/resources/tests/test_aed_xml_source.py b/portal/backend/mcod/resources/tests/test_aed_xml_source.py
+new file mode 100644
+index 0000000..eb1dcc8
+--- /dev/null
++++ b/portal/backend/mcod/resources/tests/test_aed_xml_source.py
+@@ -0,0 +1,114 @@
++"""Źródło XML (link do zewnętrznego serwera) w wykazie AED: wybór zasobów, odczyt, pominięcia i pełny przepływ."""
++
++from unittest.mock import MagicMock, patch
++
++import pytest
++import requests
++
++from mcod.datasets.factories import DatasetFactory
++from mcod.datasets.models import Dataset
++from mcod.resources.aed_utils import (
++    AEDSourceReadError,
++    create_main_aed_df,
++    get_aed_source_df,
++    get_aed_source_resources,
++    is_aed_xml_resource,
++)
++from mcod.resources.factories import ResourceFactory
++from mcod.resources.models import Resource
++from mcod.resources.tests.test_aed_sources import AGGREGATED_AT, LEGIONOWO_ROWS
++from mcod.resources.tests.test_aed_xml import make_xml
++
++REMOTE = "mcod.resources.aed_utils.request_remote_dga"
++
++
++def response(content: bytes, status_code: int = 200) -> MagicMock:
++    return MagicMock(status_code=status_code, headers={"Content-Type": "application/xml"}, content=content)
++
++
++@pytest.fixture
++def xml_resource_factory(aed_dataset):
++    """Zasób z linkiem do zewnętrznego serwera: portal klasyfikuje go jako `api`, bez pliku i bez statusu zadań plikowych."""
++
++    def create(**kwargs) -> Resource:
++        params = {
++            "dataset": aed_dataset,
++            "type": "api",
++            "format": "xml",
++            "link": "https://dostawca.example.pl/aed.xml",
++            "status": "published",
++            "link_tasks_last_status": "SUCCESS",
++            "file_tasks_last_status": "",
++            "main_file": None,
++        }
++        params.update(kwargs)
++        return ResourceFactory.create(**params)
++
++    return create
++
++
++@pytest.mark.feat_main_aed
++def test_xml_link_resource_is_selected_without_file_status(xml_resource_factory):
++    xml = xml_resource_factory()
++
++    assert is_aed_xml_resource(xml)
++    assert get_aed_source_resources() == [xml]
++
++
++@pytest.mark.feat_main_aed
++def test_xml_resource_filters(xml_resource_factory):
++    xml_resource_factory(link_tasks_last_status="FAILURE")
++    xml_resource_factory(status="draft")
++    xml_resource_factory(dataset=DatasetFactory.create(status="published", customfields={"inne": "pole"}))
++    xml_resource_factory(
++        dataset=DatasetFactory.create(
++            status="published", customfields={"standard": "AED"}, license_chosen=Dataset.LICENSE_CC_BY_SA
++        )
++    )
++
++    assert get_aed_source_resources() == []
++
++
++@pytest.mark.feat_main_aed
++def test_xml_is_read_from_link_and_validated_with_xsd(xml_resource_factory):
++    resource = xml_resource_factory()
++
++    with patch(REMOTE, return_value=response(make_xml({}, {"id_zrodlowe": "T-2"}))) as remote:
++        df = get_aed_source_df(resource)
++
++    remote.assert_called_once_with(resource.link)
++    assert len(df) == 2 and df.loc[0, "miejscowosc"] == "Olsztyn"
++
++
++@pytest.mark.feat_main_aed
++@pytest.mark.parametrize(
++    ("remote_kwargs", "message"),
++    [
++        ({"return_value": response(make_xml({}, drop=("typ_dostepu",)))}, "niezgodny z XSD"),
++        ({"return_value": response(b"", 404)}, "kod 404"),
++        ({"side_effect": requests.exceptions.ConnectionError("brak")}, "nie odpowiada"),
++    ],
++)
++def test_xml_source_errors_become_read_errors(xml_resource_factory, remote_kwargs, message):
++    with patch(REMOTE, **remote_kwargs), pytest.raises(AEDSourceReadError, match=message):
++        get_aed_source_df(xml_resource_factory())
++
++
++@pytest.mark.feat_main_aed
++def test_aggregation_merges_xml_and_csv_and_skips_invalid_xml(xml_resource_factory, aed_resource_factory):
++    csv_resource = aed_resource_factory()
++    good = xml_resource_factory()
++    bad = xml_resource_factory(link="https://dostawca.example.pl/aed_bledny.xml")
++    responses = {
++        good.link: response(make_xml({}, {"id_zrodlowe": "T-2"})),
++        bad.link: response(make_xml({}, drop=("miejscowosc",))),
++    }
++
++    with patch(REMOTE, side_effect=lambda url: responses[url]):
++        df, stats = create_main_aed_df([csv_resource, good, bad], AGGREGATED_AT)
++
++    assert stats["zasoby_przyjete"] == 2
++    assert [item["resource_id"] for item in stats["zasoby_pominiete"]] == [bad.pk]
++    assert "niezgodny z XSD" in stats["zasoby_pominiete"][0]["powod"]
++    assert len(df) == LEGIONOWO_ROWS + 2
++    assert set(df["id_zasobu_zrodlowego"]) == {str(csv_resource.pk), str(good.pk)}
 diff --git a/portal/backend/mcod/resources/tests/test_main_aed_resource.py b/portal/backend/mcod/resources/tests/test_main_aed_resource.py
 new file mode 100644
-index 0000000..b01aa67
+index 0000000..ae66341
 --- /dev/null
 +++ b/portal/backend/mcod/resources/tests/test_main_aed_resource.py
 @@ -0,0 +1,252 @@
@@ -2521,7 +4142,7 @@ index 0000000..b01aa67
 +def test_build_aed_tabular_schema():
 +    schema = build_aed_tabular_schema(MAIN_AED_COLUMNS)
 +
-+    assert len(schema["fields"]) == 51
++    assert len(schema["fields"]) == 52
 +    assert all(field["type"] == "string" for field in schema["fields"])
 +    assert schema["missingValues"] == []
 +    for geo_type, column in (("b", "szerokosc_geograficzna"), ("l", "dlugosc_geograficzna"), ("label", "nazwa_lokalizacji")):
@@ -2794,18 +4415,19 @@ index 1c2468c..909fac3 100644
      ("/resources/{id:int}/incr_download_count", res_views.ResourceDownloadCounter()),
      (
 diff --git a/portal/backend/mcod/settings/base.py b/portal/backend/mcod/settings/base.py
-index a88e90b..8df7417 100644
+index a88e90b..b94610b 100644
 --- a/portal/backend/mcod/settings/base.py
 +++ b/portal/backend/mcod/settings/base.py
-@@ -970,6 +970,7 @@ CELERY_TASK_ROUTES = {
+@@ -970,6 +970,8 @@ CELERY_TASK_ROUTES = {
      "mcod.submissions.tasks.generate_statistical_report_for_all_submissions_task": {"queue": "reports"},
      "mcod.resources.tasks.check_link_protocol": {"queue": "resources"},
      "mcod.resources.tasks.create_main_dga_resource_task": {"queue": "resources"},
 +    "mcod.resources.tasks.create_main_aed_resource_task": {"queue": "resources"},
++    "mcod.resources.tasks.refresh_aed_opis_task": {"queue": "resources"},
      "mcod.resources.tasks.delete_es_resource_tabular_data_index": {"queue": "indexing_data"},
      "mcod.resources.tasks.delete_es_resource_tabular_data_indexes_for_organization": {"queue": "indexing_data"},
      "mcod.resources.tasks.entrypoint_process_resource_file_validation_task": {"queue": "resources"},
-@@ -1747,6 +1748,38 @@ MAIN_DGA_DATASET_TAGS_NAMES = [
+@@ -1747,6 +1749,38 @@ MAIN_DGA_DATASET_TAGS_NAMES = [
      "chronione dane",
  ]
  

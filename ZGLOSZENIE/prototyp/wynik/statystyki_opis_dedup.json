@@ -1,0 +1,64 @@
+{
+  "zrodlo": "demo/wynik/komenda_create_main_aed_resource_opis.txt",
+  "data": "2026-11-22",
+  "zbior_wykazu": 4216,
+  "zasob_wykazu": 40258,
+  "zbior_z_opisu_xml": 4251,
+  "zasob_csv_z_opisu_xml": 40253,
+  "wiersze_przed_deduplikacja": 45,
+  "zasoby_przyjete": 4,
+  "zasoby_pominiete": [
+    {
+      "resource_id": 40251,
+      "powod": "XML niezgodny z XSD (3 błędów): linia 23: brak wymaganego pola: typ_dostepu"
+    },
+    {
+      "resource_id": 40210,
+      "powod": "brak kolumn: miejscowosc"
+    },
+    {
+      "resource_id": 40209,
+      "powod": "brak kolumn: nazwa_lokalizacji, miejscowosc, szerokosc_geograficzna, dlugosc_geograficzna"
+    }
+  ],
+  "wiersze": 38,
+  "wiersze_pominiete": 0,
+  "wiersze_zdeduplikowane": 7,
+  "duplikaty": [
+    {
+      "zachowany": "PL-AED-8c94410246b8",
+      "pominiety": "PL-AED-8c94410246b8",
+      "powod": "nazwa_i_lokalizacja"
+    },
+    {
+      "zachowany": "PL-AED-f52e7c3c06cd",
+      "pominiety": "PL-AED-f52e7c3c06cd",
+      "powod": "nazwa_i_lokalizacja"
+    },
+    {
+      "zachowany": "PL-AED-5b684f1f0dce",
+      "pominiety": "PL-AED-5b684f1f0dce",
+      "powod": "nazwa_i_lokalizacja"
+    },
+    {
+      "zachowany": "PL-AED-fc09f4071c01",
+      "pominiety": "PL-AED-fc09f4071c01",
+      "powod": "nazwa_i_lokalizacja"
+    },
+    {
+      "zachowany": "PL-AED-543cc007ccc4",
+      "pominiety": "PL-AED-543cc007ccc4",
+      "powod": "nazwa_i_lokalizacja"
+    },
+    {
+      "zachowany": "PL-AED-57473964d4f1",
+      "pominiety": "PL-AED-57473964d4f1",
+      "powod": "nazwa_i_lokalizacja"
+    },
+    {
+      "zachowany": "PL-AED-94891bb2df6c",
+      "pominiety": "PL-AED-e7f864440251",
+      "powod": "numer_seryjny"
+    }
+  ]
+}

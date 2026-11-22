@@ -1,0 +1,18 @@
+{
+  "zasoby_przyjete": 2,
+  "zasoby_pominiete": [
+    {
+      "resource_id": 40210,
+      "powod": "brak kolumn: miejscowosc"
+    },
+    {
+      "resource_id": 40209,
+      "powod": "brak kolumn: nazwa_lokalizacji, miejscowosc, szerokosc_geograficzna, dlugosc_geograficzna"
+    }
+  ],
+  "wiersze": 32,
+  "wiersze_pominiete": 0,
+  "zbior_zbiorczy_id": 4216,
+  "zasob_zbiorczy_id": 40247,
+  "zrodlo": "portal lokalny, create_main_aed_resource --eager, 22.11.2026"
+}
