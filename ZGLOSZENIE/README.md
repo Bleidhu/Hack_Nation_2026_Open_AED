@@ -35,7 +35,7 @@ Wersja live do przeklikania: <https://thumb-abrasive-bovine.ngrok-free.dev/live/
 | §4 księga znaku (.pdf) | [`ksiega_znaku.pdf`](ksiega_znaku.pdf) | jest |
 | §2 nazwa akcji i hasło | „Dane (prze)życie”, „Twoje dane – czyjeś życie.”; opis: [`../branding/AKCJA_DANE_PRZEZYCIE.md`](../branding/AKCJA_DANE_PRZEZYCIE.md) | jest |
 | §5 format odczytywalny maszynowo | [`dane/wykaz_aed_wynik_agregacji.csv`](dane/wykaz_aed_wynik_agregacji.csv) (CSV, 52 kolumny); schematy: [`../format_danych/schemat/`](../format_danych/schemat/) | jest |
-| Portal uruchomiony we własnym środowisku | [`prototyp/zrzuty/`](prototyp/zrzuty/README.md), [`prototyp/wynik/testy.txt`](prototyp/wynik/testy.txt), film [`wideo/dane_przezycie_wykaz_aed.mp4`](wideo/dane_przezycie_wykaz_aed.mp4) | jest |
+| Portal uruchomiony we własnym środowisku | [`prototyp/zrzuty/`](prototyp/zrzuty/README.md), [`prototyp/wynik/testy.txt`](prototyp/wynik/testy.txt), film <https://youtu.be/wiHsN31m_6o> | jest |
 | §5 WCAG, responsywność, UX | prototyp; podglądy 1440 i 390 px: [`../demo/wynik/`](../demo/wynik/) | jest |
 | Zakres użycia AI (`regulamin_zadania.pdf` §2 ust. 8) | dodatkowe informacje, krok 16; prezentacja, slajd 28 | jest |
 | Integrator danych (dodatek, krok 2) | dodatkowe informacje, krok 14; wyniki: [`prototyp/integrator/`](prototyp/integrator/README.md); kod: `../integrator/` | jest (dodatek) |

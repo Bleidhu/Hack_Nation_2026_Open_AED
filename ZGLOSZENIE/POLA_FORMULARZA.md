@@ -125,7 +125,7 @@ Długość: 22 znaków (limit: brak w formularzu).
 
 ## 13. Your video presentation (Public or Listed YouTube link)
 
-Formularz przyjmuje tylko link do YouTube. Plik filmu: `demo/wideo/dane_przezycie_wykaz_aed.mp4` (1 min 14 s, 1920×1080, bez dźwięku, napisy po polsku, ok. 18 MB). **[DO ZROBIENIA]** Wgrać go na YouTube z widocznością „Niepubliczny” (Unlisted, w formularzu nazwany „Listed”), a link wkleić tutaj.
+Formularz przyjmuje tylko link do YouTube. Plik filmu: `demo/wideo/dane_przezycie_wykaz_aed.mp4` (1 min 14 s, 1920×1080, bez dźwięku, napisy po polsku, ok. 18 MB). Link do wklejenia: https://youtu.be/wiHsN31m_6o.
 
 Tytuł filmu na YouTube:
 ```
@@ -135,7 +135,7 @@ Długość: 67 znaków (YouTube: maks. 100).
 
 Opis filmu na YouTube:
 ```
-Wykaz AED w zmodyfikowanym portalu dane.gov.pl: dostawca oznacza zbiór w „Polach niestandardowych” (standard = AED), portal co noc scala zasoby wielu dysponentów w jeden wykaz z tabelą, mapą i API. Nagrania portalu uruchomionego lokalnie w Dockerze, bez makiet; montaż opisano w demo/wideo/README.md.
+Wykaz AED w zmodyfikowanym portalu dane.gov.pl: dostawca oznacza zbiór w „Polach niestandardowych” (standard = AED), portal co noc scala zasoby wielu dysponentów w jeden wykaz z tabelą, mapą i API. Nagrania portalu uruchomionego lokalnie w Dockerze, bez makiet.
 
 Zadanie „Misja AED – Dane na ratunek”, HackNation 2026. Akcja „Dane (prze)życie”: Twoje dane – czyjeś życie.
 Kod i dokumentacja: https://github.com/Bleidhu/Hack_Nation_2026_Open_AED
@@ -144,9 +144,9 @@ Długość: 503 znaków (YouTube: maks. 5000).
 
 Link do wklejenia w formularz:
 ```
-https://youtu.be/<ID-FILMU>
+https://youtu.be/wiHsN31m_6o
 ```
-**[DO ZROBIENIA]** podmienić `<ID-FILMU>`.
+Film jest już na YouTube.
 
 ## 14. Website (https://...)
 
@@ -180,7 +180,7 @@ Wszystkie dowody są plikami w repozytorium. Nie trzeba się logować, instalowa
 2. demo/index.html: klikalny prototyp całego procesu w 9 krokach. Otwiera się dwuklikiem i działa offline.
 3. demo/wynik/weryfikacja.txt: sprawdzenie maszynowe, każde wymaganie z wynikiem PASS lub FAIL i plikiem dowodowym. Ponowne uruchomienie: python demo/sprawdz.py
 4. ZMIANY_W_PORTALU.md: opis zmian w kodzie portalu. Diff względem nietkniętego kodu: git diff a1adc22 -- portal/backend
-5. Dowody z działającego portalu: demo/zrzuty/ (zrzuty ekranu), demo/wynik/testy.txt (270 passed, w tym regresja DGA) i film demo/wideo/dane_przezycie_wykaz_aed.mp4.
+5. Dowody z działającego portalu: demo/zrzuty/ (zrzuty ekranu), demo/wynik/testy.txt (270 passed, w tym regresja DGA) i film https://youtu.be/wiHsN31m_6o.
 6. Wzorcowy zakres danych: format_danych/wzorcowy_zakres_danych.xlsx. Logotyp: branding/logo/. Księga znaku: branding/ksiega_znaku.pdf. Prezentacja: prezentacja/dane_przezycie_prezentacja.pdf.
 7. Pliki do zgłoszenia zebrane w jednym katalogu: ZGLOSZENIE/.
 8. Integrator danych to dodatek, a nie główny rezultat: integrator/README.md.
@@ -231,11 +231,11 @@ Długość: 218 znaków (limit: brak w formularzu).
 | Pole | Plik lub link | Limit z formularza | Stan |
 |---|---|---|---|
 | Cover image | `branding/okladka/okladka_800x600.png` (800×600, ok. 56 kB) | 800×600 zalecane, PNG/JPG/WEBP, 5 MB | gotowe |
-| Your video presentation | `demo/wideo/dane_przezycie_wykaz_aed.mp4` → YouTube „Niepubliczny” → link | tylko link YouTube | do zrobienia |
+| Your video presentation | https://youtu.be/wiHsN31m_6o | tylko link YouTube | gotowe |
 | Website | instrukcja w repozytorium albo adres live z `WERSJA_LIVE.md` | brak | wariant A gotowy, B po ngrok |
-| Link do repozytorium | https://github.com/Bleidhu/Hack_Nation_2026_Open_AED | brak | gotowe, wymaga push |
-| Prezentacja | `prezentacja/dane_przezycie_prezentacja.pdf` (ok. 0,9 MB) | PDF, 10 MB | gotowe |
-| Dodatkowe pole | link do `ZGLOSZENIE/` w repozytorium | brak | gotowe, wymaga push |
+| Link do repozytorium | https://github.com/Bleidhu/Hack_Nation_2026_Open_AED | brak | gotowe |
+| Prezentacja | `prezentacja/dane_przezycie_prezentacja.pdf` (ok. 1,4 MB) | PDF, 10 MB | gotowe |
+| Dodatkowe pole | link do `ZGLOSZENIE/` w repozytorium | brak | gotowe |
 
 ## [SPRAWDŹ]: liczby i stany, które mogą się jeszcze zmienić
 

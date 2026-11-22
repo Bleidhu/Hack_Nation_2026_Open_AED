@@ -38,7 +38,7 @@ Zrzuty importu opisu z portalu `build_demo.py` dołącza do kroku 4 samoczynnie,
 
 Zrzuty pochodzą z działającego portalu (`zrzuty/`, podpisy w `zrzuty/README.md`). Tabela i mapa korzystają dokładnie z `wynik/zestawienie_aed.csv`, a przycisk pobierania zwraca ten plik bajt w bajt.
 
-Film z nagraniem działającego portalu (1 min 14 s, bez przejścia przez ten prototyp): `wideo/dane_przezycie_wykaz_aed.mp4` (opis w `wideo/README.md`, źródła w `../video/`).
+Film z nagraniem działającego portalu (1 min 14 s): https://youtu.be/wiHsN31m_6o.
 
 Strona jest generowana i nie edytuje się jej ręcznie. Po zmianie szablonu albo wyników zbuduj ją ponownie (biblioteka standardowa i git):
 

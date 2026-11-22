@@ -1,6 +1,6 @@
 # Film: Wykaz AED w portalu dane.gov.pl
 
-[`dane_przezycie_wykaz_aed.mp4`](dane_przezycie_wykaz_aed.mp4): 1 min 14 s, 1920×1080, 60 kl./s, H.264, bez dźwięku, napisy po polsku. Otworzysz go w każdej przeglądarce i każdym odtwarzaczu.
+Film na YouTube: <https://youtu.be/wiHsN31m_6o> (1 min 14 s, bez dźwięku, napisy po polsku). Ten sam plik jest w repozytorium: `dane_przezycie_wykaz_aed.mp4` (1920×1080, H.264).
 
 Film pokazuje realizację zadania na nagraniach działającego portalu. Przejścia przez prototyp offline w filmie nie ma; prototyp opisuje [`../../INSTRUKCJA_DLA_JURY.md`](../../INSTRUKCJA_DLA_JURY.md).
 
@@ -19,5 +19,3 @@ Film pokazuje realizację zadania na nagraniach działającego portalu. Przejśc
   - część z prototypem offline (karta 03 i przejście przez `demo/index.html`, 35 s) usunięto w całości 22.11.2026; film przechodzi od odpowiedzi API wprost do zamknięcia.
 - Kursor jest dorysowany ze zapisu ruchów myszy, a kliknięcia i pisanie były prawdziwe.
 - Nagranie niczego nie zapisało w portalu.
-
-Źródła filmu (skrypty nagrań, kompozycja, napisy) i instrukcja odtworzenia: [`../../video/README.md`](../../video/README.md).

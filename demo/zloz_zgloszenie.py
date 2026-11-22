@@ -84,7 +84,7 @@ def main():
         for ext in ("jpg", "png", "pdf", "svg"):
             shutil.copy2(ROOT / "branding" / "logo" / f"{name}.{ext}", OUT / "logotyp")
     shutil.copy2(ROOT / "branding" / "ksiega_znaku.pdf", OUT / "ksiega_znaku.pdf")
-    (OUT / "wideo").mkdir()  # film z nagraniem portalu (źródła: video/)
+    (OUT / "wideo").mkdir()  # film z nagraniem portalu (online: https://youtu.be/wiHsN31m_6o)
     shutil.copy2(ROOT / "demo" / "wideo" / "dane_przezycie_wykaz_aed.mp4", OUT / "wideo")
     files = sorted(p.relative_to(OUT).as_posix() for p in OUT.rglob("*") if p.is_file())
     print(f"ZGLOSZENIE/: {len(files)} plików")
