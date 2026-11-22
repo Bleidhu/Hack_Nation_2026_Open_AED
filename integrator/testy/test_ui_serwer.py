@@ -134,9 +134,29 @@ class TestApiPorownaj(SerwerTestCase):
                             "osm": base64.b64encode(OSM).decode(), "osm_nazwa": "osm.json"})
         self.assertEqual(kod, 200)
         s = c["podsumowanie"]
-        self.assertEqual(s["wiersze_wykazu"], 32)
+        wiersze = len([w for w in WYKAZ.decode("utf-8").splitlines()[1:] if w.strip()])
+        self.assertEqual(s["wiersze_wykazu"], wiersze)
         self.assertEqual(s["w_obu"], 0)
         self.assertIn("ODbL", c["oznaczenie"])
+
+    def test_klucze_odpowiedzi_zgodne_z_tabelami_strony(self):
+        # tabele zakładki „Porównanie z OSM” czytają te pola; pusta kolumna id lub nazwy oznacza rozjazd kluczy
+        kod, c = self.json("POST", "/api/porownaj",
+                           {"wykaz": base64.b64encode(WYKAZ).decode(),
+                            "osm": base64.b64encode(OSM).decode(), "osm_nazwa": "osm.json"})
+        self.assertEqual(kod, 200)
+        self.assertTrue(c["tylko_w_wykazie"])
+        for t in c["tylko_w_wykazie"]:
+            for pole in ("id_aed", "id_zrodlowe", "nazwa_lokalizacji", "zrodlo_danych"):
+                self.assertIn(pole, t)
+            self.assertTrue(t["id_aed"] or t["id_zrodlowe"])
+            self.assertTrue(t["nazwa_lokalizacji"])
+        for t in c["tylko_w_osm"]:
+            for pole in ("id_zrodlowe", "zrodlo_url", "szerokosc_geograficzna", "dlugosc_geograficzna"):
+                self.assertIn(pole, t)
+        for fragment in ("t.id_aed || t.id_zrodlowe", "t.nazwa_lokalizacji", "t.zrodlo_danych",
+                         "p.wykaz.id_aed || p.wykaz.id_zrodlowe", "t.zrodlo_url"):
+            self.assertIn(fragment, INDEX_HTML, fragment)
 
     def test_porownanie_bez_pliku_odmowa(self):
         kod, c = self.json("POST", "/api/porownaj", {"wykaz": base64.b64encode(WYKAZ).decode()})

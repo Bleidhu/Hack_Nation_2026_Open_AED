@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 """
-Integrator danych AED do wzorca v2 (41 kolumn). Cienka powłoka CLI nad `rdzen/`; tylko biblioteka standardowa.
+Integrator danych AED do wzorca v2 (42 kolumny). Cienka powłoka CLI nad `rdzen/`; tylko biblioteka standardowa.
 
     python integrator/importer.py plik.csv --licencja "CC0 1.0" --mapowanie mapowanie.json --wyjscie wynik.csv --raport raport.json
     python integrator/importer.py plik.csv --podpowiedz       # propozycja mapowania kolumn
+    python integrator/importer.py opis aed.csv --link-csv https://... --tytul ... --opis ... --dysponent ... --licencja "CC BY 4.0" --czestotliwosc daily
+                                                               # opis zbioru XML z md5 pliku CSV (wejście do portalu)
 
 Wejście: CSV/TSV (UTF-8, CP1250), XLSX, GeoJSON, Overpass JSON. Presety: wzorzec, osm, warszawa (odpowiedź API um.warszawa.pl z pliku), gdansk (baza pojazdów ZTM – tylko statystyka).
 Licencja źródła jest jawna (--licencja); ODbL (preset osm) tylko z --cel lokalny.
@@ -23,6 +25,7 @@ from adaptery.osm import tagi_bez_odpowiednika, wczytaj as osm_wczytaj  # noqa: 
 from adaptery.warszawa import wczytaj as warszawa_wczytaj  # noqa: E402
 from rdzen.duplikaty import PROMIEN_DOMYSLNY, znajdz_kandydatow  # noqa: E402
 from rdzen.licencje import LicencjaBlad, sprawdz, wczytaj_konfiguracje  # noqa: E402
+from rdzen.opis_xml import OpisBlad, suma_md5, zbuduj_opis  # noqa: E402
 from rdzen.mapowanie import PRESETS, apply_mapping, suggest_mapping  # noqa: E402
 from rdzen.porownanie import porownaj  # noqa: E402
 from rdzen.rekord import RekordBlad, dopisz, sprawdz_rekord, wczytaj_istniejace, zbuduj  # noqa: E402
@@ -101,12 +104,47 @@ def _dodaj(argv) -> None:
     print(f"dopisano {rec['id_zrodlowe']} do {sciezka}" + (" (plik utworzony z nagłówkiem)" if nowy_plik else ""))
 
 
+def _opis(argv) -> None:
+    """Podkomenda `opis`: opis zbioru XML z sumą md5 pliku CSV (wejście do portalu)."""
+    ap = argparse.ArgumentParser(prog="importer.py opis",
+                                 description="Zbuduj opis zbioru XML (schemat format_danych/schemat/aed_opis_zbioru.xsd) "
+                                             "dla pliku CSV zgodnego ze wzorcem. Plik CSV i opis.xml należy wystawić "
+                                             "pod https bez zmian (md5 liczone z bajtów CSV).")
+    ap.add_argument("plik", type=Path, help="CSV zgodny ze wzorcem")
+    ap.add_argument("--link-csv", required=True, help="docelowy adres https pliku CSV")
+    ap.add_argument("--tytul", required=True)
+    ap.add_argument("--opis", required=True)
+    ap.add_argument("--dysponent", required=True, help="nazwa dysponenta danych")
+    ap.add_argument("--licencja", required=True, help="'CC0 1.0' lub 'CC BY 4.0'")
+    ap.add_argument("--czestotliwosc", required=True,
+                    help="daily, weekly, monthly, quarterly, everyHalfYear, yearly, irregular")
+    ap.add_argument("--regon")
+    ap.add_argument("--email")
+    ap.add_argument("--tytul-zasobu", help="tytuł zasobu CSV (domyślnie „Lokalizacje AED (CSV)”)")
+    ap.add_argument("--wyjscie", type=Path, help="katalog zapisu opis.xml (domyślnie katalog pliku CSV)")
+    a = ap.parse_args(argv)
+    dane = a.plik.read_bytes()
+    try:
+        xml = zbuduj_opis(dane, link_csv=a.link_csv, tytul=a.tytul, opis=a.opis, dysponent=a.dysponent,
+                          licencja=a.licencja, czestotliwosc=a.czestotliwosc, regon=a.regon, email=a.email,
+                          tytul_zasobu=a.tytul_zasobu)
+    except OpisBlad as e:
+        sys.exit(f"Błąd: {e}")
+    katalog = a.wyjscie or a.plik.parent
+    katalog.mkdir(parents=True, exist_ok=True)
+    cel = katalog / "opis.xml"
+    cel.write_text(xml, "utf-8", newline="")
+    print(f"zapisano {cel} (md5 {suma_md5(dane)}); opublikuj {a.plik.name} pod {a.link_csv} bez zmian")
+
+
 def main():
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8", errors="replace")
         sys.stderr.reconfigure(encoding="utf-8", errors="replace")
     if len(sys.argv) > 1 and sys.argv[1] == "dodaj":
         return _dodaj(sys.argv[2:])
+    if len(sys.argv) > 1 and sys.argv[1] == "opis":
+        return _opis(sys.argv[2:])
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("plik", type=Path)
     ap.add_argument("--mapowanie", type=Path)

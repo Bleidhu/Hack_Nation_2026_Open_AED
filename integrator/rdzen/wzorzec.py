@@ -1,4 +1,4 @@
-"""Wzorzec v2 (41 kolumn): kolumny, typy, słowniki i minimum czytane z ../format_danych/schemat/."""
+"""Wzorzec v2 (42 kolumny): kolumny, typy, słowniki i minimum czytane z ../format_danych/schemat/."""
 from __future__ import annotations
 
 import json
@@ -32,6 +32,7 @@ HEADER_ALIASES = {
     "telefon": "telefon_kontaktowy", "phone": "telefon_kontaktowy",
     "email": "email_kontaktowy", "e_mail": "email_kontaktowy",
     "id": "id_zrodlowe", "numer_id": "id_zrodlowe",
+    "nr_seryjny": "numer_seryjny", "serial": "numer_seryjny", "serial_number": "numer_seryjny", "sn": "numer_seryjny",
 }
 
 

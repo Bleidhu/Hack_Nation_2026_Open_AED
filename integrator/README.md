@@ -9,12 +9,12 @@ dostawca z własnym eksportem (CSV/TSV/XLSX, inne nazwy kolumn, CP1250, OSM)
         │  plik mapowania JSON (raz, potem reużywany)
         ▼
 integrator: mapowanie → normalizacja → walidacja (raport z numerami wierszy)
-        │  CSV zgodny ze wzorcem, wystawiony pod https
+        │  CSV zgodny ze wzorcem (42 kolumny) + opis.xml z sumą md5 (podkomenda `opis`), oba pod https
         ▼
-portal dane.gov.pl: zasób typu „link” z automatycznym odświeżaniem
+portal dane.gov.pl: import opisu (XSD → CSV → md5) albo zasób typu „link” z automatycznym odświeżaniem
         │  zbiór oznaczony jako zgodny ze wzorcem AED
         ▼
-nocne zadanie portalu (krok 1) → krajowy zasób zbiorczy AED
+nocne zadanie portalu (krok 1) → scalenie i deduplikacja → Wykaz AED (52 kolumny)
 ```
 
 ## Zawartość
@@ -39,6 +39,7 @@ nocne zadanie portalu (krok 1) → krajowy zasób zbiorczy AED
   Podkomenda `dodaj` (dla małych dostawców bez własnego systemu): flagi odpowiadają kolumnom
   wzorca v2; brakujący `id_zrodlowe` dostaje kolejny wolny numer z prefiksem dostawcy; przed
   zapisem walidacja i kontrola duplikatów (zapis mimo kandydatów dopiero z `--tak`).
+- Podkomenda `opis`: opis zbioru w XML z sumą md5 pliku CSV (opis niżej, w sekcji „Opis zbioru XML + CSV + md5”).
 - `ui/`: mały lokalny interfejs (zadanie 09). Start jednym poleceniem:
   ```bash
   python integrator/ui/serwer.py          # http://127.0.0.1:8765/
@@ -55,7 +56,36 @@ Przykładowe pliki dostawców wraz z mapowaniami są w `dane_przykladowe/` (bank
 
 > **Archiwum v1.** Pliki z wersji przed wzorcem v2 (`wzorzec_v1/`, próbki v1 z `dane_przykladowe/00_format_v1/`, `schemat/`, `szablony/`, `narzedzia/`, `FORMAT_V1.md`, `ARCHIWUM_V1.md` i szkic `openapi.yaml` z poprzedniego demonstratora) **przeniesiono do [`../archive/integrator/`](../archive/integrator/ARCHIWUM_V1.md)** (nic nie usuwamy; kod i testy nie odwołują się do archiwum, opis w [`../archive/README.md`](../archive/README.md)). Importer działa na wzorcu v2 (`../format_danych/`).
 
-> **Faza 2 (zakończona):** 12 zadań (zadania 01–09, 11 i 12 wykonane; 10, czyli schemat źródła wg wzorca w portalu, świadomie odłożone). Importer jest cienką powłoką CLI nad `rdzen/` (czyste funkcje), `adaptery/` (OSM, Warszawa, Gdańsk), `ui/` i `testy/` (87 testów, bez Dockera).
+> **Faza 2 (zakończona):** 12 zadań (zadania 01–09, 11 i 12 wykonane; 10, czyli schemat źródła wg wzorca w portalu, świadomie odłożone). Importer jest cienką powłoką CLI nad `rdzen/` (czyste funkcje), `adaptery/` (OSM, Warszawa, Gdańsk), `ui/` i `testy/` (97 testów, bez Dockera; test zgodności opisu z XSD wymaga `lxml` i bez niej jest pomijany).
+
+## Opis zbioru XML + CSV + md5 (wejście do portalu)
+
+Główna droga zaczytania danych zewnętrznych do portalu: dostawca wystawia pod https **dwa pliki**: CSV zgodny ze wzorcem (42 kolumny, `../format_danych/`) i **opis zbioru w XML** zgodny ze schematem [`../format_danych/schemat/aed_opis_zbioru.xsd`](../format_danych/schemat/aed_opis_zbioru.xsd). Opis zawiera metadane zbioru (tytuł, opis, dysponent, licencja, częstotliwość aktualizacji, data), link do CSV i **sumę md5 pliku CSV**. Integrator buduje ten opis z gotowego pliku CSV.
+
+1. Doprowadzić dane do wzorca (jeśli trzeba): `python integrator/importer.py eksport.xlsx --mapowanie mapowanie.json --licencja "CC BY 4.0" --wyjscie aed.csv`.
+2. Zbudować opis zbioru:
+   ```bash
+   python integrator/importer.py opis aed.csv --link-csv https://dostawca.example.pl/aed.csv \
+       --tytul "Defibrylatory AED – Gmina Przykład" --opis "Lokalizacje AED w budynkach gminy." \
+       --dysponent "Gmina Przykład" --licencja "CC BY 4.0" --czestotliwosc daily \
+       [--regon 123456785] [--email aed@example.pl] [--tytul-zasobu "Lokalizacje AED (CSV)"] [--wyjscie katalog/]
+   ```
+   Wynik: `opis.xml` w katalogu pliku CSV (albo w `--wyjscie`) i komunikat z sumą md5. Przed zapisem podkomenda sprawdza: minimum kolumn wzorca w CSV, kodowanie UTF-8, licencję (tylko `CC0 1.0` i `CC BY 4.0`; ODbL i CC BY-SA są odrzucane), częstotliwość ze słownika schematu, link `https://`, REGON (9 lub 14 cyfr). Liczba rekordów trafia do `<liczba_rekordow>`.
+3. Opublikować **oba pliki bez zmian** pod https: `aed.csv` dokładnie pod adresem z `--link-csv` i `opis.xml` obok. Suma md5 jest liczona z bajtów pliku, więc każda zmiana CSV (także końców linii albo kodowania przez serwer) wymaga ponownego uruchomienia `opis`. Inaczej portal odrzuci import.
+4. Zgłosić portalowi adres opisu. W portalu (krok 1) robi to komenda `python manage.py import_aed_xml https://dostawca.example.pl/opis.xml --organizacja <ID>` (`--dry-run` tylko sprawdza, `--odswiez` ponawia import wszystkich zbiorów zaczytanych z opisu). Kolejność kontroli w portalu: kod 200 → XSD → pobranie CSV → md5 → kolumny i duplikaty → zbiór (`standard` = `AED`) i zasób CSV. Zmiana md5 przy kolejnym imporcie zastępuje zasób nowym.
+
+Przykład na danych z repozytorium (CSV z 7 rekordami, w tym celowa kopia jednego urządzenia do pokazania deduplikacji):
+
+```bash
+python integrator/importer.py opis format_danych/przyklady/opis/aed_dostawcy.csv \
+    --link-csv https://dostawca.example.pl/aed.csv --tytul "Defibrylatory AED – Gmina Przykład" \
+    --opis "Lokalizacje AED gminy." --dysponent "Gmina Przykład" --licencja "CC BY 4.0" --czestotliwosc daily \
+    --wyjscie /tmp/opis
+```
+
+Wynik przechodzi walidację schematem `aed_opis_zbioru.xsd` (sprawdzone `lxml`, tak jak w portalu: `mcod/resources/aed_opis.py`), a `<md5>` jest równe `md5sum` pliku CSV. Gotowe przykłady opisów (poprawny, z błędnym md5, niezgodny z XSD) są w `../format_danych/przyklady/opis/`, a serwer dostawcy, który je wystawia, w `../demo/serwer_zewnetrzny.py` (instrukcja tunelu: `../demo/NGROK.md`).
+
+Integrator jest tu **dodatkiem**: dostawca, który ma już CSV zgodny ze wzorcem, może przygotować opis ręcznie według schematu. Integrator oszczędza liczenie md5 i pilnuje słowników.
 
 ## Zasady
 
@@ -65,4 +95,4 @@ Przykładowe pliki dostawców wraz z mapowaniami są w `dane_przykladowe/` (bank
 
 ## Co dalej, świadomie poza zakresem
 
-- **Deduplikacja w portalu.** Flagowanie kandydatów na duplikaty działa w integratorze (`rdzen/duplikaty.py`). Gdy pomysł się sprawdzi na realnych próbkach, można go dodać do agregacji w portalu za ustawieniem `AED_DEDUP_ENABLED` (domyślnie wyłączone, nowy plik `mcod/resources/aed_dedup.py`, wynik tylko w logu i statystykach komendy, **bez** nowych kolumn w zasobie zbiorczym i bez usuwania wierszy). Nie robimy tego teraz: zmiana w portalu miałaby być czysto opcjonalna, a głównym rezultatem zadania pozostaje wykaz z agregacją.
+- **Deduplikacja: integrator flaguje, portal scala.** Integrator tylko wskazuje kandydatów na duplikaty (`rdzen/duplikaty.py`, raport `--duplikaty`) i niczego nie usuwa. Scalanie odbywa się w portalu przy budowie Wykazu AED (`mcod/resources/aed_dedup.py`: klucz mocny producent + numer seryjny, klucz słaby marka/model i odległość między różnymi zasobami; pary trafiają do statystyk i logu zadania). Integrator nie powiela tej logiki.

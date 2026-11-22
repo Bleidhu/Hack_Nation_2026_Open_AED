@@ -23,7 +23,7 @@ def _csv_cols(path):
 
 class TestWzorzec(unittest.TestCase):
     def test_41_kolumn_w_kolejnosci_pliku(self):
-        self.assertEqual(len(wzorzec.FIELDS), 41)
+        self.assertEqual(len(wzorzec.FIELDS), 42)
         self.assertEqual(wzorzec.FIELDS, _csv_cols(PRZYKLAD))
 
     def test_aliasy_zgodne_z_portalem(self):

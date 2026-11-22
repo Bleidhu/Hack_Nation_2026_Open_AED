@@ -135,7 +135,7 @@ footer p { margin: .25rem 0; }
 <header class="pasek">
   <div class="wew">
     <h1>Integrator AED</h1>
-    <p>Sprawdź plik z defibrylatorami, dopasuj kolumny do wzorca v2 (41 pól) i pobierz CSV gotowy
+    <p>Sprawdź plik z defibrylatorami, dopasuj kolumny do wzorca v2 (42 pola) i pobierz CSV gotowy
        dla dane.gov.pl. Plik nie opuszcza twojego komputera.</p>
     <p class="dopisek">Dodatek do zmian w portalu (krok 1 zadania). Serwer działa lokalnie pod 127.0.0.1.</p>
   </div>
@@ -348,7 +348,7 @@ footer p { margin: .25rem 0; }
 <footer>
   <p>Integrator działa w całości offline: pliki są przetwarzane lokalnie, strona nie ładuje skryptów
      ani czcionek z internetu. OSM (ODbL) służy tylko do porównań.</p>
-  <p>Wzorzec danych: <span class="mono">format_danych/schemat/aed_punkty.tableschema.json</span> (41 kolumn).
+  <p>Wzorzec danych: <span class="mono">format_danych/schemat/aed_punkty.tableschema.json</span> (42 kolumny).
      Licencje dozwolone dla portalu definiuje <span class="mono">integrator/konfiguracja.json</span>.</p>
 </footer>
 
@@ -556,7 +556,10 @@ document.getElementById("formularz-osm").addEventListener("submit", function (e)
         }), "W obu źródłach");
       h += tabelka([["id", "id_aed / id źródłowe"], ["nazwa", "nazwa lokalizacji"],
                     ["zrodlo_danych", "źródło danych"]],
-        rap.tylko_w_wykazie, "Tylko w wykazie (do sprawdzenia u dostawców)");
+        rap.tylko_w_wykazie.map(function (t) {
+          return { id: esc(t.id_aed || t.id_zrodlowe), nazwa: esc(t.nazwa_lokalizacji),
+                   zrodlo_danych: esc(t.zrodlo_danych) };
+        }), "Tylko w wykazie (do sprawdzenia u dostawców)");
       h += tabelka([["id_zrodlowe", "OSM id"], ["zrodlo_url", "odnośnik"], ["wsp", "współrzędne"]],
         rap.tylko_w_osm.map(function (t) {
           return { id_zrodlowe: t.id_zrodlowe, zrodlo_url: t.zrodlo_url,
@@ -564,7 +567,7 @@ document.getElementById("formularz-osm").addEventListener("submit", function (e)
         }), "Tylko w OSM (minimum danych, licencja ODbL)");
       h += tabelka([["q", "wykaz"], ["o", "OSM"], ["odleglosc_m", "odległość (m)"], ["powod", "powód"]],
         rap.pary_do_sprawdzenia.map(function (p) {
-          return { q: p.wykaz.id_zrodlowe, o: p.osm.id_zrodlowe, odleglosc_m: p.odleglosc_m, powod: p.powod };
+          return { q: p.wykaz.id_aed || p.wykaz.id_zrodlowe, o: p.osm.id_zrodlowe, odleglosc_m: p.odleglosc_m, powod: p.powod };
         }), "Pary do sprawdzenia (różna kondygnacja)");
       wyn.innerHTML = h;
     });
