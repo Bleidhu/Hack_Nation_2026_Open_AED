@@ -2,6 +2,11 @@
 
 > **Pokaż, gdzie jest. Powiedz, czy działa.**
 
+**Zacznij tutaj:**
+- [`INSTRUKCJA_DLA_JURY.md`](INSTRUKCJA_DLA_JURY.md): każde wymaganie zadania w ponumerowanych krokach;
+- [`demo/index.html`](demo/index.html): klikalny prototyp offline;
+- [`ZMIANY_W_PORTALU.md`](ZMIANY_W_PORTALU.md): opis zmian w kodzie portalu.
+
 Rozwiązanie zadania „Misja AED – Dane na ratunek” (HackNation 2026, Ministerstwo Cyfryzacji). Modyfikujemy otwarty kod portalu [dane.gov.pl](https://dane.gov.pl/source-code/) tak, żeby **zbierał zasoby z danymi o defibrylatorach AED od wielu dysponentów i co noc budował z nich jeden krajowy zasób zbiorczy** z tabelą, mapą i API. Robimy to bez migracji bazy portalu, na wzór istniejącego mechanizmu zbiorczego wykazu DGA.
 
 | Część | Gdzie | Rola |
@@ -12,6 +17,6 @@ Rozwiązanie zadania „Misja AED – Dane na ratunek” (HackNation 2026, Minis
 | Akcja „Otwórz AED” | `branding/` | logo, księga znaku, opis akcji |
 | Materiały źródłowe | `references/`, `docs/` | polecenie, regulamin, wytyczne organizatora, standardy, wiedza |
 
-Zmiany w portalu najłatwiej zobaczyć jako diff względem pierwszego commitu z oryginalnym kodem portalu (commit „Oryginalny kod portalu dane.gov.pl”).
+Zmiany w portalu najłatwiej zobaczyć jako diff względem commita `a119b1b` z oryginalnym kodem portalu: `git diff a119b1b -- portal/backend`. Opis zmian jest w [`ZMIANY_W_PORTALU.md`](ZMIANY_W_PORTALU.md).
 
 Instrukcje dla zespołu i agentów są w [`CLAUDE.md`](CLAUDE.md).
