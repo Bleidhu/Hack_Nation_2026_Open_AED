@@ -1,9 +1,12 @@
 """
 Weryfikacja agregacji Wykazu AED bez Dockera i bazy danych.
 
-Uruchamia te same funkcje co portal (`portal/backend/mcod/resources/aed_aggregation.py`) na migawce
-realnych zasobów AED z dane.gov.pl (`references/dane_gov_pl_aed/`) i na przykładzie wzorca
-(`format_danych/przyklady/`). Zapisuje wynik w `demo/wynik/`.
+Uruchamia te same funkcje co portal (`portal/backend/mcod/resources/aed_aggregation.py` i deduplikację
+`aed_dedup.deduplicate_rows`, którą wywołuje `create_main_aed_df` w `aed_utils.py`) na migawce realnych zasobów AED
+z dane.gov.pl (`references/dane_gov_pl_aed/`), na przykładzie wzorca (`format_danych/przyklady/`) i na pliku CSV
+dostawcy zewnętrznego z opisem zbioru w XML (`format_danych/przyklady/opis/`). Zapisuje w `demo/wynik/`:
+`zestawienie_aed.csv` (zasób zbiorczy), `raport_agregacji.txt` i `statystyki_agreguj.json` (statystyki w układzie
+`create_main_aed_df`, z deduplikacją).
 
     uv run --python 3.11 --with "pandas==1.5.3" --with "numpy<2" --with openpyxl python demo/agreguj.py
 """
@@ -59,7 +62,11 @@ def load_portal_module(name: str):
 
 
 constants = load_portal_module("aed_constants")
+aed_xml = load_portal_module("aed_xml")
 aggregation = load_portal_module("aed_aggregation")
+dedup = load_portal_module("aed_dedup")
+opis = load_portal_module("aed_opis")
+OPIS_DIR = EXAMPLES / "opis"
 
 
 def read_json(path: Path) -> dict:
@@ -154,7 +161,26 @@ def aggregate_example():
     return result, matches
 
 
-def format_report(report, example_rows: int, matches: bool, total_rows: int, aggregated_at: str) -> str:
+def aggregate_supplier(aggregated_at: str):
+    """CSV dostawcy zewnętrznego: źródło (wydawca, licencja, link) z opisu zbioru, jak w komendzie import_aed_xml."""
+    parsed = opis.parse_opis((OPIS_DIR / "opis_poprawny.xml").read_bytes())
+    content = (OPIS_DIR / "aed_dostawcy.csv").read_bytes()
+    if not opis.verify_md5(content, parsed["zasob"]["md5"]):
+        raise SystemExit("suma md5 aed_dostawcy.csv różni się od sumy w opis_poprawny.xml")
+    source = {
+        "institution_id": 2003,
+        "publisher": parsed["dysponent_nazwa"],
+        "license": parsed["licencja"],
+        "resource_id": 900103,
+        "url": parsed["zasob"]["link_csv"],
+        "data_date": parsed["data_aktualizacji"][:10],
+        "personal_data": False,
+    }
+    rows, skipped = aggregation.build_aggregate_rows(aggregation.read_tabular_bytes(content, "csv"), source, aggregated_at)
+    return rows, skipped
+
+
+def format_report(report, example_rows: int, matches: bool, total_rows: int, aggregated_at: str, stats: dict) -> str:
     lines = [f"Wykaz AED: weryfikacja agregacji bez bazy (data agregacji {aggregated_at})", ""]
     lines.append(f"{'zasób':>8}  {'format':<8} {'przyjęte':>8} {'pominięte':>9}  zbiór / powód pominięcia zasobu")
     for entry in report:
@@ -170,9 +196,15 @@ def format_report(report, example_rows: int, matches: bool, total_rows: int, agg
         "",
         f"Przykład wzorca (format_danych/przyklady/aed_punkty_przyklad.csv): {example_rows} wierszy, "
         f"zgodność z aed_zestawienie_przyklad.csv: {'TAK' if matches else 'NIE'}",
+        f"Dostawca zewnętrzny z opisem XML (format_danych/przyklady/opis/aed_dostawcy.csv, md5 zgodne z opisem): "
+        f"{stats['wiersze_dostawcy']} wierszy",
         f"Zasoby realne: przyjęte {accepted}, pominięte {len(report) - accepted}.",
-        f"Wiersze w demo/wynik/zestawienie_aed.csv: {total_rows}.",
+        f"Deduplikacja (aed_dedup.deduplicate_rows): wierszy przed {stats['wiersze_przed_deduplikacja']}, "
+        f"pominięte duplikaty {stats['wiersze_zdeduplikowane']}.",
     ]
+    for duplicate in stats["duplikaty"]:
+        lines.append(f"  duplikat {duplicate['pominiety']} pominięty, bo to samo urządzenie co {duplicate['zachowany']} ({duplicate['powod']})")
+    lines.append(f"Wiersze w demo/wynik/zestawienie_aed.csv: {total_rows} (kolumn: {stats['kolumny']}).")
     return "\n".join(lines) + "\n"
 
 
@@ -180,11 +212,30 @@ def main() -> int:
     aggregated_at = datetime.datetime.now().replace(microsecond=0).isoformat()
     report, parts = aggregate_real_sources(aggregated_at)
     example, matches = aggregate_example()
-    result = pd.concat(parts + [example], ignore_index=True)
+    supplier, supplier_skipped = aggregate_supplier(aggregated_at)
+    merged = pd.concat(parts + [example, supplier], ignore_index=True)
+    result, duplicates = dedup.deduplicate_rows(merged)
+    accepted = [entry for entry in report if not entry["powod"]]
+    stats = {
+        "zrodlo": "demo/agreguj.py (bez bazy): migawka dane.gov.pl, przykład wzorca i plik dostawcy z opisem XML",
+        "data_agregacji": aggregated_at,
+        "zasoby_przyjete": len(accepted) + 2,
+        "zasoby_pominiete": [{"resource_id": entry["zasob"], "powod": entry["powod"]} for entry in report if entry["powod"]],
+        "wiersze": len(result),
+        "wiersze_pominiete": sum(entry["pominiete"] for entry in accepted) + len(supplier_skipped),
+        "wiersze_zdeduplikowane": len(duplicates),
+        "duplikaty": duplicates,
+        "wiersze_przed_deduplikacja": len(merged),
+        "wiersze_dostawcy": len(supplier),
+        "kolumny": len(result.columns),
+    }
 
     OUTPUT.mkdir(parents=True, exist_ok=True)
     (OUTPUT / "zestawienie_aed.csv").write_bytes(aggregation.to_csv_bytes(result))
-    text = format_report(report, len(example), matches, len(result), aggregated_at)
+    (OUTPUT / "statystyki_agreguj.json").write_text(
+        json.dumps(stats, ensure_ascii=False, indent=2) + "\n", encoding="utf-8", newline="\n"
+    )
+    text = format_report(report, len(example), matches, len(result), aggregated_at, stats)
     (OUTPUT / "raport_agregacji.txt").write_text(text, encoding="utf-8", newline="\n")
     sys.stdout.reconfigure(encoding="utf-8")
     print(text, end="")

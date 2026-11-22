@@ -143,6 +143,15 @@ pre.xml { background: #f5f7fa; border: 1px solid var(--ramka); padding: .75rem; 
 pre.xml .l { display: block; white-space: pre; }
 pre.xml .l.blad { background: #fbe9e7; color: #8c1d18; font-weight: 700; }
 pre.xml .n { display: inline-block; width: 3rem; color: var(--szary); user-select: none; }
+.etapy-importu { list-style: none; counter-reset: etap; display: flex; flex-wrap: wrap; gap: .5rem; padding: 0; margin: 1rem 0; max-width: 60rem; }
+.etapy-importu li { counter-increment: etap; background: var(--tlo); border-left: 4px solid var(--granat); padding: .3rem .7rem; font-size: .92rem; }
+.etapy-importu li::before { content: counter(etap) ". "; font-weight: 700; color: var(--granat); }
+.wynik-ok { color: var(--zielen-ciemna); font-weight: 700; white-space: nowrap; }
+.wynik-zly { color: #8c1d18; font-weight: 700; white-space: nowrap; }
+.wynik-brak { color: var(--szary); white-space: nowrap; }
+.wynik-portal { color: var(--granat); font-weight: 700; white-space: nowrap; }
+details.wariant { border-top: 2px solid var(--granat); padding-top: .75rem; margin-top: 2rem; }
+details.wariant > summary { font-size: 1.1rem; }
 </style>
 </head>
 <body>
@@ -160,7 +169,7 @@ pre.xml .n { display: inline-block; width: 3rem; color: var(--szary); user-selec
     <li><button type="button" data-krok="1">1. Problem</button></li>
     <li><button type="button" data-krok="2">2. Dostawca oznacza zbiór</button></li>
     <li><button type="button" data-krok="3">3. Dostawca publikuje zasób</button></li>
-    <li><button type="button" data-krok="4">4. Dane z zewnątrz (XML)</button></li>
+    <li><button type="button" data-krok="4">4. Dane z zewnątrz przez API</button></li>
     <li><button type="button" data-krok="5">5. Portal buduje wykaz</button></li>
     <li><button type="button" data-krok="6">6. Odbiorca przegląda</button></li>
     <li><button type="button" data-krok="7">7. Pobieranie i API</button></li>
@@ -190,7 +199,7 @@ pre.xml .n { display: inline-block; width: 3rem; color: var(--szary); user-selec
     </table>
   </div>
   <p><strong>Cel:</strong> jeden ogólnopolski zasób <strong>Wykaz AED</strong>, który portal co noc składa z zasobów zadeklarowanych przez dostawców. Działa tak jak istniejący mechanizm DGA (nocny zasób zbiorczy z zasobów wielu instytucji), bez nowych tabel w bazie i bez migracji.</p>
-  <p class="uwaga">Kolejne kroki pokazują ścieżkę dostawcy i odbiorcy. Zrzuty pochodzą ze <strong>zmodyfikowanego portalu uruchomionego lokalnie</strong> (22.11.2026), a tabela i mapa w kroku 5 korzystają z prawdziwego wyniku naszej funkcji agregacji.</p>
+  <p class="uwaga">Kolejne kroki pokazują ścieżkę dostawcy i odbiorcy. Zrzuty pochodzą ze <strong>zmodyfikowanego portalu uruchomionego lokalnie</strong> (22.11.2026), a tabela i mapa w kroku 6 korzystają z prawdziwego wyniku naszej funkcji agregacji.</p>
 </section>
 
 <section class="krok" id="etap-2" aria-labelledby="h-2" hidden>
@@ -209,7 +218,7 @@ pre.xml .n { display: inline-block; width: 3rem; color: var(--szary); user-selec
 
 <section class="krok" id="etap-3" aria-labelledby="h-3" hidden>
   <h2 id="h-3" tabindex="-1"><span class="nr">3</span>Dostawca publikuje zasób we wzorcowym formacie</h2>
-  <p>Zasób to plik CSV lub XLSX z kolumnami <strong>wzorcowego zakresu danych</strong> (41 kolumn). Do wykazu wystarczy minimum: <code>nazwa_lokalizacji</code>, <code>miejscowosc</code>, <code>szerokosc_geograficzna</code>, <code>dlugosc_geograficzna</code>. Dostawca może wgrać plik albo podać link, który portal odświeża cyklicznie. Licencja: CC0 1.0 lub CC BY 4.0.</p>
+  <p>Zasób to plik CSV lub XLSX z kolumnami <strong>wzorcowego zakresu danych</strong> (<span class="n-wzorzec">42</span> kolumny). Do wykazu wystarczy minimum: <code>nazwa_lokalizacji</code>, <code>miejscowosc</code>, <code>szerokosc_geograficzna</code>, <code>dlugosc_geograficzna</code>. Dostawca może wgrać plik albo podać link, który portal odświeża cyklicznie. Licencja: CC0 1.0 lub CC BY 4.0.</p>
   <div class="tabela-wrap" role="region" aria-labelledby="cap-przyklad" tabindex="0">
     <table id="tab-przyklad">
       <caption id="cap-przyklad"></caption>
@@ -228,8 +237,58 @@ pre.xml .n { display: inline-block; width: 3rem; color: var(--szary); user-selec
 </section>
 
 <section class="krok" id="etap-4" aria-labelledby="h-4" hidden>
-  <h2 id="h-4" tabindex="-1"><span class="nr">4</span>Dane z zewnątrz: XML z serwera dostawcy i walidacja XSD</h2>
-  <p>Dostawca nie musi być na dane.gov.pl. Wystawia plik <strong>XML</strong> pod adresem https na własnym serwerze, a w portalu dodaje zasób z <strong>linkiem</strong> do tego pliku (w panelu albo komendą <code>manage.py import_aed_xml &lt;adres&gt;</code>, która najpierw sprawdza plik schematem <strong>XSD</strong>). Co noc zadanie Wykazu AED pobiera plik spod linku, waliduje go XSD, zamienia na te same kolumny wzorca co CSV i XLSX i scala z pozostałymi źródłami. Plik niezgodny z XSD jest pomijany, a powód trafia do logu.</p>
+  <h2 id="h-4" tabindex="-1"><span class="nr">4</span>Dane z zewnątrz przez API: opis zbioru w XML, plik CSV i suma md5</h2>
+  <p class="lead">Dostawca nie musi być na dane.gov.pl. W swoim API (na własnym serwerze https) wystawia dwa pliki: <strong>opis zbioru w XML</strong> (tytuł, dysponent, licencja, częstotliwość aktualizacji, link do danych i suma <strong>md5</strong>) oraz <strong>dane w CSV</strong> zgodnym ze wzorcem (<span class="n-wzorzec">42</span> kolumny).</p>
+  <p>Portal pobiera opis po HTTPS i przyjmuje tylko odpowiedź z kodem 200. Pierwszy import uruchamia komenda <code>manage.py import_aed_xml &lt;adres opisu&gt; --organizacja &lt;id&gt;</code> (<code>--dry-run</code> tylko sprawdza). Portal sprawdza opis schematem <strong>XSD</strong>, pobiera CSV spod linku z opisu i porównuje jego sumę md5 z sumą z opisu. Potem kontroluje kolumny i dopiero wtedy zapisuje zbiór i zasób. Niezgodny opis albo plik niczego nie zapisuje. Zbiór dostaje w „Polach niestandardowych” wpisy <code>standard = AED</code>, <code>opis_xml</code> i <code>md5</code>.</p>
+  <p>Co noc o <strong>4:05</strong> zadanie Celery <code>refresh_aed_opis_task</code> ponownie pobiera każdy taki opis (to samo robi ręcznie <code>--odswiez</code>). Ta sama suma md5 nic nie zmienia, a inna oznacza nowe dane i zasób jest zastępowany. O <strong>4:15</strong> budowa wykazu usuwa duplikaty: to samo urządzenie zgłoszone przez dwóch dostawców trafia do wykazu raz.</p>
+  <ol class="etapy-importu" aria-label="Kolejność importu opisu zbioru">
+    <li>opis XML z API dostawcy (kod 200)</li><li>walidacja XSD</li><li>pobranie CSV</li><li>kontrola md5</li><li>kontrola CSV</li><li>zbiór i zasób w portalu</li><li>nocne odświeżenie opisu (4:05)</li><li>deduplikacja przy budowie wykazu (4:15)</li>
+  </ol>
+  <fieldset class="wybor-xml">
+    <legend>Który opis zbioru zaimportować? (wyniki pochodzą z uruchomienia funkcji portalu przez <code>demo/sprawdz.py</code>)</legend>
+    <label><input type="radio" name="opis-plik" value="opis_poprawny.xml" checked> <code>opis_poprawny.xml</code>: opis zgodny z XSD, md5 pasuje do CSV</label>
+    <label><input type="radio" name="opis-plik" value="opis_bledny_md5.xml"> <code>opis_bledny_md5.xml</code>: zgodny z XSD, ale md5 nie pasuje do CSV</label>
+    <label><input type="radio" name="opis-plik" value="opis_bledny_xsd.xml"> <code>opis_bledny_xsd.xml</code>: niezgodny z XSD</label>
+  </fieldset>
+  <div id="opis-wynik" aria-live="polite">
+    <p id="opis-werdykt" class="werdykt"></p>
+    <div class="tabela-wrap" role="region" aria-labelledby="cap-opis-etapy" tabindex="0">
+      <table><caption id="cap-opis-etapy">Kroki importu dla wybranego opisu</caption>
+        <thead><tr><th scope="col">Krok</th><th scope="col">Wynik</th><th scope="col">Szczegóły</th></tr></thead><tbody id="opis-etapy"></tbody></table>
+    </div>
+    <div class="tabela-wrap" role="region" aria-labelledby="cap-opis-bledy" tabindex="0" id="opis-bledy-wrap" hidden>
+      <table><caption id="cap-opis-bledy">Błędy walidacji XSD opisu (funkcja <code>validate_opis_xml</code>, komunikaty biblioteki lxml)</caption>
+        <thead><tr><th scope="col">Linia</th><th scope="col">Pole</th><th scope="col">Komunikat</th></tr></thead><tbody id="opis-bledy"></tbody></table>
+    </div>
+    <details><summary>Zawartość opisu (numery linii; błędne linie wyróżnione)</summary><pre id="opis-tresc" class="xml"></pre></details>
+  </div>
+  <p class="przyciski">
+    <a class="btn" href="../format_danych/przyklady/opis/opis_poprawny.xml">Opis zbioru (XML)</a>
+    <a class="btn drugi" href="../format_danych/przyklady/opis/aed_dostawcy.csv">Dane dostawcy (CSV)</a>
+    <a class="btn drugi" href="../format_danych/schemat/aed_opis_zbioru.xsd">Schemat XSD opisu</a>
+    <a class="btn drugi" href="wynik/import_opisu.json">Wyniki (JSON)</a>
+  </p>
+
+  <h3>Deduplikacja przy budowie wykazu</h3>
+  <p>Plik dostawcy zawiera urządzenie, które jest już w pliku innego dostawcy: ten sam producent i numer seryjny, inny identyfikator i inna nazwa lokalizacji. Funkcja portalu <code>deduplicate_rows</code> (<code>mcod/resources/aed_dedup.py</code>) zostawia jeden wiersz: ten z wyższym poziomem weryfikacji, a przy remisie nowszy. Puste pola producenta, modelu i numeru seryjnego uzupełnia z duplikatu. Każdą parę zapisuje w statystykach i logu.</p>
+  <div class="karty" id="karty-dedup"></div>
+  <div class="tabela-wrap" role="region" aria-labelledby="cap-dedup" tabindex="0">
+    <table id="tab-dedup"><caption id="cap-dedup"></caption><thead></thead><tbody></tbody></table>
+  </div>
+  <p>Wynik w portalu uruchomionym lokalnie (22.11.2026, zasób wykazu 40258): <strong>45 wierszy przed deduplikacją, 38 po</strong>, 7 duplikatów pominiętych z powodem. Jeden to para powyżej (powód <code>numer_seryjny</code>). Sześć to te same rekordy dostawcy podane raz w zasobie XML, a raz w CSV z opisu (powód <code>nazwa_i_lokalizacja</code>). Log: <a href="wynik/komenda_create_main_aed_resource_opis.txt">komenda_create_main_aed_resource_opis.txt</a>, statystyki: <a href="wynik/statystyki_opis_dedup.json">statystyki_opis_dedup.json</a>, wykaz: <a href="wynik/wykaz_opis_xml_dedup.csv">wykaz_opis_xml_dedup.csv</a>.</p>
+
+  <h3>Serwer dostawcy</h3>
+  <p>Serwer <code>demo/serwer_zewnetrzny.py</code> (dane fikcyjne) wystawia opisy, CSV i schematy. Link do CSV wpisuje do opisu na podstawie adresu, pod którym go wywołano, więc ten sam opis działa lokalnie, z kontenera portalu i przez ngrok. Pomiar <code>demo/sprawdz.py</code> (serwer uruchomiony w wątku na wolnym porcie 127.0.0.1):</p>
+  <div class="tabela-wrap" role="region" aria-labelledby="cap-serwer" tabindex="0">
+    <table id="tab-serwer"><caption id="cap-serwer"></caption>
+      <thead><tr><th scope="col">Adres</th><th scope="col" class="num">Kod HTTP</th><th scope="col" class="num">Czas [ms]</th><th scope="col" class="num">Bajty</th></tr></thead><tbody></tbody></table>
+  </div>
+  <p id="serwer-md5"></p>
+{{ZRZUTY_OPIS}}
+
+  <details class="wariant">
+  <summary>Wariant dodatkowy: rekordy AED wprost w XML (schemat <code>aed_punkty.xsd</code>)</summary>
+  <p>Zamiast opisu i CSV dostawca może wystawić same rekordy AED w pliku <strong>XML</strong>, a w portalu dodać zasób z <strong>linkiem</strong> do tego pliku. Co noc zadanie Wykazu AED pobiera plik spod linku, waliduje go XSD, zamienia na te same kolumny wzorca co CSV i XLSX i scala z pozostałymi źródłami. Plik niezgodny z XSD jest pomijany, a powód trafia do logu.</p>
   <fieldset class="wybor-xml">
     <legend>Którego pliku dostawcy użyć? (wynik walidacji pochodzi z prawdziwego uruchomienia kodu portalu)</legend>
     <label><input type="radio" name="xml-plik" value="poprawny" checked> <code>aed_poprawny.xml</code>: 6 rekordów</label>
@@ -267,23 +326,24 @@ pre.xml .n { display: inline-block; width: 3rem; color: var(--szary); user-selec
     <img src="zrzuty/14_wykaz_z_xml_tabela.png" width="1440" height="2070" loading="lazy" alt="Frontend portalu, tabela zasobu Wykaz defibrylatorów AED: pierwsze wiersze to rekordy z XML (Olsztyn, Elbląg) z identyfikatorami id_aed, id_zrodlowe OL-001 do EL-003.">
     <figcaption>Wykaz AED w portalu zawiera rekordy z zewnętrznego XML (Olsztyn, Elbląg). <a href="zrzuty/14_wykaz_z_xml_tabela.png">Pełny rozmiar</a></figcaption>
   </figure>
+  </details>
 </section>
 
 <section class="krok" id="etap-5" aria-labelledby="h-5" hidden>
   <h2 id="h-5" tabindex="-1"><span class="nr">5</span>Portal sprawdza zasoby i co noc buduje Wykaz AED</h2>
   <svg class="proces" viewBox="0 0 1000 250" role="img" aria-labelledby="proces-t proces-d">
     <title id="proces-t">Schemat budowy Wykazu AED</title>
-    <desc id="proces-d">Pięć etapów od lewej do prawej. Pierwszy: zbiory z wpisem standard = AED. Drugi: kontrola zasobu, czyli format CSV lub XLSX, licencja CC0 lub CC BY i kolumny minimum. Trzeci: normalizacja, czyli aliasy nagłówków, identyfikator id_aed, wartości jawne i pochodzenie. Czwarty: zasób zbiorczy CSV z 51 kolumnami w zbiorze Wykaz AED. Piąty: tabela, mapa i API portalu. Pod schematem: zasoby odrzucone trafiają do logu z powodem.</desc>
+    <desc id="proces-d">Pięć etapów od lewej do prawej. Pierwszy: zbiory z wpisem standard = AED. Drugi: kontrola zasobu, czyli format CSV, XLSX lub XML, licencja CC0 lub CC BY i kolumny minimum. Trzeci: normalizacja, czyli aliasy nagłówków, identyfikator id_aed i pochodzenie, oraz deduplikacja tego samego urządzenia od różnych dostawców. Czwarty: zasób zbiorczy CSV z 52 kolumnami w zbiorze Wykaz AED. Piąty: tabela, mapa i API portalu. Pod schematem: zasoby odrzucone trafiają do logu z powodem.</desc>
     <defs><marker id="strz" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#0E2A47"/></marker></defs>
     <g font-size="17" text-anchor="middle" fill="#1b2430">
       <rect x="5" y="20" width="170" height="120" rx="3" fill="#e6f2ec" stroke="#007A45" stroke-width="2"/>
       <text x="90" y="55" font-weight="700" fill="#0E2A47">Zbiory</text><text x="90" y="80">customfields</text><text x="90" y="104">standard = AED</text>
       <rect x="210" y="20" width="170" height="120" rx="3" fill="#fff" stroke="#0E2A47" stroke-width="2"/>
-      <text x="295" y="55" font-weight="700" fill="#0E2A47">Kontrola zasobu</text><text x="295" y="80">CSV / XLSX</text><text x="295" y="104">CC0 lub CC BY</text><text x="295" y="128">kolumny minimum</text>
+      <text x="295" y="55" font-weight="700" fill="#0E2A47">Kontrola zasobu</text><text x="295" y="80">CSV / XLSX / XML</text><text x="295" y="104">CC0 lub CC BY</text><text x="295" y="128">kolumny minimum</text>
       <rect x="415" y="20" width="170" height="120" rx="3" fill="#fff" stroke="#0E2A47" stroke-width="2"/>
-      <text x="500" y="55" font-weight="700" fill="#0E2A47">Normalizacja</text><text x="500" y="80">aliasy nagłówków</text><text x="500" y="104">id_aed, wartości</text><text x="500" y="128">jawne, pochodzenie</text>
+      <text x="500" y="55" font-weight="700" fill="#0E2A47">Normalizacja</text><text x="500" y="80">aliasy nagłówków</text><text x="500" y="104">id_aed, pochodzenie</text><text x="500" y="128">deduplikacja</text>
       <rect x="620" y="0" width="170" height="160" rx="3" fill="#0E2A47"/>
-      <text x="705" y="45" font-weight="700" font-size="19" fill="#fff">Zasób zbiorczy</text><text x="705" y="80" fill="#fff">CSV, 51 kolumn</text><text x="705" y="104" fill="#fff">zbiór Wykaz AED</text><text x="705" y="128" fill="#fff">CC BY 4.0</text>
+      <text x="705" y="45" font-weight="700" font-size="19" fill="#fff">Zasób zbiorczy</text><text x="705" y="80" fill="#fff">CSV, 52 kolumny</text><text x="705" y="104" fill="#fff">zbiór Wykaz AED</text><text x="705" y="128" fill="#fff">CC BY 4.0</text>
       <rect x="825" y="20" width="170" height="120" rx="3" fill="#e6f2ec" stroke="#007A45" stroke-width="2"/>
       <text x="910" y="55" font-weight="700" fill="#0E2A47">Portal</text><text x="910" y="80">tabela</text><text x="910" y="104">mapa</text><text x="910" y="128">API</text>
     </g>
@@ -291,7 +351,7 @@ pre.xml .n { display: inline-block; width: 3rem; color: var(--szary); user-selec
     <path d="M295 142V200H560" fill="none" stroke="#b3261e" stroke-width="3" stroke-dasharray="7 5" marker-end="url(#strz)"/>
     <text x="570" y="206" font-size="17" fill="#8c1d18">zasoby odrzucone → log z powodem</text>
   </svg>
-  <p>Zadanie Celery uruchamia się codziennie o 4:15, po harvesterze (3:00) i DGA (3:30). Ten sam proces można wywołać ręcznie komendą <code>manage.py create_main_aed_resource</code>. Cały dodatek wyłącza ustawienie <code>AED_AGGREGATION_ENABLED</code>; wtedy portal działa jak oryginał.</p>
+  <p>Zadanie Celery uruchamia się codziennie o 4:15, po harvesterze (3:00), DGA (3:30) i odświeżeniu opisów zbiorów z XML (4:05). Ten sam proces można wywołać ręcznie komendą <code>manage.py create_main_aed_resource</code>. Cały dodatek wyłącza ustawienie <code>AED_AGGREGATION_ENABLED</code>; wtedy portal działa jak oryginał.</p>
   <h3>Wynik uruchomienia w portalu lokalnym</h3>
   <div class="karty" id="karty-statystyk"></div>
   <ul id="lista-pominietych"></ul>
@@ -308,7 +368,7 @@ pre.xml .n { display: inline-block; width: 3rem; color: var(--szary); user-selec
 
 <section class="krok" id="etap-6" aria-labelledby="h-6" hidden>
   <h2 id="h-6" tabindex="-1"><span class="nr">6</span>Odbiorca przegląda Wykaz AED</h2>
-  <p>W portalu Wykaz AED to zwykły zasób z tabelą, mapą i wyszukiwaniem (zrzuty w kroku 7). Poniżej możesz przejrzeć te same dane offline: to dokładnie plik <a href="wynik/zestawienie_aed.csv"><code>demo/wynik/zestawienie_aed.csv</code></a> wyprodukowany przez <code>demo/agreguj.py</code> z realnego zasobu Legionowa (CC0) i przykładu wzorca (dane fikcyjne).</p>
+  <p>W portalu Wykaz AED to zwykły zasób z tabelą, mapą i wyszukiwaniem (zrzuty w kroku 7). Poniżej te same dane można przejrzeć offline: to dokładnie plik <a href="wynik/zestawienie_aed.csv"><code>demo/wynik/zestawienie_aed.csv</code></a> wyprodukowany przez <code>demo/agreguj.py</code> z realnego zasobu Legionowa (CC0), przykładu wzorca i pliku dostawcy zewnętrznego z opisem XML (oba z danymi fikcyjnymi). Przed zapisem działa deduplikacja portalu: z <span id="agr-przed"></span> wierszy zostało <span id="agr-po"></span>, bo plik dostawcy powtarza urządzenie z przykładu wzorca (ten sam producent i numer seryjny).</p>
   <form class="filtry" id="filtry" role="search" aria-label="Filtry wykazu" onsubmit="return false">
     <div><label for="f-szukaj">Szukaj</label><input id="f-szukaj" type="search" placeholder="nazwa, ulica, dysponent…" autocomplete="off"></div>
     <div><label for="f-miasto">Miejscowość</label><select id="f-miasto"><option value="*">wszystkie</option></select></div>
@@ -324,12 +384,12 @@ pre.xml .n { display: inline-block; width: 3rem; color: var(--szary); user-selec
       </div>
       <svg id="mapa" viewBox="0 0 640 620" role="group" aria-label="Mapa punktów AED na konturze Polski. Każdy punkt to przycisk otwierający szczegóły rekordu."></svg>
       <ul class="legenda" id="legenda"></ul>
-      <p class="maly">Wybierz miejscowość w filtrze, aby przybliżyć mapę do jej punktów. Kontur Polski: Natural Earth (domena publiczna), projekcja równoodległościowa. Mapa nie pobiera kafelków z sieci.</p>
+      <p class="maly">Wybór miejscowości w filtrze przybliża mapę do jej punktów. Kontur Polski: Natural Earth (domena publiczna), projekcja równoodległościowa. Mapa nie pobiera kafelków z sieci.</p>
     </div>
     <div>
       <div class="tabela-wrap" role="region" aria-labelledby="cap-wykaz" tabindex="0">
         <table id="tab-wykaz">
-          <caption id="cap-wykaz">Wykaz AED: wybrane kolumny (wszystkie 51 kolumn w szczegółach rekordu)</caption>
+          <caption id="cap-wykaz">Wykaz AED: wybrane kolumny (wszystkie kolumny pliku, <span class="n-csv">52</span>, w szczegółach rekordu)</caption>
           <thead><tr><th scope="col">Lokalizacja</th><th scope="col">Miejscowość i adres</th><th scope="col">Dostęp</th><th scope="col">Status</th><th scope="col">Źródło</th></tr></thead>
           <tbody></tbody>
         </table>
@@ -384,7 +444,7 @@ pre.xml .n { display: inline-block; width: 3rem; color: var(--szary); user-selec
     </table>
   </div>
   <figure>
-    <img src="zrzuty/09_testy.png" width="1440" height="900" loading="lazy" alt="Wynik testów pytest w kontenerze portalu: liczby zaliczonych testów w plikach test_aed oraz test_main_dga, makemigrations No changes detected, łącznie 192 passed.">
+    <img src="zrzuty/09_testy.png" width="1440" height="900" loading="lazy" alt="Wynik testów pytest w kontenerze portalu: liczby zaliczonych testów w plikach test_aed oraz test_main_dga, makemigrations No changes detected, łącznie 270 passed i 2 skipped.">
     <figcaption>Testy Wykazu AED i regresja DGA w kontenerze portalu (pełny log: <a href="wynik/testy.txt">testy.txt</a>).</figcaption>
   </figure>
   <h3>Do pobrania i dalszej lektury</h3>
@@ -402,7 +462,7 @@ pre.xml .n { display: inline-block; width: 3rem; color: var(--szary); user-selec
   <h2 id="h-9" tabindex="-1"><span class="nr">9</span>Dodatek: integrator dla dostawców bez wzorcowego formatu</h2>
   <p><strong>To osobny dodatek, nie część zmian w portalu.</strong> Dwóch największych dostawców
      na dane.gov.pl (Warszawa, Gdańsk) nie da się dziś odczytać jako tabeli. Integrator bierze ich
-     pliki, mapuje kolumny na wzorzec v2 (41 pól), normalizuje wartości, waliduje i wystawia CSV,
+     pliki, mapuje kolumny na wzorzec v2 (<span class="n-wzorzec">42</span> pola), normalizuje wartości, waliduje i wystawia CSV,
      który dostawca podłącza do portalu zwykłym zasobem typu „link”. W <code>portal/</code> nie przybyło
      przez niego ani jednej linii kodu.</p>
   <p>Wyniki poniżej generuje jedno polecenie na plikach z repo, bez internetu:
@@ -428,8 +488,8 @@ pre.xml .n { display: inline-block; width: 3rem; color: var(--szary); user-selec
   <ul>
     <li>README integratora i testy (<code>integrator/README.md</code>, <code>integrator/testy/</code> – w repozytorium): polecenia, zasady licencji, archiwum v1</li>
     <li><a href="integrator/README.md">demo/integrator/</a>: pięć plików wynikowych z jednego uruchomienia (m.in. <a href="integrator/warszawa_wzorcowy_v2.csv">CSV z odpowiedzi Warszawy</a> i <a href="integrator/statystyka_gdansk.json">statystyka Gdańska</a>)</li>
-    <li>Testy: 87 testów, bez Dockera (<code>python -m unittest discover -s integrator/testy -t .</code>)</li>
-    <li><a href="../INSTRUKCJA_DLA_JURY.md">Instrukcja dla jury</a>, krok 14: jak sprawdzić dodatek</li>
+    <li>Testy: 97 testów, bez Dockera (<code>python -m unittest discover -s integrator/testy -t .</code>)</li>
+    <li><a href="../DODATKOWE_INFORMACJE.md">Dodatkowe informacje</a>, krok 14: jak sprawdzić dodatek</li>
   </ul>
 </section>
 
@@ -444,7 +504,7 @@ pre.xml .n { display: inline-block; width: 3rem; color: var(--szary); user-selec
 <footer>
   <div class="wrap">
     <p><strong>Dane (prze)życie</strong>: HackNation 2026, zadanie „Misja AED – Dane na ratunek”. Prototyp działa offline z pliku, bez zasobów z innych domen.</p>
-    <p>Dane wykazu: Urząd Miasta Legionowo (CC0 1.0) i przykład wzorca (dane fikcyjne). Kontur Polski: Natural Earth (domena publiczna). Krój pisma: Atkinson Hyperlegible (SIL OFL).</p>
+    <p>Dane wykazu: Urząd Miasta Legionowo (CC0 1.0), przykład wzorca i plik dostawcy zewnętrznego (dane fikcyjne). Kontur Polski: Natural Earth (domena publiczna). Krój pisma: Atkinson Hyperlegible (SIL OFL).</p>
   </div>
 </footer>
 
@@ -557,11 +617,106 @@ pre.xml .n { display: inline-block; width: 3rem; color: var(--szary); user-selec
   Array.prototype.forEach.call(document.querySelectorAll('input[name="xml-plik"]'), function (r) { r.addEventListener("change", renderXml); });
   renderXml();
 
+  /* Liczby kolumn z Table Schema (format_danych/schemat/) i z pliku wykazu */
+  Array.prototype.forEach.call(document.querySelectorAll(".n-wzorzec"), function (e) { e.textContent = D.kolumny.wzorzec; });
+  Array.prototype.forEach.call(document.querySelectorAll(".n-csv"), function (e) { e.textContent = H.length; });
+  $("#agr-przed").textContent = plNumber(D.agreguj.wiersze_przed_deduplikacja);
+  $("#agr-po").textContent = plNumber(D.agreguj.wiersze);
+
+  /* Krok 4: import opisu zbioru (wyniki demo/sprawdz.py: demo/wynik/import_opisu.json) */
+  var O = D.opis.wynik;
+  function stage(name, state, detail) {
+    var label = { ok: "zaliczony", zly: "odrzucony", brak: "nie wykonano", portal: "wykonuje portal" }[state];
+    var tr = el("tr");
+    tr.appendChild(el("th", { scope: "row", text: name }));
+    tr.appendChild(el("td", null, el("span", { "class": "wynik-" + state, text: (state === "ok" ? "✓ " : state === "zly" ? "✗ " : state === "portal" ? "→ " : "– ") + label })));
+    tr.appendChild(el("td", { text: detail }));
+    return tr;
+  }
+  function renderOpis() {
+    var name = document.querySelector('input[name="opis-plik"]:checked').value;
+    var r = O.opisy[name], s = O.serwer;
+    var served = s.zadania.filter(function (z) { return z.sciezka === "/" + (name === "opis_poprawny.xml" ? "opis.xml" : name); })[0];
+    var csvReq = s.zadania.filter(function (z) { return /\.csv$/.test(z.sciezka); })[0];
+    var verdict = $("#opis-werdykt");
+    verdict.className = "werdykt" + (r.wynik === "przyjęty" ? "" : " zly");
+    verdict.textContent = r.wynik === "przyjęty"
+      ? "Opis przyjęty: kontrole zaliczone, w portalu komenda zapisuje zbiór i zasób (" + r.kontrola_csv.przyjete + " rekordów)."
+      : "Import odrzucony: " + r.powod + ". W portalu nic nie zostaje zapisane.";
+    var body = $("#opis-etapy");
+    body.textContent = "";
+    body.appendChild(stage("1. Pobranie opisu", "ok", "serwer dostawcy: kod " + served.kod + ", " + served.czas_ms.toLocaleString("pl-PL") + " ms"));
+    body.appendChild(stage("2. Walidacja XSD", r.xsd.valid ? "ok" : "zly",
+      r.xsd.valid ? "zgodny z aed_opis_zbioru.xsd" : r.xsd.errors.length + " błędy, szczegóły w tabeli poniżej"));
+    var afterXsd = r.xsd.valid;
+    body.appendChild(stage("3. Pobranie CSV", afterXsd ? "ok" : "brak",
+      afterXsd ? "link z opisu, kod " + csvReq.kod + ", " + csvReq.czas_ms.toLocaleString("pl-PL") + " ms, " + plNumber(csvReq.bajty) + " B" : "opis odrzucony wcześniej"));
+    body.appendChild(stage("4. Kontrola md5", r.md5_zgodne === true ? "ok" : r.md5_zgodne === false ? "zly" : "brak",
+      r.md5_zgodne === null ? "opis odrzucony wcześniej" : "w opisie " + r.md5_w_opisie + ", pobrany CSV " + r.md5_csv));
+    var k = r.kontrola_csv;
+    body.appendChild(stage("5. Kontrola CSV", k ? "ok" : "brak",
+      k ? "wierszy " + k.wiersze + ", przyjętych " + k.przyjete + ", pominiętych " + k.pominiete + ", duplikatów w pliku " + k.duplikaty.length : "import przerwany wcześniej"));
+    body.appendChild(stage("6. Zbiór i zasób w portalu", k ? "portal" : "brak",
+      k ? "zapis w bazie robi komenda import_aed_xml w portalu, offline nie jest wykonywany; customfields: standard = AED, opis_xml, md5 = " + r.md5_w_opisie
+        : "nic nie zapisano"));
+    body.appendChild(stage("7. Deduplikacja przy budowie wykazu", k ? "ok" : "brak",
+      k ? "z przykładem wzorca: " + O.deduplikacja.wiersze_przed + " → " + O.deduplikacja.wiersze_po + " wierszy, " + O.deduplikacja.duplikaty.length + " para duplikatów (opis poniżej)" : "dane nie trafiły do portalu"));
+    $("#opis-bledy-wrap").hidden = r.xsd.valid;
+    var bad = {};
+    var errBody = $("#opis-bledy");
+    errBody.textContent = "";
+    r.xsd.errors.slice().sort(function (a, b) { return a.line - b.line; }).forEach(function (e) {
+      bad[e.line] = true;
+      errBody.appendChild(el("tr", null, el("td", { text: String(e.line) }), el("td", { text: e.field }), el("td", { text: e.message })));
+    });
+    if (r.md5_zgodne === false) {
+      D.opis.pliki[name].split("\n").forEach(function (line, i) { if (line.indexOf("<md5>") !== -1) bad[i + 1] = true; });
+    }
+    var pre = $("#opis-tresc");
+    pre.textContent = "";
+    D.opis.pliki[name].split("\n").forEach(function (line, i) {
+      var row = el("span", { "class": "l" + (bad[i + 1] ? " blad" : "") });
+      row.appendChild(el("span", { "class": "n", text: String(i + 1) }));
+      row.appendChild(document.createTextNode(line));
+      pre.appendChild(row);
+    });
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('input[name="opis-plik"]'), function (r) { r.addEventListener("change", renderOpis); });
+  renderOpis();
+
+  (function () {
+    var d = O.deduplikacja;
+    var cards = $("#karty-dedup");
+    [[d.wiersze_przed, "wierszy przed deduplikacją", d.zrodla.map(function (z) { return z.wiersze; }).join(" + ") + " z dwóch plików"],
+     [d.wiersze_po, "wierszy w wykazie", "po scaleniu, " + d.kolumny + " kolumny"],
+     [d.duplikaty.length, "duplikat pominięty", "z powodem w statystykach i logu"]].forEach(function (c) {
+      cards.appendChild(el("div", { "class": "karta" }, el("div", { "class": "liczba", text: plNumber(c[0]) }), el("h3", { text: c[1] }), el("p", { text: c[2] })));
+    });
+    var pair = d.duplikaty[0];
+    $("#cap-dedup").textContent = "Wykryta para (powód: " + pair.powod + "); pliki: " + d.zrodla.map(function (z) { return z.plik; }).join(", ");
+    var head = el("tr", null, el("th", { scope: "col", text: "Pole" }), el("th", { scope: "col", text: "Zostaje w wykazie" }), el("th", { scope: "col", text: "Pominięty jako duplikat" }));
+    $("#tab-dedup thead").appendChild(head);
+    ["id_zrodlowe", "nazwa_lokalizacji", "miejscowosc", "producent", "model", "numer_seryjny", "poziom_weryfikacji", "wydawca_zasobu", "licencja_zasobu", "id_aed"].forEach(function (c) {
+      $("#tab-dedup tbody").appendChild(el("tr", null, el("th", { scope: "row" }, el("code", { text: c })),
+        el("td", { text: pair.zachowany[c] || "—" }), el("td", { text: pair.pominiety[c] || "—" })));
+    });
+    var s = O.serwer;
+    $("#cap-serwer").textContent = "Odpowiedzi serwera dostawcy (" + s.adres + ")";
+    s.zadania.forEach(function (z) {
+      $("#tab-serwer tbody").appendChild(el("tr", null, el("th", { scope: "row" }, el("code", { text: z.sciezka })),
+        el("td", { "class": "num", text: String(z.kod) }), el("td", { "class": "num", text: z.czas_ms.toLocaleString("pl-PL") }),
+        el("td", { "class": "num", text: plNumber(z.bajty) })));
+    });
+    $("#serwer-md5").textContent = "Suma md5 z pobranego opisu (" + s.md5_w_opisie + ") " + (s.md5_zgodne ? "jest równa" : "różni się od") +
+      " sumie pobranego CSV (" + s.md5_pobranego_csv + "). Opis z błędną sumą i opis niezgodny z XSD " +
+      (s.opis_bledny_md5_odrzucony && s.opis_bledny_xsd_odrzucony ? "zostały odrzucone." : "nie zostały odrzucone.");
+  })();
+
   /* Krok 3: przykład pliku dostawcy */
   (function () {
     var p = D.przyklad;
     $("#cap-przyklad").textContent = "Fragment pliku format_danych/przyklady/aed_punkty_przyklad.csv: " + p.wiersze.length +
-      " z " + p.liczba + " wierszy, " + p.naglowki.length + " z 41 kolumn (dane fikcyjne)";
+      " z " + p.liczba + " wierszy, " + p.naglowki.length + " z " + D.kolumny.wzorzec + " kolumn (dane fikcyjne)";
     var head = el("tr");
     p.naglowki.forEach(function (h) { head.appendChild(el("th", { scope: "col", text: h })); });
     $("#tab-przyklad thead").appendChild(head);
@@ -582,6 +737,7 @@ pre.xml .n { display: inline-block; width: 3rem; color: var(--szary); user-selec
     cards.appendChild(card(s.wiersze, "wierszy w wykazie", "zbiór " + s.zbior_zbiorczy_id + ", zasób " + s.zasob_zbiorczy_id));
     cards.appendChild(card(s.zasoby_przyjete, "zasoby przyjęte", "Legionowo (CC0) i plik wzorca (CC BY 4.0)"));
     cards.appendChild(card(s.zasoby_pominiete.length, "zasoby pominięte", "z powodem w logu"));
+    if (typeof s.wiersze_zdeduplikowane === "number") cards.appendChild(card(s.wiersze_zdeduplikowane, "duplikaty pominięte", "to samo urządzenie od dwóch dostawców"));
     s.zasoby_pominiete.forEach(function (p) {
       $("#lista-pominietych").appendChild(el("li", null, el("span", { class: "etykieta-zla", text: "Pominięty: " }),
         (p.nazwa || "zasób") + " (id " + p.resource_id + "): " + p.powod));
@@ -773,7 +929,7 @@ pre.xml .n { display: inline-block; width: 3rem; color: var(--szary); user-selec
   Object.keys(filters).forEach(function (k) { filters[k].addEventListener("input", render); });
   $("#widok-kraj").addEventListener("click", function () { mapMode = "kraj"; render(); });
   $("#widok-punkty").addEventListener("click", function () { mapMode = "punkty"; render(); });
-  window.addEventListener("resize", function () { if (current === 5) renderMap(filtered()); });
+  window.addEventListener("resize", function () { if (current === 6) renderMap(filtered()); });
 
   /* Krok 6: pobieranie i API */
   $("#api").textContent = "GET /1.4/aed-aggregated\n\n" + JSON.stringify(D.api, null, 2);

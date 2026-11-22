@@ -1,11 +1,11 @@
 // Kolejność części wideo. Długość całości wynika z sumy.
+// Przejście przez prototyp (karta 03 i scena Prototyp) jest poza filmem: film pokazuje portal, prototyp opisuje INSTRUKCJA_DLA_JURY.md.
 import React from 'react';
 import {Series} from 'remotion';
 import {COPY} from './copy';
 import {Card, CARD_FRAMES, Intro, INTRO_FRAMES, Outro, OUTRO_FRAMES} from './scenes/Cards';
 import {Dostawca, DOSTAWCA_FRAMES} from './scenes/Dostawca';
 import {Odbiorca, ODBIORCA_FRAMES} from './scenes/Odbiorca';
-import {Prototyp, PROTOTYP_FRAMES} from './scenes/Prototyp';
 
 const PARTS: [name: string, node: React.ReactNode, frames: number][] = [
   ['intro', <Intro />, INTRO_FRAMES],
@@ -13,8 +13,6 @@ const PARTS: [name: string, node: React.ReactNode, frames: number][] = [
   ['dostawca', <Dostawca />, DOSTAWCA_FRAMES],
   ['card 02', <Card {...COPY.odbiorca.card} />, CARD_FRAMES],
   ['odbiorca', <Odbiorca />, ODBIORCA_FRAMES],
-  ['card 03', <Card {...COPY.prototyp.card} />, CARD_FRAMES],
-  ['prototyp', <Prototyp />, PROTOTYP_FRAMES],
   ['outro', <Outro />, OUTRO_FRAMES],
 ];
 export const DEMO_FRAMES = PARTS.reduce((n, p) => n + p[2], 0);

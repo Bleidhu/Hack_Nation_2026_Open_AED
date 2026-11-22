@@ -8,12 +8,12 @@ export const COPY = {
     kicker: 'HackNation 2026 · Misja AED – Dane na ratunek',
     lead: 'Ogólnopolska lista defibrylatorów w portalu dane.gov.pl.',
     sub: 'Zasoby wielu dysponentów scalane co noc w jeden zasób, bez migracji bazy.',
-    chips: ['Dostawca', 'Odbiorca', 'Prototyp dla jury'],
+    chips: ['Dostawca', 'Odbiorca'],
   },
   /** Napis po cięciu, które skraca czekanie. Zostaje: dzięki niemu montaż jest jawny. */
   skipped: (s: number) => `Pominięto ${seconds(s)} s czekania`,
   dostawca: {
-    tag: '1/3 · Dostawca',
+    tag: '1/2 · Dostawca',
     card: {no: '01', title: 'Dostawca', sub: 'Oznacza zbiór istniejącą metadaną portalu.'},
     window: 'Panel administracyjny dane.gov.pl (nasz fork, lokalnie)',
     zbior: 'Panel dostawcy: zbiór AED Urzędu Miasta Legionowo.',
@@ -24,7 +24,7 @@ export const COPY = {
     wykaz: 'Nocne zadanie na wzór DGA scala je w Wykaz AED.',
   },
   odbiorca: {
-    tag: '2/3 · Odbiorca',
+    tag: '2/2 · Odbiorca',
     card: {no: '02', title: 'Odbiorca', sub: 'Wykaz AED: tabela, mapa i API portalu.'},
     window: 'Portal dane.gov.pl (nasz fork, lokalnie)',
     zasob: 'Wykaz AED to zwykły zasób portalu dane.gov.pl.',
@@ -33,6 +33,7 @@ export const COPY = {
     mapa: 'Schemat z polem geo włącza mapę portalu.',
     api: 'Stały adres API /aed-aggregated, jak /dga-aggregated.',
   },
+  /** Scena prototypu (demo/index.html) jest poza filmem od 22.11.2026; napisy zostają dla src/scenes/Prototyp.tsx. */
   prototyp: {
     tag: '3/3 · Prototyp',
     card: {no: '03', title: 'Prototyp dla jury', sub: 'Cały proces offline, w jednym pliku HTML.'},
@@ -52,7 +53,7 @@ export const COPY = {
       ['Akcja „Dane (prze)życie”', 'logotyp, hasło i księga znaku (PDF)'],
       ['Dla jury', 'INSTRUKCJA_DLA_JURY.md i demo/index.html'],
     ],
-    note: 'Nagrania działającego portalu (Docker, lokalnie) i prototypu z repozytorium. Wyniki są prawdziwe; '
+    note: 'Nagrania działającego portalu (Docker, lokalnie). Wyniki są prawdziwe; '
       + 'przejścia między ekranami skrócono tylko tam, gdzie obraz przygasa.',
   },
 };

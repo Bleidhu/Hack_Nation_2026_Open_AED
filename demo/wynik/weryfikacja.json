@@ -3,9 +3,9 @@
   "kontrole": [
     {
       "id": "xsd-zgodny-ze-wzorcem",
-      "wymaganie": "Schemat XSD odpowiada wzorcowi (41 kolumn, pola wymagane)",
+      "wymaganie": "Schemat XSD odpowiada wzorcowi (42 kolumny, pola wymagane)",
       "status": "PASS",
-      "szczegoly": "41 pól, wymaganych 9, kopia w portalu identyczna: True",
+      "szczegoly": "42 pól (w tym numer_seryjny), wymaganych 9, kopia w portalu identyczna: True",
       "dowod": "format_danych/schemat/aed_punkty.xsd, aed_punkty.tableschema.json"
     },
     {
@@ -30,6 +30,41 @@
       "dowod": "portal/backend/mcod/resources/aed_xml.py"
     },
     {
+      "id": "opis-xsd",
+      "wymaganie": "Opis zbioru w XML jest sprawdzany schematem XSD: poprawny przechodzi, błędny jest odrzucany z linią i polem",
+      "status": "PASS",
+      "szczegoly": "opis_poprawny.xml: zgodny, błędów 0; opis_bledny_xsd.xml: odrzucony, linia 7 licencja; linia 12 link_csv; linia 2 tytul; kopia XSD w portalu identyczna: True",
+      "dowod": "format_danych/schemat/aed_opis_zbioru.xsd, portal/backend/mcod/resources/aed_opis.py"
+    },
+    {
+      "id": "opis-md5",
+      "wymaganie": "Suma md5 z opisu musi pasować do pobranego CSV; niezgodna suma odrzuca import",
+      "status": "PASS",
+      "szczegoly": "md5 CSV f093977df25274d89fff1ac82b592380; opis_poprawny.xml: f093977df25274d89fff1ac82b592380 (zgodne, przyjęty); opis_bledny_md5.xml: 00000000000000000000000000000000 (zgodny z XSD, md5 niezgodne, odrzucony)",
+      "dowod": "format_danych/przyklady/opis/opis_poprawny.xml, opis_bledny_md5.xml, aed_dostawcy.csv"
+    },
+    {
+      "id": "opis-kontrola-csv",
+      "wymaganie": "Przed zapisem portal sprawdza CSV z opisu: kolumny minimum, wiersze przyjęte i pominięte",
+      "status": "PASS",
+      "szczegoly": "wierszy w CSV: 7 (w opisie liczba_rekordow: 7), przyjętych: 7, pominiętych: 0, duplikatów w pliku: 0",
+      "dowod": "portal/backend/mcod/resources/aed_opis.py (inspect_csv)"
+    },
+    {
+      "id": "deduplikacja",
+      "wymaganie": "To samo urządzenie zgłoszone przez dwóch dostawców trafia do wykazu raz (numer seryjny + producent)",
+      "status": "PASS",
+      "szczegoly": "wierszy przed: 15, po: 14; zachowany CT-01 (Gmina Przykładowa (dane fikcyjne)), pominięty BYD-HALA-A (Miejski Zakład Przykład (PRZYKŁAD)), powód: numer_seryjny FRX-2026-0001",
+      "dowod": "portal/backend/mcod/resources/aed_dedup.py, format_danych/przyklady/opis/aed_dostawcy.csv"
+    },
+    {
+      "id": "serwer-dostawcy",
+      "wymaganie": "Serwer dostawcy odpowiada 200 w < 1 s, a md5 z opisu = md5 pobranego CSV",
+      "status": "PASS",
+      "szczegoly": "/opis.xml 200 w 2 ms; /aed.csv 200 w 1 ms; /opis_bledny_md5.xml 200 w 1 ms; /opis_bledny_xsd.xml 200 w 1 ms; md5 z opisu = md5 CSV: True; błędne opisy odrzucone: True",
+      "dowod": "demo/serwer_zewnetrzny.py (make_server)"
+    },
+    {
       "id": "agregacja-dwoch-dostawcow",
       "wymaganie": "Dane dwóch dostawców i dwóch formatów (XML i CSV) scalone w jeden wykaz",
       "status": "PASS",
@@ -38,9 +73,9 @@
     },
     {
       "id": "kolumny-wykazu",
-      "wymaganie": "Wykaz ma 51 kolumn zgodnych z Table Schema, unikalne id_aed i pochodzenie każdego wiersza",
+      "wymaganie": "Wykaz ma 52 kolumny zgodne z Table Schema, unikalne id_aed i pochodzenie każdego wiersza",
       "status": "PASS",
-      "szczegoly": "kolumn: 51, unikalnych id_aed: 14/14",
+      "szczegoly": "kolumn: 52, unikalnych id_aed: 14/14",
       "dowod": "format_danych/schemat/aed_zestawienie.tableschema.json"
     },
     {
@@ -54,21 +89,21 @@
       "id": "nic-nie-usunieto",
       "wymaganie": "Portal rozszerzono, a nie przepisano: w diffie względem oryginału nic nie usunięto",
       "status": "PASS",
-      "szczegoly": "dodane pliki: 22, zmienione istniejące: 11, usunięte: 0",
+      "szczegoly": "dodane pliki: 34, zmienione istniejące: 11, usunięte: 0",
       "dowod": "git diff --name-status a1adc22 -- portal/backend"
     },
     {
       "id": "zero-migracji",
       "wymaganie": "Zero migracji: żaden plik migracji nie został dodany ani zmieniony",
       "status": "PASS",
-      "szczegoly": "zmienionych plików migracji: 0 (wszystkich zmienionych plików: 33)",
+      "szczegoly": "zmienionych plików migracji: 0 (wszystkich zmienionych plików: 45)",
       "dowod": "git diff a1adc22 -- '*/migrations/*'"
     },
     {
       "id": "testy-portalu",
       "wymaganie": "Testy portalu (nowe i DGA) przechodzą, makemigrations --check: brak zmian",
       "status": "PASS",
-      "szczegoly": "219 passed; makemigrations: No changes detected",
+      "szczegoly": "270 passed; makemigrations: No changes detected",
       "dowod": "demo/wynik/testy.txt"
     },
     {
@@ -89,14 +124,14 @@
       "id": "prototyp-offline",
       "wymaganie": "Prototyp działa offline: strona nie ładuje nic z innych domen",
       "status": "PASS",
-      "szczegoly": "rozmiar 274 kB; zewnętrzne zasoby: brak",
+      "szczegoly": "rozmiar 315 kB; zewnętrzne zasoby: brak",
       "dowod": "demo/index.html"
     },
     {
       "id": "proces-maszynowy",
       "wymaganie": "Prototyp ma opis procesu w JSON: każdy krok wskazuje istniejące pliki dowodowe i zrzuty",
       "status": "PASS",
-      "szczegoly": "kroków: 9 (sekcji na stronie: 9), plików: 33, brakuje: nic",
+      "szczegoly": "kroków: 9 (sekcji na stronie: 9), plików: 63, brakuje: nic",
       "dowod": "demo/proces.json"
     },
     {

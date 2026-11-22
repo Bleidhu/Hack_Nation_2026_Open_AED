@@ -1,7 +1,7 @@
-Weryfikacja maszynowa Wykazu AED: 15/15 PASS
+Weryfikacja maszynowa Wykazu AED: 20/20 PASS
 
-[PASS] Schemat XSD odpowiada wzorcowi (41 kolumn, pola wymagane)
-       41 pól, wymaganych 9, kopia w portalu identyczna: True
+[PASS] Schemat XSD odpowiada wzorcowi (42 kolumny, pola wymagane)
+       42 pól (w tym numer_seryjny), wymaganych 9, kopia w portalu identyczna: True
        dowód: format_danych/schemat/aed_punkty.xsd, aed_punkty.tableschema.json
 [PASS] Poprawny plik XML od zewnętrznego dostawcy przechodzi walidację XSD
        rekordów: 6, błędów: 0
@@ -12,23 +12,38 @@ Weryfikacja maszynowa Wykazu AED: 15/15 PASS
 [PASS] Plik z zewnątrz nie może wczytywać zewnętrznych encji (XXE)
        deklaracje DOCTYPE i ENTITY są niedozwolone
        dowód: portal/backend/mcod/resources/aed_xml.py
+[PASS] Opis zbioru w XML jest sprawdzany schematem XSD: poprawny przechodzi, błędny jest odrzucany z linią i polem
+       opis_poprawny.xml: zgodny, błędów 0; opis_bledny_xsd.xml: odrzucony, linia 7 licencja; linia 12 link_csv; linia 2 tytul; kopia XSD w portalu identyczna: True
+       dowód: format_danych/schemat/aed_opis_zbioru.xsd, portal/backend/mcod/resources/aed_opis.py
+[PASS] Suma md5 z opisu musi pasować do pobranego CSV; niezgodna suma odrzuca import
+       md5 CSV f093977df25274d89fff1ac82b592380; opis_poprawny.xml: f093977df25274d89fff1ac82b592380 (zgodne, przyjęty); opis_bledny_md5.xml: 00000000000000000000000000000000 (zgodny z XSD, md5 niezgodne, odrzucony)
+       dowód: format_danych/przyklady/opis/opis_poprawny.xml, opis_bledny_md5.xml, aed_dostawcy.csv
+[PASS] Przed zapisem portal sprawdza CSV z opisu: kolumny minimum, wiersze przyjęte i pominięte
+       wierszy w CSV: 7 (w opisie liczba_rekordow: 7), przyjętych: 7, pominiętych: 0, duplikatów w pliku: 0
+       dowód: portal/backend/mcod/resources/aed_opis.py (inspect_csv)
+[PASS] To samo urządzenie zgłoszone przez dwóch dostawców trafia do wykazu raz (numer seryjny + producent)
+       wierszy przed: 15, po: 14; zachowany CT-01 (Gmina Przykładowa (dane fikcyjne)), pominięty BYD-HALA-A (Miejski Zakład Przykład (PRZYKŁAD)), powód: numer_seryjny FRX-2026-0001
+       dowód: portal/backend/mcod/resources/aed_dedup.py, format_danych/przyklady/opis/aed_dostawcy.csv
+[PASS] Serwer dostawcy odpowiada 200 w < 1 s, a md5 z opisu = md5 pobranego CSV
+       /opis.xml 200 w 2 ms; /aed.csv 200 w 1 ms; /opis_bledny_md5.xml 200 w 1 ms; /opis_bledny_xsd.xml 200 w 1 ms; md5 z opisu = md5 CSV: True; błędne opisy odrzucone: True
+       dowód: demo/serwer_zewnetrzny.py (make_server)
 [PASS] Dane dwóch dostawców i dwóch formatów (XML i CSV) scalone w jeden wykaz
        XML: 6, CSV: 8, w wykazie: 14, pominiętych wierszy: 0
        dowód: demo/wynik/wykaz_xml_i_csv.csv
-[PASS] Wykaz ma 51 kolumn zgodnych z Table Schema, unikalne id_aed i pochodzenie każdego wiersza
-       kolumn: 51, unikalnych id_aed: 14/14
+[PASS] Wykaz ma 52 kolumny zgodne z Table Schema, unikalne id_aed i pochodzenie każdego wiersza
+       kolumn: 52, unikalnych id_aed: 14/14
        dowód: format_danych/schemat/aed_zestawienie.tableschema.json
 [PASS] Do wykazu trafiają tylko CC0 i CC BY 4.0; ODbL (OpenStreetMap) jest wykluczona
        dozwolone: ['CC BY 4.0', 'CC0 1.0']; w wykazie: ['CC BY 4.0', 'CC0 1.0']
        dowód: portal/backend/mcod/resources/aed_constants.py
 [PASS] Portal rozszerzono, a nie przepisano: w diffie względem oryginału nic nie usunięto
-       dodane pliki: 22, zmienione istniejące: 11, usunięte: 0
+       dodane pliki: 34, zmienione istniejące: 11, usunięte: 0
        dowód: git diff --name-status a1adc22 -- portal/backend
 [PASS] Zero migracji: żaden plik migracji nie został dodany ani zmieniony
-       zmienionych plików migracji: 0 (wszystkich zmienionych plików: 33)
+       zmienionych plików migracji: 0 (wszystkich zmienionych plików: 45)
        dowód: git diff a1adc22 -- '*/migrations/*'
 [PASS] Testy portalu (nowe i DGA) przechodzą, makemigrations --check: brak zmian
-       219 passed; makemigrations: No changes detected
+       270 passed; makemigrations: No changes detected
        dowód: demo/wynik/testy.txt
 [PASS] Realne wadliwe dane z dane.gov.pl nie psują wykazu: pominięcia mają powód
        10 zasobów pominiętych z powodem
@@ -37,10 +52,10 @@ Weryfikacja maszynowa Wykazu AED: 15/15 PASS
        1_Zakres_wzorca, 2_Szablon_z_przykladami, 3_Slowniki, 4_Zasob_zbiorczy, 5_Zasady
        dowód: format_danych/wzorcowy_zakres_danych.xlsx
 [PASS] Prototyp działa offline: strona nie ładuje nic z innych domen
-       rozmiar 274 kB; zewnętrzne zasoby: brak
+       rozmiar 315 kB; zewnętrzne zasoby: brak
        dowód: demo/index.html
 [PASS] Prototyp ma opis procesu w JSON: każdy krok wskazuje istniejące pliki dowodowe i zrzuty
-       kroków: 9 (sekcji na stronie: 9), plików: 33, brakuje: nic
+       kroków: 9 (sekcji na stronie: 9), plików: 63, brakuje: nic
        dowód: demo/proces.json
 [PASS] Obecne są wszystkie pliki z §4: opis, prezentacja, logotypy, księga znaku, instrukcja
        9 plików jest

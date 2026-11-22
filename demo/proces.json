@@ -1,61 +1,81 @@
 {
   "proces": "Wykaz AED w portalu dane.gov.pl",
-  "opis": "Opis kroków prototypu demo/index.html w postaci do odczytu maszynowego. Ścieżki są względem katalogu głównego repozytorium; weryfikator demo/sprawdz.py sprawdza, czy każdy plik istnieje, a liczba kroków zgadza się ze stroną.",
+  "opis": "Opis kroków prototypu demo/index.html w postaci do odczytu maszynowego. Ścieżki są względem katalogu głównego repozytorium; weryfikator demo/sprawdz.py sprawdza, czy każdy plik istnieje, a liczba kroków zgadza się ze stroną. Pole zrzuty_oczekiwane wymienia zrzuty, które build_demo.py dołącza do strony dopiero wtedy, gdy plik istnieje.",
   "kroki": [
     {
-      "nr": 1, "tytul": "Problem: dane o AED są rozproszone",
-      "wejscie": ["references/dane_gov_pl_aed/"], "wyjscie": [],
-      "dowody": ["references/dane_gov_pl_aed/README.md"], "zrzuty": []
+      "nr": 1,
+      "tytul": "Problem: dane o AED są rozproszone",
+      "wejscie": ["references/dane_gov_pl_aed/"],
+      "wyjscie": [],
+      "dowody": ["references/dane_gov_pl_aed/README.md"],
+      "zrzuty": []
     },
     {
-      "nr": 2, "tytul": "Dostawca oznacza zbiór: standard = AED",
-      "wejscie": ["Dataset.customfields"], "wyjscie": ["zbiór z deklaracją standardu"],
-      "dowody": ["docs/05_DECYZJA_OZNACZENIE_AED.md"], "zrzuty": ["demo/zrzuty/01_formularz_zbioru_standard_aed.png"]
+      "nr": 2,
+      "tytul": "Dostawca oznacza zbiór: standard = AED",
+      "wejscie": ["Dataset.customfields"],
+      "wyjscie": ["zbiór z deklaracją standardu"],
+      "dowody": ["docs/05_DECYZJA_OZNACZENIE_AED.md"],
+      "zrzuty": ["demo/zrzuty/01_formularz_zbioru_standard_aed.png"]
     },
     {
-      "nr": 3, "tytul": "Dostawca publikuje zasób we wzorcowym formacie (CSV, XLSX)",
-      "wejscie": ["format_danych/wzorcowy_zakres_danych.xlsx"], "wyjscie": ["zasób CSV lub XLSX"],
-      "dowody": ["format_danych/przyklady/aed_punkty_przyklad.csv"], "zrzuty": ["demo/zrzuty/02_zasoby_dostawcow.png"]
+      "nr": 3,
+      "tytul": "Dostawca publikuje zasób we wzorcowym formacie (CSV, XLSX)",
+      "wejscie": ["format_danych/wzorcowy_zakres_danych.xlsx"],
+      "wyjscie": ["zasób CSV lub XLSX"],
+      "dowody": ["format_danych/przyklady/aed_punkty_przyklad.csv"],
+      "zrzuty": ["demo/zrzuty/02_zasoby_dostawcow.png"]
     },
     {
-      "nr": 4, "tytul": "Dane z zewnątrz: XML z serwera dostawcy i walidacja XSD",
-      "wejscie": ["https://<serwer dostawcy>/aed.xml", "format_danych/schemat/aed_punkty.xsd"],
-      "wyjscie": ["zasób z linkiem (typ api, format xml)", "raport walidacji XSD"],
-      "dowody": ["format_danych/przyklady/xml/aed_poprawny.xml", "format_danych/przyklady/xml/aed_bledny.xml",
-                 "demo/wynik/walidacja_xml.json", "portal/backend/mcod/resources/aed_xml.py",
-                 "portal/backend/mcod/resources/management/commands/import_aed_xml.py"],
-      "zrzuty": ["demo/zrzuty/10_zewnetrzny_xml.png", "demo/zrzuty/12_zasob_xml_w_panelu.png",
-                 "demo/zrzuty/13_komenda_wykaz_z_xml.png", "demo/zrzuty/14_wykaz_z_xml_tabela.png"]
+      "nr": 4,
+      "tytul": "Dane z zewnątrz przez API: opis zbioru w XML, plik CSV i suma md5",
+      "opis": "Portal pobiera po HTTPS opis zbioru w XML z API (serwera) dostawcy i wymaga kodu 200. Sprawdza opis schematem XSD, pobiera CSV spod linku z opisu i porównuje sumę md5 pliku z sumą z opisu. Dopiero potem tworzy zbiór (customfields: standard = AED, opis_xml, md5) i zasób CSV; niezgodny opis lub plik niczego nie zapisuje. Co noc o 4:05 zadanie refresh_aed_opis_task ponawia import każdego takiego opisu: ta sama suma md5 nic nie zmienia, nowa zastępuje zasób. O 4:15 budowa Wykazu AED usuwa duplikaty tego samego urządzenia. W portalu uruchomionym lokalnie (zasób wykazu 40258): 45 wierszy przed deduplikacją, 38 po, 7 duplikatów (1 po numerze seryjnym, 6 po nazwie i lokalizacji).",
+      "wejscie": ["https://<serwer dostawcy>/opis.xml", "format_danych/schemat/aed_opis_zbioru.xsd", "https://<serwer dostawcy>/aed.csv"],
+      "wyjscie": ["zbiór z customfields: standard = AED, opis_xml, md5", "zasób CSV z linkiem do serwera dostawcy", "raport importu: XSD, md5, kontrola CSV", "nocne odświeżenie opisu o 4:05 (refresh_aed_opis_task)", "wykaz bez duplikatów (deduplikacja przy budowie o 4:15)"],
+      "kolejnosc": ["opis XML z API dostawcy (HTTPS, kod 200)", "walidacja XSD", "pobranie CSV", "kontrola md5", "kontrola CSV", "zbiór i zasób w portalu", "nocne odświeżenie opisu (4:05)", "deduplikacja przy budowie wykazu (4:15)"],
+      "dowody": ["format_danych/przyklady/opis/opis_poprawny.xml", "format_danych/przyklady/opis/opis_bledny_md5.xml", "format_danych/przyklady/opis/opis_bledny_xsd.xml", "format_danych/przyklady/opis/aed_dostawcy.csv", "format_danych/schemat/aed_opis_zbioru.xsd", "portal/backend/mcod/resources/aed_opis.py", "portal/backend/mcod/resources/aed_import.py", "portal/backend/mcod/resources/aed_dedup.py", "portal/backend/mcod/resources/management/commands/import_aed_xml.py", "portal/backend/mcod/resources/tasks/aed.py", "demo/serwer_zewnetrzny.py", "demo/wynik/import_opisu.json", "demo/wynik/weryfikacja.json", "format_danych/przyklady/xml/aed_poprawny.xml", "format_danych/przyklady/xml/aed_bledny.xml", "demo/wynik/walidacja_xml.json", "portal/backend/mcod/resources/aed_xml.py", "demo/wynik/komenda_import_aed_xml.txt", "demo/wynik/komenda_create_main_aed_resource_opis.txt", "demo/wynik/statystyki_opis_dedup.json", "demo/wynik/wykaz_opis_xml_dedup.csv", "demo/wynik/wymus_harvest.txt", "demo/wymus_harvest.py"],
+      "zrzuty": ["demo/zrzuty/10_zewnetrzny_xml.png", "demo/zrzuty/12_zasob_xml_w_panelu.png", "demo/zrzuty/13_komenda_wykaz_z_xml.png", "demo/zrzuty/14_wykaz_z_xml_tabela.png", "demo/zrzuty/16_opis_xml_dostawcy.png", "demo/zrzuty/17_import_opisu_komenda.png", "demo/zrzuty/18_zbior_z_opisu_w_panelu.png", "demo/zrzuty/19_wykaz_deduplikacja.png", "demo/zrzuty/20_zasob_csv_z_opisu_w_panelu.png", "demo/zrzuty/21_api_wykaz_numer_seryjny.png", "demo/zrzuty/22_wykaz_tabela_opis.png"],
+      "zrzuty_oczekiwane": [{"plik": "demo/zrzuty/16_opis_xml_dostawcy.png", "alt": "Serwer dostawcy: odpowiedź GET /opis.xml (kod 200) z opisem zbioru: tytuł, dysponent, REGON, kontakt, licencja CC BY 4.0, częstotliwość daily, data aktualizacji, a w elemencie zasob link https do aed.csv, format csv, suma md5 i liczba rekordów 7. Pod spodem GET /aed.csv (kod 200) i md5 pobranego pliku, równe sumie z opisu.", "podpis": "Opis zbioru w XML i plik CSV na serwerze dostawcy (demo/serwer_zewnetrzny.py, dane fikcyjne): suma md5 pobranego CSV jest równa sumie w opisie."}, {"plik": "demo/zrzuty/17_import_opisu_komenda.png", "alt": "Terminal: pięć wywołań import_aed_xml w kontenerze portalu. Z opcją --dry-run: opis zgodny z XSD, md5 zgodne, CSV ma 7 wierszy. Opis z błędną sumą md5 i opis niezgodny z XSD (licencja CC BY-SA 4.0 spoza słownika) odrzucone z powodem, kod wyjścia 1, nic nie zapisano. Import poprawnego opisu: utworzono zbiór 4251 i zasób 40253. Powtórny import z tą samą sumą md5: bez zmian.", "podpis": "Komenda import_aed_xml w portalu: poprawny opis przyjęty, opisy z błędną sumą md5 i niezgodny z XSD odrzucone bez zapisu, powtórka z tą samą sumą nic nie zmienia."}, {"plik": "demo/zrzuty/18_zbior_z_opisu_w_panelu.png", "alt": "Panel portalu, formularz zbioru 4251 utworzonego z opisu: opis zbioru przepisany z XML, a w Polach niestandardowych wpisy md5 z sumą pliku CSV, opis_xml z adresem opisu i standard = AED; pod nimi podpowiedź Wykazu AED.", "podpis": "Zbiór utworzony z opisu: metadane z XML i wpisy standard, opis_xml, md5 w polach niestandardowych (customfields, bez migracji)."}, {"plik": "demo/zrzuty/19_wykaz_deduplikacja.png", "alt": "Terminal: create_main_aed_resource --eager. Zasoby pominięte z powodem (XML niezgodny z XSD, brak kolumn). Siedem duplikatów: BYD-HALA-A z CSV dostawcy pominięty jako to samo urządzenie co CT-01 ze wzorca (powód numer_seryjny) oraz sześć rekordów tego samego dostawcy podanych w XML i w CSV (powód nazwa_i_lokalizacja). Przyjęte zasoby 4, wiersze 38; w statystykach 45 wierszy przed deduplikacją i 7 zdeduplikowanych.", "podpis": "Budowa wykazu z deduplikacją: 45 wierszy ze źródeł, 38 w wykazie. To samo urządzenie (ten sam producent i numer seryjny) od dwóch dostawców trafia do wykazu raz."}, {"plik": "demo/zrzuty/20_zasob_csv_z_opisu_w_panelu.png", "alt": "Panel portalu, formularz zasobu „Lokalizacje AED (CSV)”: link https://host.docker.internal:8098/aed.csv, plik pobrany przez portal, opis z sumą md5 sprawdzoną przy imporcie, format CSV, typ Plik, zielony znak widoku tabelarycznego.", "podpis": "Zasób CSV utworzony z opisu: link do serwera dostawcy, plik pobrany i przetworzony zwykłym potokiem portalu."}, {"plik": "demo/zrzuty/21_api_wykaz_numer_seryjny.png", "alt": "Wybrane pola odpowiedzi GET /1.4/resources/40258/data: 38 wierszy, 52 kolumny, 10 wierszy z numerem seryjnym. Wiersz OL-001 z zasobu XML z producentem, modelem i numerem seryjnym uzupełnionymi z CSV dostawcy oraz wiersz CT-01 z numerem FRX-2026-0001, który zastąpił kopię BYD-HALA-A.", "podpis": "Wykaz po deduplikacji w API portalu: kolumna numer_seryjny i wiersze zachowane z par duplikatów (wybrane pola, sformatowane)."}, {"plik": "demo/zrzuty/22_wykaz_tabela_opis.png", "alt": "Frontend portalu, tabela Wykazu AED przewinięta do kolumn status_urzadzenia, producent, model, numer_seryjny: pierwsze wiersze Philips HeartStart FRx FRX-2026-1101, Zoll AED Plus ZP-2026-1102, Defibtech Lifeline AED DL-2026-1103.", "podpis": "Tabela Wykazu AED w portalu z nową kolumną numer_seryjny."}]
     },
     {
-      "nr": 5, "tytul": "Portal sprawdza zasoby i co noc buduje Wykaz AED",
-      "wejscie": ["zasoby zbiorów standard = AED (CSV, XLSX, XML)"], "wyjscie": ["zasób zbiorczy CSV, 51 kolumn"],
-      "dowody": ["portal/backend/mcod/resources/aed_utils.py", "portal/backend/mcod/resources/tasks/aed.py",
-                 "demo/wynik/komenda_create_main_aed_resource.txt", "demo/wynik/komenda_create_main_aed_resource_xml.txt"],
+      "nr": 5,
+      "tytul": "Portal sprawdza zasoby i co noc buduje Wykaz AED",
+      "wejscie": ["zasoby zbiorów standard = AED (CSV, XLSX, XML, CSV z opisu XML)"],
+      "wyjscie": ["zasób zbiorczy CSV, 52 kolumny, bez duplikatów"],
+      "dowody": ["portal/backend/mcod/resources/aed_utils.py", "portal/backend/mcod/resources/aed_dedup.py", "portal/backend/mcod/resources/tasks/aed.py", "demo/wynik/komenda_create_main_aed_resource.txt", "demo/wynik/komenda_create_main_aed_resource_xml.txt", "demo/wynik/komenda_create_main_aed_resource_opis.txt", "demo/wynik/statystyki_opis_dedup.json"],
       "zrzuty": ["demo/zrzuty/03_komenda_wykaz_statystyki.png"]
     },
     {
-      "nr": 6, "tytul": "Odbiorca przegląda Wykaz AED (tabela, mapa, filtry)",
-      "wejscie": ["demo/wynik/zestawienie_aed.csv"], "wyjscie": [],
-      "dowody": ["demo/wynik/zestawienie_aed.csv", "demo/wynik/wykaz_xml_i_csv.csv"],
-      "zrzuty": ["demo/zrzuty/04_wykaz_tabela.png", "demo/zrzuty/05_wykaz_mapa.png", "demo/zrzuty/15_wykaz_z_xml_mapa.png"]
+      "nr": 6,
+      "tytul": "Odbiorca przegląda Wykaz AED (tabela, mapa, filtry)",
+      "wejscie": ["demo/wynik/zestawienie_aed.csv"],
+      "wyjscie": [],
+      "dowody": ["demo/wynik/zestawienie_aed.csv", "demo/wynik/statystyki_agreguj.json", "demo/wynik/wykaz_xml_i_csv.csv"],
+      "zrzuty": ["demo/zrzuty/04_wykaz_tabela.png", "demo/zrzuty/05_wykaz_mapa.png", "demo/zrzuty/15_wykaz_z_xml_mapa.png", "demo/zrzuty/23_wykaz_mapa_opis.png"]
     },
     {
-      "nr": 7, "tytul": "Pobieranie i API",
-      "wejscie": [], "wyjscie": ["CSV", "JSON-LD", "API /1.4/aed-aggregated"],
+      "nr": 7,
+      "tytul": "Pobieranie i API",
+      "wejscie": [],
+      "wyjscie": ["CSV", "JSON-LD", "API /1.4/aed-aggregated"],
       "dowody": ["demo/wynik/api_aed_aggregated.json"],
       "zrzuty": ["demo/zrzuty/06_api_aed_aggregated.png", "demo/zrzuty/07_api_dane_zasobu.png"]
     },
     {
-      "nr": 8, "tytul": "Co zmieniliśmy w portalu",
-      "wejscie": [], "wyjscie": [],
+      "nr": 8,
+      "tytul": "Co zmieniliśmy w portalu",
+      "wejscie": [],
+      "wyjscie": [],
       "dowody": ["ZMIANY_W_PORTALU.md", "portal/backend/CHANGELOG.md", "demo/wynik/testy.txt"],
       "zrzuty": ["demo/zrzuty/09_testy.png"]
     },
     {
-      "nr": 9, "tytul": "Dodatek: integrator dla dostawców bez wzorcowego formatu",
-      "wejscie": [], "wyjscie": [],
-      "dowody": ["integrator/README.md", "demo/integrator/README.md"], "zrzuty": []
+      "nr": 9,
+      "tytul": "Dodatek: integrator dla dostawców bez wzorcowego formatu",
+      "wejscie": [],
+      "wyjscie": [],
+      "dowody": ["integrator/README.md", "demo/integrator/README.md"],
+      "zrzuty": []
     }
   ]
 }

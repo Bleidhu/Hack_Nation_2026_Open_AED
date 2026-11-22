@@ -11,6 +11,7 @@ Zrzuty z demo/zrzuty/ są ładowane względnie (pliki obok index.html), więc in
 
 import base64
 import csv
+import html
 import io
 import json
 import subprocess
@@ -21,7 +22,7 @@ DEMO = ROOT / "demo"
 ORIGINAL_COMMIT = "a1adc22"
 
 PORTAL_FILE_NOTES = {
-    "CHANGELOG.md": "wpisy zmian AED-01…AED-10",
+    "CHANGELOG.md": "wpisy zmian AED",
     "data/test_samples/aed/": "próbki testowe: realne pliki z dane.gov.pl i przykład wzorca",
     "mcod/celeryapp.py": "wpis harmonogramu: zadanie nocne Wykazu AED o 4:15 (tylko gdy włączone); "
     "sygnatura get_beat_schedule dostała parametr opcjonalny, stąd jedna linia zamieniona",
@@ -32,6 +33,13 @@ PORTAL_FILE_NOTES = {
     "mcod/datasets/tests/test_aed_customfields_help.py": "testy podpowiedzi formularza",
     "mcod/resources/aed_aggregation.py": "logika ramek danych bez ORM: kolumny, aliasy, normalizacja, id_aed, pochodzenie",
     "mcod/resources/aed_constants.py": "kontrakt kolumn wzorca i zasobu zbiorczego, licencje, nazwy",
+    "mcod/resources/aed_dedup.py": "deduplikacja wierszy wykazu: numer seryjny i producent, marka i lokalizacja (bez ORM)",
+    "mcod/resources/aed_opis.py": "opis zbioru w XML: walidacja XSD, suma md5, kontrola CSV (bez ORM)",
+    "mcod/resources/aed_opis_zbioru.xsd": "schemat XSD opisu zbioru (kopia z format_danych/schemat/)",
+    "mcod/resources/aed_import.py": "import opisu zbioru: XSD, pobranie CSV, md5, zapis zbioru i zasobu",
+    "mcod/resources/aed_xml.py": "walidacja XML plikiem XSD i odczyt rekordów AED z XML (bez ORM)",
+    "mcod/resources/aed_punkty.xsd": "schemat XSD rekordów AED (kopia z format_danych/schemat/)",
+    "mcod/resources/management/commands/import_aed_xml.py": "komenda importu opisu zbioru (--dry-run, --odswiez)",
     "mcod/resources/aed_utils.py": "wybór zbiorów standard = AED, odczyt zasobów, budowa zasobu zbiorczego (wzór: dga_utils.py)",
     "mcod/resources/management/commands/create_main_aed_resource.py": "komenda ręcznego uruchomienia (--dry-run, --eager)",
     "mcod/resources/serializers.py": "serializer odpowiedzi /aed-aggregated",
@@ -109,7 +117,33 @@ def integrator_summary():
     }
 
 
+def table_schema_columns(name):
+    return len(json.loads(read_text(f"format_danych/schemat/{name}"))["fields"])
+
+
+def opis_screenshots(proces):
+    """Zrzuty importu opisu z proces.json (zrzuty_oczekiwane): na stronę trafiają tylko pliki, które istnieją."""
+    figures = []
+    for step in proces["kroki"]:
+        for shot in step.get("zrzuty_oczekiwane", []):
+            path = ROOT / shot["plik"]
+            if not path.exists():
+                continue
+            src = html.escape(path.relative_to(DEMO).as_posix())
+            figures.append(
+                f'  <figure>\n    <img src="{src}" loading="lazy" alt="{html.escape(shot["alt"])}">\n'
+                f'    <figcaption>{html.escape(shot["podpis"])} <a href="{src}">Pełny rozmiar</a></figcaption>\n  </figure>'
+            )
+    if not figures:
+        return (
+            '  <p class="uwaga">Wyniki w tym kroku pochodzą z uruchomienia funkcji portalu przez <code>demo/sprawdz.py</code> '
+            "na plikach z repozytorium. Zrzutów importu opisu z portalu w tej wersji prototypu nie ma.</p>"
+        )
+    return "  <h3>Ten sam proces w zmodyfikowanym portalu</h3>\n" + "\n".join(figures)
+
+
 def main():
+    proces = json.loads(read_text("demo/proces.json"))
     csv_text = (DEMO / "wynik" / "zestawienie_aed.csv").read_bytes().decode("utf-8")
     table = list(csv.reader(io.StringIO(csv_text, newline="")))
     stats = json.loads(read_text("demo/wynik/statystyki_agregacji.json"))
@@ -127,6 +161,18 @@ def main():
         "przyklad": sample_rows(),
         "zmiany": portal_changes(),
         "integrator": integrator_summary(),
+        "kolumny": {
+            "wzorzec": table_schema_columns("aed_punkty.tableschema.json"),
+            "wykaz": table_schema_columns("aed_zestawienie.tableschema.json"),
+        },
+        "agreguj": json.loads(read_text("demo/wynik/statystyki_agreguj.json")),
+        "opis": {
+            "pliki": {
+                name: read_text(f"format_danych/przyklady/opis/{name}")
+                for name in ("opis_poprawny.xml", "opis_bledny_md5.xml", "opis_bledny_xsd.xml")
+            },
+            "wynik": json.loads(read_text("demo/wynik/import_opisu.json")),
+        },
         "xml": {
             "poprawny": read_text("format_danych/przyklady/xml/aed_poprawny.xml"),
             "bledny": read_text("format_danych/przyklady/xml/aed_bledny.xml"),
@@ -138,20 +184,21 @@ def main():
     logo = logo.replace('aria-labelledby="t d"', 'aria-labelledby="logo-t"').replace('id="t"', 'id="logo-t"')
     logo = logo.replace('<desc id="d">', "<desc>")
 
-    html = read_text("demo/szablon.html")
+    page = read_text("demo/szablon.html")
     for key, value in {
         "{{FONT_REGULAR}}": font_data_uri("AtkinsonHyperlegible-Regular.ttf"),
         "{{FONT_BOLD}}": font_data_uri("AtkinsonHyperlegible-Bold.ttf"),
         "{{LOGO_SVG}}": logo,
         "{{DANE_JSON}}": data_json,
-        "{{PROCES_JSON}}": json.dumps(json.loads(read_text("demo/proces.json")), ensure_ascii=False, separators=(",", ":")).replace("<", "\u003c"),
+        "{{PROCES_JSON}}": json.dumps(proces, ensure_ascii=False, separators=(",", ":")).replace("<", "\\u003c"),
+        "{{ZRZUTY_OPIS}}": opis_screenshots(proces),
     }.items():
-        if key not in html:
+        if key not in page:
             raise SystemExit(f"brak {key} w demo/szablon.html")
-        html = html.replace(key, value)
+        page = page.replace(key, value)
     out = DEMO / "index.html"
-    out.write_text(html, encoding="utf-8", newline="\n")
-    print(f"{out.relative_to(ROOT)}: {len(html.encode('utf-8')) / 1024:.0f} kB, wiersze wykazu: {len(table) - 1}")
+    out.write_text(page, encoding="utf-8", newline="\n")
+    print(f"{out.relative_to(ROOT)}: {len(page.encode('utf-8')) / 1024:.0f} kB, wiersze wykazu: {len(table) - 1}")
 
 
 if __name__ == "__main__":

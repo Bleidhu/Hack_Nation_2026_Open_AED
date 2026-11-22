@@ -34,6 +34,7 @@
     "status_urzadzenia": 100,
     "producent": 100,
     "model": 0,
+    "numer_seryjny": 0,
     "elektrody_pediatryczne": 0,
     "data_waznosci_elektrod": 0,
     "data_waznosci_baterii": 0,

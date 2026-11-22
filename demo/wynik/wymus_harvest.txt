@@ -1,0 +1,30 @@
+Wymuszenie harvestu AED: https://host.docker.internal:8098/opis.xml (kontener mcod-admin)
+1/3 Zbiór 4251 z tym opisem jest w portalu (md5 f093977df25274d89fff1ac82b592380): import_aed_xml --odswiez
+$ docker exec mcod-admin python manage.py import_aed_xml --odswiez
+  https://host.docker.internal:8098/opis.xml: bez_zmian, zbiór: 4251, zasób: 40253
+2/3 Czekam na Celery dla zasobu 40253 (limit 300 s)
+    74.9 s  link=SUCCESS plik=SUCCESS dane=FAILURE
+  Walidacja danych portalu: FAILURE (typy zgadywane przez portal); Wykaz AED czyta plik mimo to.
+3/3 Wykaz AED
+$ docker exec mcod-admin python manage.py create_main_aed_resource --eager
+  ERROR    Pomijam zasób źródłowy AED 40251, bo nie da się go odczytać: XML niezgodny z XSD (3 błędów): linia 23: brak wymaganego pola: typ_dostepu
+  WARNING  Pomijam zasób źródłowy AED 40210: brak kolumn: miejscowosc
+  WARNING  Pomijam zasób źródłowy AED 40209: brak kolumn: nazwa_lokalizacji, miejscowosc, szerokosc_geograficzna, dlugosc_geograficzna
+  Duplikat w Wykazie AED: PL-AED-8c94410246b8 pominięty, bo to samo urządzenie co PL-AED-8c94410246b8 (nazwa_i_lokalizacja).
+  Duplikat w Wykazie AED: PL-AED-f52e7c3c06cd pominięty, bo to samo urządzenie co PL-AED-f52e7c3c06cd (nazwa_i_lokalizacja).
+  Duplikat w Wykazie AED: PL-AED-5b684f1f0dce pominięty, bo to samo urządzenie co PL-AED-5b684f1f0dce (nazwa_i_lokalizacja).
+  Duplikat w Wykazie AED: PL-AED-fc09f4071c01 pominięty, bo to samo urządzenie co PL-AED-fc09f4071c01 (nazwa_i_lokalizacja).
+  Duplikat w Wykazie AED: PL-AED-543cc007ccc4 pominięty, bo to samo urządzenie co PL-AED-543cc007ccc4 (nazwa_i_lokalizacja).
+  Duplikat w Wykazie AED: PL-AED-57473964d4f1 pominięty, bo to samo urządzenie co PL-AED-57473964d4f1 (nazwa_i_lokalizacja).
+  Duplikat w Wykazie AED: PL-AED-e7f864440251 pominięty, bo to samo urządzenie co PL-AED-94891bb2df6c (numer_seryjny).
+  Wykaz AED: przyjęte zasoby 4, pominięte 3, wiersze 38, pominięte wiersze 0, zdeduplikowane wiersze 7.
+  Zbiór: 4216
+  Zasób: 40255
+  Wiersze: 38
+
+Raport
+  opis zbioru:    https://host.docker.internal:8098/opis.xml
+  zbiór dostawcy: 4251, zasób CSV: 40253, md5: f093977df25274d89fff1ac82b592380
+  statusy zasobu: link SUCCESS, plik SUCCESS, dane FAILURE
+  Wykaz AED:      zbiór 4216, zasób 40255, wiersze 38
+  czas:           100.6 s

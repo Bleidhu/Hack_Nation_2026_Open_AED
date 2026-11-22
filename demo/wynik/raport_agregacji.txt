@@ -1,4 +1,4 @@
-Wykaz AED: weryfikacja agregacji bez bazy (data agregacji 2026-11-22T01:00:14)
+Wykaz AED: weryfikacja agregacji bez bazy (data agregacji 2026-11-22T09:27:40)
 
    zasób  format   przyjęte pominięte  zbiór / powód pominięcia zasobu
    54632  csv             0         0  3624 Defibrylatory zlokalizowane w Mieście Krosno
@@ -25,5 +25,8 @@ Wykaz AED: weryfikacja agregacji bez bazy (data agregacji 2026-11-22T01:00:14)
                                        POMINIĘTY: brak lokalnej kopii pliku w references/dane_gov_pl_aed/
 
 Przykład wzorca (format_danych/przyklady/aed_punkty_przyklad.csv): 8 wierszy, zgodność z aed_zestawienie_przyklad.csv: TAK
+Dostawca zewnętrzny z opisem XML (format_danych/przyklady/opis/aed_dostawcy.csv, md5 zgodne z opisem): 7 wierszy
 Zasoby realne: przyjęte 1, pominięte 10.
-Wiersze w demo/wynik/zestawienie_aed.csv: 32.
+Deduplikacja (aed_dedup.deduplicate_rows): wierszy przed 39, pominięte duplikaty 1.
+  duplikat PL-AED-a129c4f1cf35 pominięty, bo to samo urządzenie co PL-AED-7e649367c1b8 (numer_seryjny)
+Wiersze w demo/wynik/zestawienie_aed.csv: 38 (kolumn: 52).
