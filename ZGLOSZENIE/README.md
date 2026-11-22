@@ -2,6 +2,8 @@
 
 Tu są pliki do przekazania organizatorowi. To kopie: oryginały zostają w repozytorium. Kopie składa polecenie `python demo/zloz_zgloszenie.py`, uruchamiane po `python demo/build_demo.py`.
 
+Wersja live do przeklikania: <https://thumb-abrasive-bovine.ngrok-free.dev/live/>.
+
 **Na początek [`INSTRUKCJA_DLA_JURY.md`](INSTRUKCJA_DLA_JURY.md)** (kilka zdań, 2 minuty), potem prototyp [`prototyp/index.html`](prototyp/index.html) (działa offline). Pełna wersja instrukcji: [`DODATKOWE_INFORMACJE.md`](DODATKOWE_INFORMACJE.md). Opcjonalna wersja live: [`../WERSJA_LIVE.md`](../WERSJA_LIVE.md); ocena jej nie wymaga.
 
 ## Stan wersji

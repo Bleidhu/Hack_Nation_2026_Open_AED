@@ -61,7 +61,7 @@
       "id": "serwer-dostawcy",
       "wymaganie": "Serwer dostawcy odpowiada 200 w < 1 s, a md5 z opisu = md5 pobranego CSV",
       "status": "PASS",
-      "szczegoly": "/opis.xml 200 w 2 ms; /aed.csv 200 w 1 ms; /opis_bledny_md5.xml 200 w 1 ms; /opis_bledny_xsd.xml 200 w 1 ms; md5 z opisu = md5 CSV: True; błędne opisy odrzucone: True",
+      "szczegoly": "/opis.xml 200 w 4 ms; /aed.csv 200 w 2 ms; /opis_bledny_md5.xml 200 w 2 ms; /opis_bledny_xsd.xml 200 w 2 ms; md5 z opisu = md5 CSV: True; błędne opisy odrzucone: True",
       "dowod": "demo/serwer_zewnetrzny.py (make_server)"
     },
     {

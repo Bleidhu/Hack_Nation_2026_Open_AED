@@ -239,4 +239,4 @@ To samo urządzenie zgłoszone przez dwóch dostawców trafia do wykazu raz. Ded
 ### 20. Opcjonalnie: wymuszenie harvestu i wersja live
 
 1. **Wymuszenie harvestu w demo:** w portalu opisy są odświeżane o 4:05, a wykaz powstaje o 4:15. Skrypt [`demo/wymus_harvest.py`](demo/wymus_harvest.py) robi to od razu: wykonuje w kontenerze portalu `import_aed_xml --odswiez`, czeka, aż Celery zwaliduje zasób, i buduje wykaz poleceniem `create_main_aed_resource --eager`. Skrypt wymaga portalu w Dockerze. Zapis przebiegu: [`demo/wynik/wymus_harvest.txt`](demo/wynik/wymus_harvest.txt).
-2. **Wersja live:** [`WERSJA_LIVE.md`](WERSJA_LIVE.md) podaje tymczasowe adresy prototypu i serwera dostawcy przez tunel ngrok (instrukcja: [`demo/NGROK.md`](demo/NGROK.md)). To tylko dodatek: ocena według kroków 1–19 działa offline.
+2. **Wersja live:** <https://thumb-abrasive-bovine.ngrok-free.dev/live/> (strona startowa). [`WERSJA_LIVE.md`](WERSJA_LIVE.md) podaje tymczasowe adresy portalu (Wykaz AED, API, panel), prototypu i serwera dostawcy przez tunel ngrok (instrukcja: [`demo/NGROK.md`](demo/NGROK.md)). To tylko dodatek: ocena według kroków 1–19 działa offline.

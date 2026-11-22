@@ -11,7 +11,7 @@ Rozwiązanie zadania „Misja AED – Dane na ratunek” (HackNation 2026, Minis
 - [`prezentacja/dane_przezycie_prezentacja.pdf`](prezentacja/dane_przezycie_prezentacja.pdf): prezentacja (28 slajdów);
 - [`ZMIANY_W_PORTALU.md`](ZMIANY_W_PORTALU.md): opis zmian w kodzie portalu;
 - [`ZGLOSZENIE/`](ZGLOSZENIE/README.md): pliki do zgłoszenia zebrane w jednym miejscu;
-- [`WERSJA_LIVE.md`](WERSJA_LIVE.md): opcjonalny adres wersji live. Do oceny nie jest potrzebny, bo wszystko powyżej działa offline.
+- wersja live do przeklikania: <https://thumb-abrasive-bovine.ngrok-free.dev/live/> (działający portal z Wykazem AED, API, panel, prototyp i serwer dostawcy; lista adresów: [`WERSJA_LIVE.md`](WERSJA_LIVE.md)). Do oceny nie jest potrzebny, bo wszystko powyżej działa offline.
 
 ## Problem
 

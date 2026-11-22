@@ -8,6 +8,8 @@
 4. **Zmiany w kodzie portalu:** [`ZMIANY_W_PORTALU.md`](../ZMIANY_W_PORTALU.md) (rozszerzenie, nic nie usunięto, zero migracji).
 5. **Pozostałe pliki do oceny:** wzorcowy zakres danych [`format_danych/wzorcowy_zakres_danych.xlsx`](../format_danych/wzorcowy_zakres_danych.xlsx), prezentacja [`prezentacja/dane_przezycie_prezentacja.pdf`](../prezentacja/dane_przezycie_prezentacja.pdf), logotyp [`branding/logo/`](../branding/logo/) i księga znaku [`branding/ksiega_znaku.pdf`](../branding/ksiega_znaku.pdf).
 
-Film z działającego portalu (1 min 14 s): [`demo/wideo/dane_przezycie_wykaz_aed.mp4`](../demo/wideo/dane_przezycie_wykaz_aed.mp4). Wersja live (opcjonalna): [`WERSJA_LIVE.md`](../WERSJA_LIVE.md).
+**Wersja live do przeklikania:** <https://thumb-abrasive-bovine.ngrok-free.dev/live/>. Pod tym adresem są działający portal z Wykazem AED (tabela, mapa, API, panel), prototyp i serwer dostawcy. Przy pierwszym wejściu ngrok pokazuje stronę ostrzegawczą, wystarczy kliknąć „Visit Site”. Link działa, gdy tunel jest włączony; lista adresów: [`WERSJA_LIVE.md`](../WERSJA_LIVE.md).
+
+Film z działającego portalu (1 min 14 s): [`demo/wideo/dane_przezycie_wykaz_aed.mp4`](../demo/wideo/dane_przezycie_wykaz_aed.mp4).
 
 **Dodatkowe informacje** (realizacja każdego wymagania, testy, licencje, ograniczenia, użycie AI, integrator): [`DODATKOWE_INFORMACJE.md`](../DODATKOWE_INFORMACJE.md). Zgłoszenie w jednym katalogu: [`ZGLOSZENIE/`](../ZGLOSZENIE/README.md).
