@@ -34,7 +34,7 @@ Wersja wstępna. Zawiera komplet materiałów, które zamierzamy przesłać, raz
 
 ## v1.0.0 (22.11.2026): działająca integracja danych AED w portalu
 
-Tag `v1.0.0` (commit `22dd379`). To podstawowa wersja rozwiązania. Zawiera działający mechanizm integracji danych AED w kodzie portalu dane.gov.pl, czyli **Wykaz AED**. Nie zawiera materiałów do finalnego zgłoszenia.
+Tag `v1.0.0` (commit `3c3e274`). To podstawowa wersja rozwiązania. Zawiera działający mechanizm integracji danych AED w kodzie portalu dane.gov.pl, czyli **Wykaz AED**. Nie zawiera materiałów do finalnego zgłoszenia.
 
 ### Co zawiera
 

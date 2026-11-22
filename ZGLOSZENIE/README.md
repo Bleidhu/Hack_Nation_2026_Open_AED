@@ -23,7 +23,7 @@ Tu są pliki do przekazania organizatorowi. To kopie: oryginały zostają w repo
 | §4 prezentacja (min. 5 slajdów ze zrzutami, kroki użytkownika, ograniczenia) | [`prezentacja/dane_przezycie_prezentacja.pdf`](prezentacja/dane_przezycie_prezentacja.pdf), [`.pptx`](prezentacja/dane_przezycie_prezentacja.pptx) | jest (15 slajdów, zrzuty na slajdach 4-10) |
 | §4 prototyp rozwiązania, klikalny | [`prototyp/index.html`](prototyp/index.html) | jest |
 | §4 wzorcowy zakres danych (XLSX) | [`wzorcowy_zakres_danych.xlsx`](wzorcowy_zakres_danych.xlsx) | jest |
-| §4 kod źródłowy | całe repozytorium; zmiany portalu jako łatka względem oryginału (`a119b1b`): [`kod/zmiany_portalu_wzgledem_oryginalu.patch`](kod/zmiany_portalu_wzgledem_oryginalu.patch) | jest |
+| §4 kod źródłowy | całe repozytorium; zmiany portalu jako łatka względem oryginału (`a1adc22`): [`kod/zmiany_portalu_wzgledem_oryginalu.patch`](kod/zmiany_portalu_wzgledem_oryginalu.patch) | jest |
 | §4 logotyp (.jpg, .png, .pdf i format otwarty) | [`logotyp/`](logotyp/): wersja pozioma, z hasłem, pionowa, znak i sygnet, każda w JPG, PNG, PDF i SVG | jest |
 | §4 księga znaku (.pdf) | [`ksiega_znaku.pdf`](ksiega_znaku.pdf) | jest |
 | §2 nazwa akcji i hasło | „Dane (prze)życie”, „Twoje dane – czyjeś życie.”; opis: [`../branding/AKCJA_DANE_PRZEZYCIE.md`](../branding/AKCJA_DANE_PRZEZYCIE.md) | jest |

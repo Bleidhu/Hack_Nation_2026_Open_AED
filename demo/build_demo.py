@@ -18,7 +18,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 DEMO = ROOT / "demo"
-ORIGINAL_COMMIT = "a119b1b"
+ORIGINAL_COMMIT = "a1adc22"
 
 PORTAL_FILE_NOTES = {
     "CHANGELOG.md": "wpisy zmian AED-01…AED-10",

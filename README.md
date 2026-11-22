@@ -39,7 +39,7 @@ Portal ma już mechanizm, który co noc scala zasoby wielu instytucji w jeden za
    - każdy pominięty zasób zapisuje w logu z powodem.
 4. **Wykaz AED** to jeden zasób zbiorczy CSV (51 kolumn). Każdy wiersz ma pochodzenie: wydawcę, licencję, zasób źródłowy i datę. Portal sam daje mu tabelę, mapę (schemat z polem `geo`), pobieranie CSV i JSON-LD oraz API (`/1.4/resources/{id}/data`, stały adres `/1.4/aed-aggregated`).
 
-Portal jest rozszerzony, nie przepisany: 22 nowe pliki obok DGA i 11 istniejących z dopiskami (punkty zaczepienia). Dodatek wyłącza się ustawieniem `AED_AGGREGATION_ENABLED`, a po wyłączeniu portal działa jak oryginał. Testy: 192 passed, w tym regresja DGA; `makemigrations --check`: „No changes detected” ([`demo/wynik/testy.txt`](demo/wynik/testy.txt)). Diff względem nietkniętego kodu portalu: `git diff a119b1b -- portal/backend`.
+Portal jest rozszerzony, nie przepisany: 22 nowe pliki obok DGA i 11 istniejących z dopiskami (punkty zaczepienia). Dodatek wyłącza się ustawieniem `AED_AGGREGATION_ENABLED`, a po wyłączeniu portal działa jak oryginał. Testy: 192 passed, w tym regresja DGA; `makemigrations --check`: „No changes detected” ([`demo/wynik/testy.txt`](demo/wynik/testy.txt)). Diff względem nietkniętego kodu portalu: `git diff a1adc22 -- portal/backend`.
 
 ### 2. Wzorcowy zakres danych
 

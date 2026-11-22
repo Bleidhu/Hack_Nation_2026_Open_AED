@@ -1,10 +1,10 @@
 # Zmiany w portalu dane.gov.pl: Wykaz AED
 
-Ten plik opisuje wszystkie nasze zmiany w kodzie portalu (`portal/backend`) względem nietkniętego oryginału z commita `a119b1b` („Oryginalny kod portalu dane.gov.pl”). Dokładny diff:
+Ten plik opisuje wszystkie nasze zmiany w kodzie portalu (`portal/backend`) względem nietkniętego oryginału z commita `a1adc22` („Oryginalny kod portalu dane.gov.pl”). Dokładny diff:
 
 ```bash
-git diff --stat a119b1b -- portal/backend
-git diff a119b1b -- portal/backend
+git diff --stat a1adc22 -- portal/backend
+git diff a1adc22 -- portal/backend
 ```
 
 ## W skrócie

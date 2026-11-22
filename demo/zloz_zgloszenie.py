@@ -15,7 +15,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "ZGLOSZENIE"
-ORIGINAL_COMMIT = "a119b1b"
+ORIGINAL_COMMIT = "a1adc22"
 GENERATED = ["INSTRUKCJA_DLA_JURY.md", "ZMIANY_W_PORTALU.md", "prototyp", "wzorcowy_zakres_danych.xlsx", "kod", "dane",
              "prezentacja", "logotyp", "ksiega_znaku.pdf"]
 LOGOTYPY = ["dane-przezycie_logo_poziome", "dane-przezycie_logo_poziome_haslo", "dane-przezycie_logo_pionowe",

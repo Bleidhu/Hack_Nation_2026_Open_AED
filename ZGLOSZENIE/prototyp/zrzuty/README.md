@@ -2,7 +2,7 @@
 
 ## Skąd pochodzą zrzuty
 
-- **Data i stan kodu:** zrzuty zrobiono 22.11.2026 w pełnym portalu dane.gov.pl uruchomionym lokalnie w Dockerze (panel, API, Celery, nginx, frontend Angular), na kodzie z commita `16ae6f8` (AED-10). Pliki utworzył skrypt `demo/scenariusz/zrzuty.py` (Playwright z przeglądarką Edge).
+- **Data i stan kodu:** zrzuty zrobiono 22.11.2026 w pełnym portalu dane.gov.pl uruchomionym lokalnie w Dockerze (panel, API, Celery, nginx, frontend Angular), na kodzie z commita `a082628` (AED-10). Pliki utworzył skrypt `demo/scenariusz/zrzuty.py` (Playwright z przeglądarką Edge).
 - **Dane:** dane scenariusza utworzył skrypt `demo/scenariusz/przygotuj_dane.py`.
   - Legionowo (plik z dane.gov.pl): `standard = AED`, licencja CC0.
   - Wzorzec v2 (dane fikcyjne): `standard = AED 1.1`, licencja CC BY 4.0.

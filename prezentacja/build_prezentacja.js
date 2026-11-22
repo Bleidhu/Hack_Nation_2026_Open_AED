@@ -136,7 +136,7 @@ const slajd = (master = "TRESC") => pres.addSlide({ masterName: master });
     ["22 nowe pliki obok DGA i 11 istniejących z dopiskami. ", "Nic nie usunięto."],
     ["Jeden wyłącznik, AED_AGGREGATION_ENABLED. ", "Po wyłączeniu portal działa jak oryginał."],
   ], K.granat), { x: M, y: 4.55, w: 10.5, h: 1.6, fontSize: 17, paraSpaceAfter: 8 });
-  podpis(s, "Szczegóły: ZMIANY_W_PORTALU.md. Diff względem oryginału: git diff a119b1b -- portal/backend", M, 6.6, 11);
+  podpis(s, "Szczegóły: ZMIANY_W_PORTALU.md. Diff względem oryginału: git diff a1adc22 -- portal/backend", M, 6.6, 11);
   s.addNotes("Kierunek: zmieniać kod portalu, słowo kluczowe zasób, przerobić DGA, bez migracji, scalać wykazy w jedną listę.");
 }
 
