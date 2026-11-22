@@ -1,7 +1,7 @@
 """Wejście z Gdańska: baza pojazdów ZTM (zasób 31843 z dane.gov.pl) – dane flotowe, nie punkty.
 
 AED ma 278 z 503 pojazdów (autobusy i tramwaje), ale wzorzec v2 opisuje **punkty**
-(`docs/06_DECYZJE_STRUKTURA_DANYCH_AED.md`: kolumny `id_pojazdu` nie ma). Adapter nie tworzy
+(`format_danych/schemat/aed_punkty.tableschema.json`: kolumny `id_pojazdu` nie ma). Adapter nie tworzy
 wierszy punktowych – zwraca statystykę i jednoznaczny powód. Do zasobu zbiorczego trafiają
 punkty, a nie flota.
 """

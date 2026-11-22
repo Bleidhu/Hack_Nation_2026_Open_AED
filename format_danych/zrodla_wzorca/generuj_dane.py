@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Wzorcowy zakres danych AED, wersja 2: jedno źródło prawdy dla kolumn, słowników i przykładów.
-Specyfikacja: docs/06_DECYZJE_STRUKTURA_DANYCH_AED.md, zasady: docs/07_ZASADY_PORTALU_I_OCHRONY_DANYCH.md.
+Specyfikacja: format_danych/schemat/, zasady: arkusz 5_Zasady w wzorcowym zakresie danych.
 
 Tylko biblioteka standardowa (Python 3.8+). Uruchomienie:
     python format_danych/zrodla_wzorca/generuj_dane.py
@@ -310,7 +310,7 @@ DATA_AGREGACJI = "2026-11-22T04:15:00"
 
 
 # ---------------------------------------------------------------------------
-# 5. REGUŁY AGREGACJI – implementacja referencyjna (docs/06). Portal ma dawać ten sam wynik.
+# 5. REGUŁY AGREGACJI – implementacja referencyjna. Portal ma dawać ten sam wynik.
 # ---------------------------------------------------------------------------
 def _norm(s: str) -> str:
     s = unicodedata.normalize("NFKD", str(s).replace("ł", "l").replace("Ł", "L"))
@@ -466,7 +466,7 @@ def main():
             f["constraints"]["unique"] = True
         pola.append(f)
     zapisz_json("schemat_tableschema.json", {
-        "$comment": "Frictionless Table Schema wzorca dostawcy AED v2 (docs/06). Pola x-* to rozszerzenia projektu.",
+        "$comment": "Frictionless Table Schema wzorca dostawcy AED v2 (decyzje projektu). Pola x-* to rozszerzenia projektu.",
         "name": "aed-wzorzec-dostawcy", "title": "Wzorcowy zakres danych o defibrylatorach AED – plik dostawcy",
         "version": WERSJA, "fields": pola, "primaryKey": "id_zrodlowe", "missingValues": [""],
         "x-minimum-agregacji": MINIMUM_AGREGACJI,
@@ -528,7 +528,7 @@ def main():
          for i, n in enumerate(NAZWY_ZESTAWIENIA, 1)],
     )
     zapisz_json("schemat_zestawienia_tableschema.json", {
-        "$comment": "Table Schema zasobu zbiorczego AED budowanego przez portal (docs/06). Pola wzorca bez wymagalności dostawcy.",
+        "$comment": "Table Schema zasobu zbiorczego AED budowanego przez portal (decyzje projektu). Pola wzorca bez wymagalności dostawcy.",
         "name": "aed-zestawienie", "title": "Wykaz defibrylatorów AED – wykaz zbiorczy", "version": WERSJA,
         "fields": [dict(pole_schematu(n, opisy[n][0], opisy[n][2], wymagane=(n in MINIMUM_AGREGACJI or n in
                    ("id_aed", "status_urzadzenia", "poziom_weryfikacji", "dysponent_nazwa", "dysponent_z_wydawcy", "wydawca_zasobu",

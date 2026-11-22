@@ -271,7 +271,7 @@ const slajd = (master = "TRESC") => pres.addSlide({ masterName: master });
     ["Dane osobowe. ", "Gdy zbiór deklaruje dane osobowe, telefon i e-mail są usuwane, a rekord dostaje kod kontakt_usuniety."],
     ["Brak wiedzy to nie „sprawny”. ", "Puste pole statusu oznacza „nieznany”. Data importu nie jest datą weryfikacji."],
   ], K.granat), { x: 7.2, y: 1.55, w: 5.45, h: 4.6, fontSize: 17, paraSpaceAfter: 16 });
-  podpis(s, "Plik: format_danych/wzorcowy_zakres_danych.xlsx. Uzasadnienie: docs/06_DECYZJE_STRUKTURA_DANYCH_AED.md", M, 6.55, 12);
+  podpis(s, "Plik: format_danych/wzorcowy_zakres_danych.xlsx. Reguły: arkusz 5_Zasady i schemat Table Schema", M, 6.55, 12);
 }
 
 // 12. Akcja promocyjna

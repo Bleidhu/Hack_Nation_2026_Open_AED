@@ -1,4 +1,4 @@
-> **Kopia z poprzedniego workspace (21.11.2026).** Ścieżki typu `../deliverable/`, `../scratch/`, `../portal_kod/` odnoszą się do starego układu. Mapowanie: `deliverable/` → `format_danych/`, `portal_kod/backend_latest/` → `portal/backend/`, `portal_kod/frontend_latest/` → `portal/frontend/`, `scratch/importer.py` → `integrator/importer.py`.  Nadrzędny jest `CLAUDE.md`.
+> **Kopia z poprzedniego workspace (21.11.2026).** Ścieżki typu `../deliverable/`, `../scratch/`, `../portal_kod/` odnoszą się do starego układu. Mapowanie: `deliverable/` → `format_danych/`, `portal_kod/backend_latest/` → `portal/backend/`, `portal_kod/frontend_latest/` → `portal/frontend/`, `scratch/importer.py` → `integrator/importer.py`.
 
 # Format danych AED: pełny opis
 

@@ -1,6 +1,6 @@
 # Wzorcowy zakres danych AED, wersja 2
 
-Specyfikacja jest w `../docs/06_DECYZJE_STRUKTURA_DANYCH_AED.md` (decyzje), a zasady portalu, ochrony danych i licencji w `../docs/07_ZASADY_PORTALU_I_OCHRONY_DANYCH.md`. Wszystkie pliki poniżej generuje jedno źródło prawdy, a przykłady są **fikcyjne**.
+Specyfikacją jest `schemat/aed_punkty.tableschema.json` (reguły dodatkowe w `x-reguly-dodatkowe`), a zasady portalu, ochrony danych i licencji zbiera arkusz `5_Zasady` w `wzorcowy_zakres_danych.xlsx`. Wszystkie pliki poniżej generuje jedno źródło prawdy, a przykłady są **fikcyjne**.
 
 ## Dwie warstwy
 

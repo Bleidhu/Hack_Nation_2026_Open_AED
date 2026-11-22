@@ -2,7 +2,7 @@
 
 ## v2.0.0 (22.11.2026): integrator danych (dodatek), ukończona faza 2
 
-Zakończona faza 2 planu (`.scratch/integrator-faza2/`): integrator danych dla dostawców bez wzorcowego formatu, cały w `integrator/`. **Kod portalu bez zmian względem v1.5.0** – integrator celowo nie dotyka `portal/`, bo oceniany jest główny rezultat, a nie dodatki.
+Zakończona faza 2 planu: integrator danych dla dostawców bez wzorcowego formatu, cały w `integrator/`. **Kod portalu bez zmian względem v1.5.0** – integrator celowo nie dotyka `portal/`, bo oceniany jest główny rezultat, a nie dodatki.
 
 ### Co dochodzi względem v1.5.0
 
@@ -50,5 +50,3 @@ Tag `v1.0.0` (commit `22dd379`). To podstawowa wersja rozwiązania. Zawiera dzia
 - **Księgi znaku ani logotypów.** Pliki w `branding/` to szkice robocze, a nie finalny znak akcji.
 - **Materiałów do finalnego zgłoszenia.** Nie ma prezentacji ani finalnej kampanii promocyjnej. Folder [`ZGLOSZENIE/`](ZGLOSZENIE/README.md) to robocze zestawienie plików, a nie gotowa paczka do wysłania.
 - **Integratora danych** (`integrator/`, krok 2 projektu). Dostawca bez wzorcowego formatu musi na razie sam przygotować plik zgodny ze wzorcem.
-
-Lista prac do finalnego zgłoszenia: `.scratch/przed-wyslaniem/`.

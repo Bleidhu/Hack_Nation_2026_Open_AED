@@ -1748,7 +1748,7 @@ MAIN_DGA_DATASET_TAGS_NAMES = [
     "chronione dane",
 ]
 
-# Wykaz AED – dodatek na wzór zbiorczego wykazu DGA (docs/06, docs/07).
+# Wykaz AED – dodatek na wzór zbiorczego wykazu DGA.
 # Przy AED_AGGREGATION_ENABLED = False zadanie nic nie robi, harmonogram nie ma wpisu, a endpoint zwraca 404.
 AED_AGGREGATION_ENABLED = env.bool("AED_AGGREGATION_ENABLED", default=True)
 MAIN_AED_DATASET_OWNER_ORGANIZATION_PK = int(

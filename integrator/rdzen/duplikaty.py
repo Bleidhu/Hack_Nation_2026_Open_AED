@@ -1,6 +1,6 @@
 """Kandydaci na duplikaty: pary wierszy w promieniu o podobnej nazwie lub opisie lokalizacji.
 
-Raport tylko flaguje pary; niczego nie scala i nie usuwa (docs/06 §3: wiele AED w jednym
+Raport tylko flaguje pary; niczego nie scala i nie usuwa (wzorzec v2, x-reguly-dodatkowe: wiele AED w jednym
 miejscu to osobne wiersze). Funkcja czyta wiersze i nie modyfikuje ich. Siatka po współrzędnych
 zamiast porównań każdy z każdym, żeby kilkadziesiąt tysięcy wierszy liczyło się w sekundach.
 """

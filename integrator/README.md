@@ -55,7 +55,7 @@ Przykładowe pliki dostawców wraz z mapowaniami są w `dane_przykladowe/` (bank
 
 > **Archiwum v1.** Pliki z wersji przed wzorcem v2 (`wzorzec_v1/`, próbki v1 z `dane_przykladowe/00_format_v1/`, `schemat/`, `szablony/`, `narzedzia/`, `FORMAT_V1.md`, `ARCHIWUM_V1.md` i szkic `openapi.yaml` z poprzedniego demonstratora) **przeniesiono do [`../archive/integrator/`](../archive/integrator/ARCHIWUM_V1.md)** (nic nie usuwamy; kod i testy nie odwołują się do archiwum, opis w [`../archive/README.md`](../archive/README.md)). Importer działa na wzorcu v2 (`../format_danych/`).
 
-> **Faza 2 (zakończona):** plan i decyzje w `../.scratch/integrator-faza2/` (12 zadań, zadania 01–09, 11 i 12 wykonane; 10, czyli schemat źródła wg wzorca w portalu, świadomie odłożone). Importer jest cienką powłoką CLI nad `rdzen/` (czyste funkcje), `adaptery/` (OSM, Warszawa, Gdańsk), `ui/` i `testy/` (87 testów, bez Dockera).
+> **Faza 2 (zakończona):** 12 zadań (zadania 01–09, 11 i 12 wykonane; 10, czyli schemat źródła wg wzorca w portalu, świadomie odłożone). Importer jest cienką powłoką CLI nad `rdzen/` (czyste funkcje), `adaptery/` (OSM, Warszawa, Gdańsk), `ui/` i `testy/` (87 testów, bez Dockera).
 
 ## Zasady
 

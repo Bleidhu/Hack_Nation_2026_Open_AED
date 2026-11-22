@@ -2,7 +2,7 @@
 
 > **Przeniesione tutaj z `integrator/` (22.11.2026, porządki po v2.0.0).** Poniższe pliki leżą teraz obok tego dokumentu w `archive/integrator/`. Opis całego folderu `archive/`: [`../README.md`](../README.md).
 
-Decyzja o strukturze danych v2 ([`../../docs/06_DECYZJE_STRUKTURA_DANYCH_AED.md`](../../docs/06_DECYZJE_STRUKTURA_DANYCH_AED.md), 41 kolumn wzorca i 51 kolumn zasobu zbiorczego) zastąpiła wzorzec v1. Pliki v1 **nie są usuwane**: zostają jako ślad poprzedniej koncepcji i jako baza porównań. Nowy kod (`integrator/rdzen/`) nie używa ich od zadania 02 fazy 2.
+Decyzja o strukturze danych v2 (41 kolumn wzorca i 51 kolumn zasobu zbiorczego) zastąpiła wzorzec v1. Pliki v1 **nie są usuwane**: zostają jako ślad poprzedniej koncepcji i jako baza porównań. Nowy kod (`integrator/rdzen/`) nie używa ich od zadania 02 fazy 2.
 
 | Plik / katalog | Co to jest | Dlaczego zostaje |
 |---|---|---|

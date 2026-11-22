@@ -28,4 +28,4 @@ Metadane z API (JSON:API) są w `metadane_api/`: `dataset_*`, `inst_*`, `resourc
 1. Realne zasoby AED trafiają do portalu **wszystkimi drogami**: plik, link do pliku, link do strony i harvester CKAN. Mechanizm agregacji musi obsłużyć ścieżkę lokalną (`resource.tabular_data`) i ścieżkę CKAN (`resource.link`), tak jak DGA. Zasoby bez tabeli ma pomijać z czytelnym powodem w logu.
 2. **Zbiory mieszane** (Legionowo) i **wiele dystrybucji tych samych danych** (Przemyśl, Marki) wymagają wyboru zasobu: kontrola kolumn per zasób i preferencja jednego formatu tabelarycznego.
 3. Dwa największe źródła (Warszawa i Gdańsk) **nie dają dziś tabeli w portalu**. To mocny argument dla jury, że krok 2 (integrator wystawiający CSV pod linkiem) ma sens, ale dopiero po kroku 1.
-4. Jakość danych (np. uszkodzony CSV z Marek, punkty skopiowane między miastami) opisuje `../../docs/03_ZRODLA_I_LICENCJE.md`.
+4. Jakość danych (np. uszkodzony CSV z Marek, punkty skopiowane między miastami) widać w plikach z tego katalogu.

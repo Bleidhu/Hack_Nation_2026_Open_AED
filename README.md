@@ -75,7 +75,7 @@ Nazwa czyta się na dwa sposoby: „dane przeżycie” i „dane życie”, a �
 | Prezentacja | [`prezentacja/`](prezentacja/README.md) | 14 slajdów, PPTX i PDF |
 | Akcja „Dane (prze)życie” | [`branding/`](branding/README.md) | logotyp, księga znaku, materiały, opis akcji |
 | Integrator danych | [`integrator/`](integrator/README.md) | dodatek (zalążek) dla dostawców bez wzorcowego formatu |
-| Materiały źródłowe | [`references/`](references/), [`docs/`](docs/) | polecenie, regulamin, realne dane AED, analizy i decyzje |
+| Materiały źródłowe | [`references/`](references/) | polecenie, regulamin, realne dane AED, standardy portalu |
 | Zgłoszenie | [`ZGLOSZENIE/`](ZGLOSZENIE/README.md) | kopie plików do przekazania organizatorowi |
 
 ## Uruchomienie portalu lokalnie
@@ -100,9 +100,9 @@ uv run --python 3.11 --with "pandas==1.5.3" --with "numpy<2" --with openpyxl pyt
 - **Zrzuty ekranu** pokazują interfejs oryginalnego portalu (w tym elementy identyfikacji gov.pl) uruchomionego lokalnie.
 - Nie kopiujemy baz zamkniętych (np. Staying Alive, Pierwszy Ratownik). Dane OpenStreetMap (ODbL) nie trafiają do wykazu.
 
-## Użycie AI i pliki pracy
+## Użycie AI
 
-Zakres użycia AI opisuje krok 16 instrukcji dla jury i ostatni slajd prezentacji. Pliki `CLAUDE.md`, `.scratch/` i `docs/agents/` to jawny ślad pracy z asystentem AI: plan prac, zadania i decyzje.
+Zakres użycia AI opisuje krok 16 instrukcji dla jury i ostatni slajd prezentacji.
 
 ## Wersje
 

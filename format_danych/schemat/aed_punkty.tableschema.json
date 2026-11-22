@@ -1,5 +1,5 @@
 {
-  "$comment": "Frictionless Table Schema wzorca dostawcy AED v2 (docs/06). Pola x-* to rozszerzenia projektu.",
+  "$comment": "Frictionless Table Schema wzorca dostawcy AED v2 (decyzje projektu). Pola x-* to rozszerzenia projektu.",
   "name": "aed-wzorzec-dostawcy",
   "title": "Wzorcowy zakres danych o defibrylatorach AED – plik dostawcy",
   "version": "2.0.0",

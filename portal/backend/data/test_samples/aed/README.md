@@ -1,6 +1,6 @@
 # Próbki testowe Zestawienia AED
 
-Pobrane 21.11.2026 przez publiczne API dane.gov.pl (`https://api.dane.gov.pl/1.4/resources/<id>` → `download_url`), poza dwoma przykładami wzorca. Używają ich testy `mcod/resources/tests/test_aed_*.py` (plan: `.scratch/zestawienie-aed/` w katalogu głównym repozytorium).
+Pobrane 21.11.2026 przez publiczne API dane.gov.pl (`https://api.dane.gov.pl/1.4/resources/<id>` → `download_url`), poza dwoma przykładami wzorca. Używają ich testy `mcod/resources/tests/test_aed_*.py`.
 
 | Plik | Źródło | Licencja | Oczekiwane zachowanie w agregacji |
 |---|---|---|---|

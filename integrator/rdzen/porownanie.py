@@ -40,7 +40,7 @@ def porownaj(wykaz: list, osm: list, *, promien: float = PROMIEN_DOMYSLNY,
              prog_podobienstwa: float = PROG_PODOBIENSTWA) -> dict:
     """Dopasowanie jedno-do-jednego po najmniejszej odległości w promieniu `promien` metrów.
 
-    Para w promieniu z różną kondygnacją to prawdopodobnie różne urządzenia (docs/06 §3):
+    Para w promieniu z różną kondygnacją to prawdopodobnie różne urządzenia (wzorzec v2, x-reguly-dodatkowe):
     trafia do `pary_do_sprawdzenia`, a nie do `w_obu`.
     """
     cell_lat = promien / META

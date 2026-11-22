@@ -1,5 +1,5 @@
 {
-  "$comment": "Table Schema zasobu zbiorczego AED budowanego przez portal (docs/06). Pola wzorca bez wymagalności dostawcy.",
+  "$comment": "Table Schema zasobu zbiorczego AED budowanego przez portal (decyzje projektu). Pola wzorca bez wymagalności dostawcy.",
   "name": "aed-zestawienie",
   "title": "Wykaz defibrylatorów AED – wykaz zbiorczy",
   "version": "2.0.0",
