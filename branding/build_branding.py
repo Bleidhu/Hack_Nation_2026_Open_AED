@@ -418,7 +418,7 @@ STRON = 12
 
 def ksiega(W, kontrasty) -> str:
     def stopka(n):
-        return f'<div class="stopka"><span>{NAZWA} · Księga znaku v1.0</span><span>{n} / {STRON}</span></div>'
+        return f'<div class="stopka"><span>{NAZWA}, księga znaku v1.0</span><span>{n} / {STRON}</span></div>'
 
     # 02 budowa znaku: znak z osiami i opisem elementów
     def kolko(n, cx, cy, px, py):
@@ -523,18 +523,18 @@ ul{{margin:0;padding-left:5mm}}
 .legenda li{{list-style:none;margin-bottom:3mm;padding-left:9mm;position:relative}}
 .legenda li b.n{{position:absolute;left:0;top:.5mm;width:6mm;height:6mm;border-radius:50%;background:{GRANAT};color:#fff;font-size:9pt;display:flex;align-items:center;justify-content:center}}
 .warianty{{display:grid;grid-template-columns:repeat(3,1fr);gap:6mm}}
-.warianty figure{{margin:0;border:1px solid #d5e1da;border-radius:3mm;padding:5mm;display:flex;flex-direction:column;justify-content:space-between;min-height:62mm}}
-.warianty .pole{{flex:1;display:flex;align-items:center;justify-content:center;border-radius:2mm;padding:3mm}}
+.warianty figure{{margin:0;border-top:2px solid {GRANAT};padding:3mm 0 0;display:flex;flex-direction:column;justify-content:space-between;min-height:62mm}}
+.warianty .pole{{flex:1;display:flex;align-items:center;justify-content:center;border-radius:1mm;padding:3mm}}
 figcaption{{font-size:9.5pt;margin-top:3mm;line-height:1.35}}
 .kolory{{display:grid;grid-template-columns:repeat(7,1fr);gap:4mm}}
-.probka{{height:26mm;border-radius:3mm;padding:2.5mm;font-weight:700;font-size:10pt;display:flex;align-items:flex-end;border:1px solid #d5e1da}}
+.probka{{height:26mm;border-radius:1mm;padding:2.5mm;font-weight:700;font-size:10pt;display:flex;align-items:flex-end;border:1px solid #d5e1da}}
 dl{{display:grid;grid-template-columns:auto 1fr;gap:.5mm 2mm;font-size:8.5pt;margin:2.5mm 0 1.5mm}}
 dt{{font-weight:700}} dd{{margin:0}}
 .rola{{font-size:8.5pt;line-height:1.3;margin:0}}
 .kropka{{display:inline-block;width:3.2mm;height:3.2mm;border-radius:50%;border:1px solid #9aa;margin-right:1mm;vertical-align:-0.4mm}}
 .zle-grid{{display:grid;grid-template-columns:repeat(4,1fr);gap:5mm}}
 .zle{{margin:0}}
-.zle .pole{{height:40mm;border:1px solid #d5e1da;border-radius:3mm;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative}}
+.zle .pole{{height:40mm;border:1px solid #d5e1da;border-radius:1mm;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative}}
 .zle .pole::after{{content:"";position:absolute;inset:0;background:linear-gradient(to top right,transparent calc(50% - 1.5px),{CZERWIEN} calc(50% - 1.5px),{CZERWIEN} calc(50% + 1.5px),transparent calc(50% + 1.5px));opacity:.85}}
 .x{{color:{CZERWIEN};font-weight:700}}
 .min{{display:flex;gap:10mm;align-items:flex-end;margin-top:6mm;flex-wrap:wrap}}
@@ -558,12 +558,12 @@ th{{font-weight:700}}
   <div class="meta">
     <strong style="font-size:20pt">Księga znaku</strong><br>
     Akcja zachęcająca dysponentów defibrylatorów AED do publikowania danych w portalu dane.gov.pl<br>
-    Zadanie „Misja AED – Dane na ratunek” · HackNation 2026 · wersja 1.0 · 2026-11-22
+    Zadanie „Misja AED – Dane na ratunek”, HackNation 2026. Wersja 1.0 z 22.11.2026
   </div>
 </section>
 
 <section class="strona">
-  <h2><small>01 · Koncepcja</small>Z chaosu w rytm: w sercu i w danych</h2>
+  <h2>Z chaosu w rytm: w sercu i w danych</h2>
   <div class="grid2" style="grid-template-columns:1.15fr 1fr;align-items:start">
     <div>
       <p class="koncepcja">Nazwa „{NAZWA}” czyta się na dwa sposoby: „dane przeżycie” i „dane życie”, a „dane” to także dane.gov.pl. W znaku czerwona linia migotania komór, czyli rytmu, który przerywa defibrylator AED, spotyka się na środku z zielonym, miarowym rytmem serca. Miejsce spotkania przykrywa folder z danymi, bo najbliższy AED da się szybko znaleźć dopiero wtedy, gdy rozproszone dane trafią do jednego wykazu. Chaos zamienia się w porządek dwa razy: w sercu po defibrylacji i w danych po publikacji według jednego wzorca. Zieleń nawiązuje do oznakowania AED, czerwień do zagrożenia życia, a granat do rzetelności danych publicznych.</p>
@@ -584,7 +584,7 @@ th{{font-weight:700}}
 </section>
 
 <section class="strona">
-  <h2><small>02 · Budowa znaku</small>Dwie linie spotykają się w środku folderu</h2>
+  <h2>Dwie linie spotykają się w środku folderu</h2>
   <div class="grid2" style="grid-template-columns:1.5fr 1fr">
     <div>{budowa}</div>
     <ul class="legenda">
@@ -599,7 +599,7 @@ th{{font-weight:700}}
 </section>
 
 <section class="strona">
-  <h2><small>03 · Wersje znaku</small>Kiedy której wersji używać</h2>
+  <h2>Kiedy której wersji używać</h2>
   <div class="warianty">
     <figure><div class="pole">{inline(W["logo_poziome"], w=270)}</div><figcaption><strong>Pozioma.</strong> Wersja podstawowa: strony www, pisma, prezentacje, stopki.</figcaption></figure>
     <figure><div class="pole">{inline(W["logo_poziome_haslo"], w=270)}</div><figcaption><strong>Pozioma z hasłem.</strong> Materiały kampanii, banery, nagłówki listów do dysponentów.</figcaption></figure>
@@ -612,7 +612,7 @@ th{{font-weight:700}}
 </section>
 
 <section class="strona">
-  <h2><small>04 · Wersje kolorystyczne</small>Pełny kolor, negatyw i wersje jednobarwne</h2>
+  <h2>Pełny kolor, negatyw i wersje jednobarwne</h2>
   <div class="warianty">
     <figure><div class="pole" style="background:{GRANAT};padding:0">{inline(W["logo_pionowe_negatyw"], h=170)}</div><figcaption><strong>Negatyw, układ pionowy.</strong> „(prze)” w żółci sygnału, tylko na granacie.</figcaption></figure>
     <figure><div class="pole">{inline(W["logo_poziome_mono-granat"], w=270)}</div><figcaption><strong>Jednobarwna granatowa.</strong> Druk jednokolorowy, dokumenty urzędowe. Migotanie i rytm różnią się kształtem, nie tylko kolorem.</figcaption></figure>
@@ -625,7 +625,7 @@ th{{font-weight:700}}
 </section>
 
 <section class="strona">
-  <h2><small>05 · Kolorystyka</small>Pięć kolorów podstawowych i dwa na ciemne tło</h2>
+  <h2>Pięć kolorów podstawowych i dwa na ciemne tło</h2>
   <div class="kolory">{karty}{karty_c}</div>
   <div class="grid2" style="grid-template-columns:1.3fr 1fr;align-items:start;margin-top:5mm">
     <table class="mala"><tr><th>Para kolorów (WCAG 2.1)</th><th>Kontrast</th><th>Wymagane</th></tr>{tab_k}</table>
@@ -636,7 +636,7 @@ th{{font-weight:700}}
 </section>
 
 <section class="strona">
-  <h2><small>06 · Pole ochronne</small>Wokół znaku zostawiamy wolne miejsce</h2>
+  <h2>Wokół znaku zostawiamy wolne miejsce</h2>
   <div class="grid2" style="grid-template-columns:1.5fr 1fr">
     <div>{ochr}</div>
     <div>
@@ -649,7 +649,7 @@ th{{font-weight:700}}
 </section>
 
 <section class="strona">
-  <h2><small>07 · Minimalna wielkość</small>Poniżej tych rozmiarów znak traci czytelność</h2>
+  <h2>Poniżej tych rozmiarów znak traci czytelność</h2>
   <table><tr><th>Wersja</th><th>Druk (szerokość)</th><th>Ekran (szerokość)</th><th>Uwagi</th></tr>{minima}</table>
   <div class="min">{minima_fig}</div>
   <p style="font-size:9.5pt;max-width:none;margin-top:5mm">Progi ustalono testem ekranowym: pliki SVG wyświetlone w przeglądarce w skali 1:1 (96 dpi) w malejących rozmiarach. Kryteria: fale migotania nie zlewają się w jedną linię, a hasło ma co najmniej 9 px. Rozmiary do druku przeliczono z pikseli z zaokrągleniem w górę; przed drukiem nakładu potwierdź je wydrukiem próbnym. Rysunki powyżej mają rozmiar minimalny przy wydruku księgi w skali 100%. Poniżej progu znaku stosujemy sygnet. Próbki z testu (znak 120, 64 i 40 px, sygnet 32 i 16 px):</p>
@@ -658,14 +658,14 @@ th{{font-weight:700}}
 </section>
 
 <section class="strona">
-  <h2><small>08 · Niedozwolone użycia</small>Czego nie robimy ze znakiem</h2>
+  <h2>Czego nie robimy ze znakiem</h2>
   <div class="zle-grid">{zle}</div>
   <p style="font-size:9.5pt;max-width:none;margin-top:5mm">Kierunek znaku ma znaczenie: migotanie zawsze po lewej, rytm zawsze po prawej, a punkt spotkania zawsze w środku folderu. Odwrócenie lub zamiana kolorów zmienia przekaz na przeciwny.</p>
   {stopka(9)}
 </section>
 
 <section class="strona">
-  <h2><small>09 · Typografia</small>Atkinson Hyperlegible: krój zaprojektowany dla czytelności</h2>
+  <h2>Atkinson Hyperlegible: krój zaprojektowany dla czytelności</h2>
   <div class="grid2" style="align-items:start">
     <div>
       <div class="typo-a"><b>Dane</b> (prze)<b>życie</b></div>
@@ -683,7 +683,7 @@ th{{font-weight:700}}
 </section>
 
 <section class="strona">
-  <h2><small>10 · Zastosowania</small>Znak na materiałach akcji</h2>
+  <h2>Znak na materiałach akcji</h2>
   <div class="zast">
     <figure>{inline(W["naklejka_A6"], w=390, label="Naklejka A6 na szafkę AED")}<figcaption><strong>Naklejka A6 na szafkę AED.</strong> Informuje, że urządzenie jest w Wykazie AED, podaje jego identyfikator i datę sprawdzenia. Kod QR prowadzi do zgłoszenia „nie działa / zamknięty” (na makiecie kod jest nieprawdziwy).</figcaption></figure>
     <figure>{inline(W["odznaka_dysponenta"], w=220, label="Odznaka dysponenta")}<figcaption><strong>Odznaka dysponenta.</strong> Dla instytucji, która opublikowała dane według wzorcowego zakresu. Na stronę www, do stopki e-maila i przy wejściu do budynku.</figcaption></figure>
@@ -693,7 +693,7 @@ th{{font-weight:700}}
 </section>
 
 <section class="strona">
-  <h2><small>11 · Pliki i prawa</small>Co jest w paczce</h2>
+  <h2>Co jest w paczce</h2>
   <table>
     <tr><th>Plik (folder logo/)</th><th>Formaty</th><th>Zastosowanie</th></tr>
     <tr><td>dane-przezycie_logo_poziome</td><td>SVG, PNG (przezroczyste tło), JPG, PDF</td><td>wersja podstawowa</td></tr>

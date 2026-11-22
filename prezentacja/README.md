@@ -11,7 +11,7 @@
 | akcja promocyjna: nazwa, hasło, logotyp | 1, 12 |
 | zakres użycia AI (`regulamin_zadania.pdf` §2 ust. 8) | 14 |
 
-Liczby na slajdach pochodzą z plików w [`../demo/wynik/`](../demo/wynik/) (`testy.txt`, `statystyki_agregacji.json`). Krój w prezentacji to Arial, czyli krój zastępczy z księgi znaku, bo Atkinson Hyperlegible nie jest instalowany z pakietem Office.
+Liczby na slajdach pochodzą z plików w [`../demo/wynik/`](../demo/wynik/) (`testy.txt`, `statystyki_agregacji.json`). Krój w prezentacji to Atkinson Hyperlegible z księgi znaku. PDF ma go osadzonego; w PPTX bez zainstalowanego kroju PowerPoint podstawi inny, więc do czytania służy PDF (krój: branding/fonty/).
 
 ## Regeneracja
 

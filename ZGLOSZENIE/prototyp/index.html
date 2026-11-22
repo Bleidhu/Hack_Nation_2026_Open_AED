@@ -45,7 +45,8 @@ main:focus { outline: none; }
 h1 { font-size: 1.6rem; line-height: 1.25; color: var(--granat); margin: 0 0 .25rem; }
 h2 { font-size: 1.45rem; line-height: 1.25; color: var(--granat); margin: 0 0 .75rem; }
 h2:focus { outline: none; }
-h2 .nr { display: inline-block; background: var(--zielen); color: #fff; border-radius: 6px; padding: 0 .45rem; margin-right: .4rem; }
+h2 .nr { color: var(--zielen); margin-right: .5rem; }
+h2 .nr::after { content: "."; }
 h3 { font-size: 1.15rem; color: var(--granat); margin: 1.5rem 0 .5rem; }
 .krok > p, .krok > ul, .krok > ol { max-width: 50rem; }
 .lead { font-size: 1.15rem; }
