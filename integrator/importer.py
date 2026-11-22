@@ -19,6 +19,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from adaptery.osm import tagi_bez_odpowiednika, wczytaj as osm_wczytaj  # noqa: E402
+from rdzen.duplikaty import PROMIEN_DOMYSLNY, znajdz_kandydatow  # noqa: E402
 from rdzen.licencje import LicencjaBlad, sprawdz, wczytaj_konfiguracje  # noqa: E402
 from rdzen.mapowanie import PRESETS, apply_mapping, suggest_mapping  # noqa: E402
 from rdzen.walidacja import validate  # noqa: E402
@@ -67,6 +68,8 @@ def main():
     ap.add_argument("--domyslne", type=Path, help="JSON z wartościami domyślnymi pól")
     ap.add_argument("--wyjscie", type=Path, help="CSV wynikowy (tylko poprawne rekordy)")
     ap.add_argument("--raport", type=Path, help="raport walidacji JSON")
+    ap.add_argument("--duplikaty", type=Path, help="raport kandydatów na duplikaty JSON (tylko flaguje, bez scalania)")
+    ap.add_argument("--promien", type=float, default=PROMIEN_DOMYSLNY, help="promień dopasowania w metrach (do --duplikaty)")
     ap.add_argument("--podpowiedz", action="store_true", help="wypisz podpowiedź mapowania i zakończ")
     a = ap.parse_args()
     data = a.plik.read_bytes()
@@ -96,6 +99,13 @@ def main():
         print(f"zapisano {a.wyjscie}")
     if a.raport:
         a.raport.write_text(json.dumps(r, ensure_ascii=False, indent=2), "utf-8")
+    if a.duplikaty:
+        rap = znajdz_kandydatow([rec for rec in res["rekordy"] if rec.get("__status") != "odrzucony"],
+                                promien=a.promien)
+        a.duplikaty.write_text(json.dumps(rap, ensure_ascii=False, indent=2), "utf-8")
+        s = rap["podsumowanie"]
+        print(f"kandydaci na duplikaty: {s['kandydaci']} (prawdopodobne: {s['prawdopodobne']}, "
+              f"mało prawdopodobne: {s['maloprawdopodobne']}) → {a.duplikaty}")
 
 
 if __name__ == "__main__":
