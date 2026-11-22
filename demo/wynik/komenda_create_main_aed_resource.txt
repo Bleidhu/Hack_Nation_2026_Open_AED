@@ -1,0 +1,45 @@
+$ python manage.py create_main_aed_resource --dry-run
+/usr/src/mcod_backend/mcod/core/registries.py:46: UserWarning: Overriding existing registry serializer `<class 'mcod.users.serializers.UserApiAttrs'>` by `<class 'mcod.users.serializers.AgentApiAttrs'>` for model `<class 'mcod.users.models.User'>`.
+  warnings.warn(
+2026-11-22 02:16:39,600 mcod         WARNING  Pomijam zasób źródłowy AED 40210: brak kolumn: miejscowosc
+2026-11-22 02:16:39,639 mcod         WARNING  Pomijam zasób źródłowy AED 40209: brak kolumn: nazwa_lokalizacji, miejscowosc, szerokosc_geograficzna, dlugosc_geograficzna
+2026-11-22 02:16:39,639 mcod         INFO     Wykaz AED: przyjęte zasoby 2, pominięte 2, wiersze 32, pominięte wiersze 0.
+2026-11-22 02:16:39,645 mcod         INFO     Created main AED file /usr/src/mcod_backend/media/main_aed/Wykaz defibrylatorów AED – wykaz zbiorczy 20261122.csv; stats: {'zasoby_przyjete': 2, 'zasoby_pominiete': [{'resource_id': 40210, 'powod': 'brak kolumn: miejscowosc'}, {'resource_id': 40209, 'powod': 'brak kolumn: nazwa_lokalizacji, miejscowosc, szerokosc_geograficzna, dlugosc_geograficzna'}], 'wiersze': 32, 'wiersze_pominiete': 0}
+Plik CSV: /usr/src/mcod_backend/media/main_aed/Wykaz defibrylatorów AED – wykaz zbiorczy 20261122.csv
+Wiersze: 32
+
+$ python manage.py create_main_aed_resource --eager
+/usr/src/mcod_backend/mcod/core/registries.py:46: UserWarning: Overriding existing registry serializer `<class 'mcod.users.serializers.UserApiAttrs'>` by `<class 'mcod.users.serializers.AgentApiAttrs'>` for model `<class 'mcod.users.models.User'>`.
+  warnings.warn(
+2026-11-22 02:16:54,252 mcod         WARNING  Pomijam zasób źródłowy AED 40210: brak kolumn: miejscowosc
+2026-11-22 02:16:54,307 mcod         WARNING  Pomijam zasób źródłowy AED 40209: brak kolumn: nazwa_lokalizacji, miejscowosc, szerokosc_geograficzna, dlugosc_geograficzna
+2026-11-22 02:16:54,309 mcod         INFO     Wykaz AED: przyjęte zasoby 2, pominięte 2, wiersze 32, pominięte wiersze 0.
+2026-11-22 02:16:54,333 mcod         INFO     Created main AED file /usr/src/mcod_backend/media/main_aed/Wykaz defibrylatorów AED – wykaz zbiorczy 20261122.csv; stats: {'zasoby_przyjete': 2, 'zasoby_pominiete': [{'resource_id': 40210, 'powod': 'brak kolumn: miejscowosc'}, {'resource_id': 40209, 'powod': 'brak kolumn: nazwa_lokalizacji, miejscowosc, szerokosc_geograficzna, dlugosc_geograficzna'}], 'wiersze': 32, 'wiersze_pominiete': 0}
+[create_graph_with_related_update] sender:resource.Resource, instance:resource.Resource, id:40247
+NoneType: None
+[pre_save] sender:resource.Resource, instance:resource.Resource, id:40247
+NoneType: None
+[update_document_with_related] sender:resource.Resource, instance:resource.Resource, id:40247
+NoneType: None
+[notify_published] sender:resource.Resource, instance:resource.Resource, id:40247
+NoneType: None
+[notify_m2m_removed] sender:resource.Resource, instance:resource.Resource, id:40247
+NoneType: None
+[notify_m2m_added] sender:resource.Resource, instance:resource.Resource, id:40247
+NoneType: None
+2026-11-22 02:16:54,498 mcod         INFO     Starting clean up process after main AED Resource creation.
+2026-11-22 02:16:54,503 mcod         INFO     File /usr/src/mcod_backend/media/main_aed/Wykaz defibrylatorów AED – wykaz zbiorczy 20261122.csv has been deleted successfully.
+2026-11-22 02:16:54,504 mcod         INFO     Clean up completed.
+[delete_graph_with_related_update] sender:resource.Resource, instance:resource.Resource, id:40246
+NoneType: None
+[remove_document_with_related] sender:resource.Resource, instance:resource.Resource, id:40246
+NoneType: None
+2026-11-22 02:16:54,564 mcod         INFO     Running update_dataset_archive signal
+[notify_removed] sender:resource.Resource, instance:resource.Resource, id:40246
+NoneType: None
+[notify_m2m_removed] sender:resource.Resource, instance:resource.Resource, id:40246
+NoneType: None
+2026-11-22 02:16:54,583 mcod         INFO     Previous Main AED Resource 40246 deleted.
+Zbiór: 4216
+Zasób: 40247
+Wiersze: 32
