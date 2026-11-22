@@ -1,4 +1,4 @@
-Testy portalu dane.gov.pl: Wykaz AED i regresja DGA (22.11.2026, commit a082628)
+Testy portalu dane.gov.pl: Wykaz AED i regresja DGA (22.11.2026, commit 655a2c3)
 Polecenie (portal/backend):
 docker compose -f docker-compose.local.yml run --rm --no-deps mcod-local-tests -n0 --no-cov -v --disable-warnings -m "feat_dga or feat_main_aed or not depends_on_component" <8 plików test_aed_* i test_main_aed_resource.py> mcod/resources/tests/test_main_dga.py mcod/resources/tests/test_api.py
 
