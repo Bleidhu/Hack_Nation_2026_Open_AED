@@ -1,6 +1,6 @@
 # Koncepcja akcji „Dane (prze)życie”: szkice do wyboru
 
-Status: **szkice robocze** (22.11.2026). Księga znaku i pliki finalne powstaną po wyborze wariantu. Obecny branding „Otwórz AED” w `../logo/` pozostaje bez zmian.
+Status: **szkice robocze, zamknięte** (22.11.2026). Znak finalny powstał z wariantu C, ale zmienił kompozycję: migotanie i rytm spotykają się na środku znaku, a folder jest na nie nałożony. Pliki finalne i księga znaku: [`../README.md`](../README.md).
 
 ## Nazwa i hasło
 
