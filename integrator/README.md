@@ -49,12 +49,11 @@ nocne zadanie portalu (krok 1) → krajowy zasób zbiorczy AED
   WCAG 2.1 AA (etykiety pól, `aria-live`, obsługa klawiaturą, kontrast) i jest responsywna.
   Serwer nasłuchuje tylko na 127.0.0.1, używa wyłącznie `rdzen/` i **nie zapisuje nic na dysku** –
   wyniki (CSV po dopisaniu, CSV wynikowy importu) przeglądarka pobiera jako plik.
-- `openapi.yaml`: szkic API integratora z poprzedniego demonstratora (import, aktualizacje stanu, organizacje, AED obszarowe). Traktuj go jako propozycję, a nie działającą usługę w tym repo.
 - **Demo offline:** `python integrator/generuj_demo.py` zapisuje do [`../demo/integrator/`](../demo/integrator/README.md) przykładowe wyniki na realnych plikach z `references/dane_gov_pl_aed/`: CSV v2 z odpowiedzi API Warszawy, raporty walidacji, duplikatów i porównania z OSM oraz statystykę Gdańska.
 
 Przykładowe pliki dostawców wraz z mapowaniami są w `dane_przykladowe/` (bank, sieć sklepów, OSM, gmina, przewoźnik, kolej, serwis, ZRM). Adaptery Warszawy i Gdańska czytają realne pliki z `../references/dane_gov_pl_aed/` (odpowiedź API Warszawy, baza pojazdów ZTM Gdańska) – oba źródła nie dają dziś tabeli w portalu.
 
-> **Archiwum v1.** Pliki z wersji przed wzorcem v2 (`wzorzec_v1/`, próbki v1 w `dane_przykladowe/00_format_v1/`, `schemat/`, `szablony/`, `narzedzia/`, `FORMAT_V1.md`) są opisane w `ARCHIWUM_V1.md` i pozostają w repo. Importer działa na wzorcu v2 (`../format_danych/`).
+> **Archiwum v1.** Pliki z wersji przed wzorcem v2 (`wzorzec_v1/`, próbki v1 z `dane_przykladowe/00_format_v1/`, `schemat/`, `szablony/`, `narzedzia/`, `FORMAT_V1.md`, `ARCHIWUM_V1.md` i szkic `openapi.yaml` z poprzedniego demonstratora) **przeniesiono do [`../archive/integrator/`](../archive/integrator/ARCHIWUM_V1.md)** (nic nie usuwamy; kod i testy nie odwołują się do archiwum, opis w [`../archive/README.md`](../archive/README.md)). Importer działa na wzorcu v2 (`../format_danych/`).
 
 > **Faza 2 (zakończona):** plan i decyzje w `../.scratch/integrator-faza2/` (12 zadań, zadania 01–09, 11 i 12 wykonane; 10, czyli schemat źródła wg wzorca w portalu, świadomie odłożone). Importer jest cienką powłoką CLI nad `rdzen/` (czyste funkcje), `adaptery/` (OSM, Warszawa, Gdańsk), `ui/` i `testy/` (87 testów, bez Dockera).
 

@@ -4,9 +4,10 @@ Każdy folder to jeden typ dostawcy danych o AED. Pliki pokazują dane **tak, ja
 
 **Wszystkie dane są fikcyjne** (oznaczone „PRZYKŁAD – dane fikcyjne”). Współrzędne wskazują ogólnodostępne miejsca w Krakowie i Bydgoszczy, ale urządzenia, firmy, numery seryjne i zdarzenia są zmyślone.
 
+> Katalog powstał przy planowaniu wzorca v1. Próbki samego formatu v1 (`00_format_v1/`, tu opisane jako „format docelowy”) są w [`../../archive/integrator/dane_przykladowe/00_format_v1/`](../../archive/integrator/dane_przykladowe/00_format_v1/). Pozostałe foldery zostały i działają z importerem v2 jako ćwiczeniowe dane wejściowe z mapowaniami; pojęcia „aktualizacje” i „obszarowe” (wiersze 06–10) to koncepcja v1, opisana w archiwum – do wzorca v2 wchodzą punkty.
+
 | Folder | Dostawca | Format natywny | Trafia do tabeli | Co pokazuje |
 |---|---|---|---|---|
-| `00_format_docelowy` | dysponent / JST publikujący już we wzorcu | CSV RFC 4180, GeoJSON | punkty, obszarowe, organizacje | cel: zero mapowania |
 | `01_integrator_osm` | OpenStreetMap / OpenAEDMap | Overpass JSON, GeoJSON | punkty (**tylko porównanie**, ODbL) | brak adresu i stanu; punkty spoza innych źródeł → kandydaci do weryfikacji |
 | `02_bank` | bank, sieć placówek | zagnieżdżony JSON z systemu + CSV ze średnikiem | punkty | placówka z 2 AED to 2 rekordy, nie duplikat; godziny per dzień; elektrody `rrrr-mm`; AED tylko dla pracowników |
 | `03_siec_sklepow` | duża sieć handlowa | TSV w CP1250 | punkty | kodowanie, zapisane mapowanie, odrzucenie wiersza z brakami |
@@ -36,7 +37,4 @@ Te same urządzenia występują w kilku źródłach, żeby było widać scalanie
 
 ## Generowanie
 
-```bash
-python deliverable/narzedzia/generuj.py          # format docelowy, bank CSV, sieć sklepów, OSM GeoJSON, aktualizacje CSV, xlsx
-python deliverable/narzedzia/generuj_zrodla.py   # natywne JSON-y pozostałych dostawców, mapowania, zrodlo.json
-```
+Próbki są już wygenerowane i są traktowane jako dane statyczne. Generatory v1 (ze ścieżkami starego układu `deliverable/...`, nieuruchamialne po przenosinach) są w [`../../archive/integrator/narzedzia/`](../../archive/integrator/narzedzia/) – pokazują tylko, jak próbki powstały.

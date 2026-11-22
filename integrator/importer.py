@@ -7,7 +7,7 @@ Integrator danych AED do wzorca v2 (41 kolumn). Cienka powłoka CLI nad `rdzen/`
 
 Wejście: CSV/TSV (UTF-8, CP1250), XLSX, GeoJSON, Overpass JSON. Presety: wzorzec, osm, warszawa (odpowiedź API um.warszawa.pl z pliku), gdansk (baza pojazdów ZTM – tylko statystyka).
 Licencja źródła jest jawna (--licencja); ODbL (preset osm) tylko z --cel lokalny.
-Wersja dla wzorca v1: wzorzec_v1/importer_v1.py (archiwum).
+Wersja dla wzorca v1: archive/integrator/wzorzec_v1/importer_v1.py (archiwum, niedostępna z tego katalogu).
 """
 from __future__ import annotations
 

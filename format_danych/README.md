@@ -69,4 +69,4 @@ cd format_danych && uv run --with "frictionless==5.18.0" python -c "from frictio
 
 Generatory używają tylko biblioteki standardowej. Wynik jest deterministyczny; pliki XLSX różnią się między uruchomieniami jedynie znacznikami czasu w archiwum.
 
-Materiał integratora (krok 2) jest w `../integrator/`: próbki dostawców, mapowania, tabele obszarowe, organizacji i aktualizacji. Opiera się jeszcze na wzorcu v1 (`../integrator/FORMAT_V1.md`).
+Materiał integratora (krok 2, dodatek) jest w `../integrator/`: próbki dostawców z mapowaniami, lokalne UI i testy – wszystko już na wzorcu v2 (41 kolumn, czyli `schemat/aed_punkty.tableschema.json`). Tabele obszarowe, organizacji i aktualizacji oraz opis wzorca v1 są w `../archive/integrator/`.
