@@ -39,6 +39,16 @@ nocne zadanie portalu (krok 1) → krajowy zasób zbiorczy AED
   Podkomenda `dodaj` (dla małych dostawców bez własnego systemu): flagi odpowiadają kolumnom
   wzorca v2; brakujący `id_zrodlowe` dostaje kolejny wolny numer z prefiksem dostawcy; przed
   zapisem walidacja i kontrola duplikatów (zapis mimo kandydatów dopiero z `--tak`).
+- `ui/`: mały lokalny interfejs (zadanie 09). Start jednym poleceniem:
+  ```bash
+  python integrator/ui/serwer.py          # http://127.0.0.1:8765/
+  ```
+  Zakładki: Import i mapowanie, Walidacja (pobranie CSV tylko przy celu „portal” i dozwolonej
+  licencji), Duplikaty (bez przycisku „scal”), Porównanie z OSM (widoczne oznaczenie ODbL)
+  i Dodaj rekord. Strona działa offline (czcionka osadzona w pliku, zero CDN), spełnia
+  WCAG 2.1 AA (etykiety pól, `aria-live`, obsługa klawiaturą, kontrast) i jest responsywna.
+  Serwer nasłuchuje tylko na 127.0.0.1, używa wyłącznie `rdzen/` i **nie zapisuje nic na dysku** –
+  wyniki (CSV po dopisaniu, CSV wynikowy importu) przeglądarka pobiera jako plik.
 - `openapi.yaml`: szkic API integratora z poprzedniego demonstratora (import, aktualizacje stanu, organizacje, AED obszarowe). Traktuj go jako propozycję, a nie działającą usługę w tym repo.
 
 Przykładowe pliki dostawców wraz z mapowaniami są w `dane_przykladowe/` (bank, sieć sklepów, OSM, gmina, przewoźnik, kolej, serwis, ZRM). Adaptery Warszawy i Gdańska czytają realne pliki z `../references/dane_gov_pl_aed/` (odpowiedź API Warszawy, baza pojazdów ZTM Gdańska) – oba źródła nie dają dziś tabeli w portalu.

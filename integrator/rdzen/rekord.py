@@ -100,16 +100,19 @@ def sprawdz_rekord(rec: dict, istniejace: list) -> dict:
     return {"bledy": bledy, "kandydaci": kandydaci, "ostrzezenia": rap["ostrzezenia"]}
 
 
+def scal_tekst(stare, rec: dict) -> str:
+    """Treść pliku po dopisaniu rekordu, w całości w pamięci (bez I/O). `stare=None` → nowy plik z nagłówkiem."""
+    fragment = to_csv([dict(rec)])
+    if stare is None:
+        return fragment
+    if stare and not stare.endswith("\r\n"):
+        stare += "\r\n"
+    return stare + fragment.split("\r\n", 1)[1]
+
+
 def dopisz(sciezka: Path, rec: dict) -> None:
     """Atomowe dopisanie jednego wiersza: CRLF, UTF-8, pozostałe wiersze bez zmian."""
-    fragment = to_csv([dict(rec)])
-    if sciezka.exists():
-        stare = sciezka.read_bytes().decode("utf-8")
-        if stare and not stare.endswith("\r\n"):
-            stare += "\r\n"
-        tekst = stare + fragment.split("\r\n", 1)[1]
-    else:
-        tekst = fragment
+    stare = sciezka.read_bytes().decode("utf-8") if sciezka.exists() else None
     tmp = sciezka.with_name(sciezka.name + ".tmp")
-    tmp.write_text(tekst, "utf-8", newline="")
+    tmp.write_text(scal_tekst(stare, rec), "utf-8", newline="")
     os.replace(tmp, sciezka)
