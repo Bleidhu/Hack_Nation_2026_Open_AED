@@ -2,6 +2,13 @@
 
 > **Pokaż, gdzie jest. Powiedz, czy działa.**
 
+**Wersja v1.0.0: rozwiązanie podstawowe.**
+- Brakuje prezentacji.
+- Kampania promocyjna z logotypem, hasłem i księgą znaku jest niezakończona; w `branding/` są materiały robocze.
+- Integrator nie wchodzi w zakres tej wersji.
+
+Pliki do zgłoszenia są w [`ZGLOSZENIE/`](ZGLOSZENIE/README.md).
+
 **Zacznij tutaj:**
 - [`INSTRUKCJA_DLA_JURY.md`](INSTRUKCJA_DLA_JURY.md): każde wymaganie zadania w ponumerowanych krokach;
 - [`demo/index.html`](demo/index.html): klikalny prototyp offline;

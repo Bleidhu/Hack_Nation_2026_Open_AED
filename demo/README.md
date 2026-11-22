@@ -22,6 +22,8 @@ python demo/build_demo.py
 
 Skrypt składa `szablon.html` z wynikami z `wynik/`, konturem Polski z `dane/kontur_polski.json` (Natural Earth, domena publiczna), logo i fontem z `branding/` oraz listą plików portalu zmienionych względem oryginału (`git diff a119b1b`). Strona nie ładuje nic z innych domen. Podgląd na szerokości 1440 i 390 px: `wynik/podglad_demo_1440.png`, `wynik/podglad_demo_390.png`.
 
+Kopie plików do zgłoszenia (instrukcja, opis zmian, prototyp ze zrzutami, XLSX, CSV wykazu i łatkę z kodem portalu) składa w `ZGLOSZENIE/` polecenie `python demo/zloz_zgloszenie.py`. Uruchom je po `build_demo.py`.
+
 ## Weryfikacja agregacji bez bazy: `agreguj.py`
 
 Jedno polecenie uruchamia **tę samą logikę agregacji co portal** (`portal/backend/mcod/resources/aed_aggregation.py`) bez Dockera, bazy i Django:

@@ -1,0 +1,2898 @@
+diff --git a/portal/backend/CHANGELOG.md b/portal/backend/CHANGELOG.md
+index 7120eb2..6d1d1f4 100644
+--- a/portal/backend/CHANGELOG.md
++++ b/portal/backend/CHANGELOG.md
+@@ -6,10 +6,35 @@ ______________________________________________________________________
+ 
+ ### New
+ 
++- Dodano moduł `aed_constants` ze stałymi Zestawienia AED (kolumny wzorca i zasobu zbiorczego, aliasy nagłówków, licencje, klucze pól niestandardowych) - AED-02
++- Dodano moduł `aed_aggregation` z regułami budowy zasobu zbiorczego AED (aliasy nagłówków, wartości jawne, dysponent z wydawcy, usuwanie kontaktów, id_aed, wymaga_przegladu, kody przetworzenia) - AED-03
++- Dodano testy `test_aed_aggregation` z testem zgodności z referencyjnym przykładem zasobu zbiorczego - AED-03
++- Dodano moduł `aed_utils` z wyborem zasobów źródłowych Wykazu AED (pole niestandardowe `standard` = `AED`, licencje CC0 i CC BY 4.0) i ich odczytem (pliki lokalne i zasoby z CKAN) - AED-04
++- Dodano funkcję `read_tabular_bytes` odczytującą pliki CSV, XLS i XLSX dostawców jako tekst, bez rzutowania typów - AED-04
++- Dodano fikstury testowe `aed` i testy `test_aed_sources` - AED-04
++- Wprowadzono zmienną środowiskową `AED_AGGREGATION_ENABLED` (domyślnie włączona) do włączania i wyłączania Wykazu AED - AED-05
++- Dodano ustawienia `MAIN_AED_*` (właściciel, tytuły i opisy zbioru oraz zasobu zbiorczego AED, katalog plików CSV) - AED-05
++- Dodano tworzenie zbioru i zasobu zbiorczego Wykazu AED (CSV, licencja CC BY 4.0, schemat z mapowaniem mapy b/l/label, rozpoznawanie po polach niestandardowych bez nowego modelu) - AED-06
++- Dodano testy `test_main_aed_resource` - AED-06
++- Dodano zadanie Celery `create_main_aed_resource_task` budujące codziennie zasób zbiorczy Wykazu AED - AED-07
++- Dodano komendę `create_main_aed_resource` (opcje `--eager`, `--dry-run`) do ręcznego budowania Wykazu AED - AED-07
++- Dodano endpoint API `/aed-aggregated` zwracający identyfikatory zbioru i zasobu zbiorczego Wykazu AED wraz z dokumentacją OpenAPI - AED-08
++
+ ### Changes
+ 
++- Zarejestrowano fikstury testowe `aed` w `mcod/core/tests/fixtures/__init__.py` - AED-04
++- Dodano trasę kolejki `resources` dla zadania `create_main_aed_resource_task` - AED-05
++- Dodano do harmonogramu Celery Beat wpis `aed_main_resource_creation` (codziennie 4:15, tylko gdy `AED_AGGREGATION_ENABLED`) - AED-07
++- Dodano zadanie `create_main_aed_resource_task` do eksportów `mcod.resources.tasks` - AED-07
++- Zarejestrowano schemat `AggregatedAEDInfo` i ścieżkę `/aed-aggregated` w specyfikacji OpenAPI - AED-08
++- Dodano serializer `AggregatedAEDInfoApiResponse`, widok `AggregatedAEDInfoView` i trasę `/aed-aggregated` - AED-08
++- Dodano podpowiedź (help_text) przy polu „Pola niestandardowe” formularza zbioru opisującą oznaczenie zbioru do Wykazu AED (`standard` = `AED`) - AED-09
++
+ ### Fixes
+ 
++- Naprawiono pomijanie w Wykazie AED zasobów zgodnych ze wzorcem, które nie przeszły walidacji typów zgadywanych przez portal (wybór źródeł nie wymaga już `data_tasks_last_status = SUCCESS`, a gdy portal nie ma danych tabelarycznych zasobu, wykaz odczytuje plik zasobu wprost) - AED-10
++- Naprawiono pozostawianie poprzedniego opublikowanego zasobu zbiorczego Wykazu AED przez komendę `create_main_aed_resource --eager` - AED-10
++
+ ### Breaks
+ 
+ ## 2.63.0 - (2026-10-28)
+diff --git a/portal/backend/data/test_samples/aed/README.md b/portal/backend/data/test_samples/aed/README.md
+new file mode 100644
+index 0000000..c46e416
+--- /dev/null
++++ b/portal/backend/data/test_samples/aed/README.md
+@@ -0,0 +1,14 @@
++# Próbki testowe Zestawienia AED
++
++Pobrane 21.11.2026 przez publiczne API dane.gov.pl (`https://api.dane.gov.pl/1.4/resources/<id>` → `download_url`), poza dwoma przykładami wzorca. Używają ich testy `mcod/resources/tests/test_aed_*.py` (plan: `.scratch/zestawienie-aed/` w katalogu głównym repozytorium).
++
++| Plik | Źródło | Licencja | Oczekiwane zachowanie w agregacji |
++|---|---|---|---|
++| `aed_punkty_przyklad.csv` | `format_danych/przyklady/` (dane FIKCYJNE, wzorzec v2) | – | 8 wierszy przyjętych |
++| `aed_zestawienie_przyklad.csv` | `format_danych/przyklady/` (wynik implementacji referencyjnej) | – | wynik oczekiwany testu golden (bajt w bajt) |
++| `legionowo_2625221.csv` | zasób 2625221, zbiór 40593, Urząd Miasta Legionowo | CC0 1.0 | 24 wiersze przyjęte; aliasy `nazwa`, `nr_budynku`, `nr_lokalu`; plik ma BOM |
++| `krosno_54632.csv` | zasób 54632, zbiór 3624, Urząd Miasta Krosna | CC0 1.0 | zasób pominięty: brak kolumny `miejscowosc` (cały adres w polu `Adres`) |
++| `przemysl_62095.csv` | zasób 62095, zbiór 4581, Urząd Miejski w Przemyślu (link do systemu miasta, wersja z 21.11.2026) | CC0 1.0 | zasób pominięty: brak kolumn współrzędnych (współrzędne w jednej kolumnie `geometry`); separator `;`, BOM |
++| `marki_68353.csv` | zasób 68353, zbiór 4955, Urząd Miasta Marki | CC BY 4.0 | zasób pominięty: każdy wiersz jest w całości w cudzysłowie, więc tabela ma jedną kolumnę |
++
++Pliki z dane.gov.pl są zapisane bez zmian. Atrybucja danych CC BY 4.0: Urząd Miasta Marki, dane.gov.pl, zasób 68353.
+diff --git a/portal/backend/data/test_samples/aed/aed_punkty_przyklad.csv b/portal/backend/data/test_samples/aed/aed_punkty_przyklad.csv
+new file mode 100644
+index 0000000..daf49fa
+--- /dev/null
++++ b/portal/backend/data/test_samples/aed/aed_punkty_przyklad.csv
+@@ -0,0 +1,9 @@
++id_zrodlowe,nazwa_lokalizacji,wojewodztwo,powiat,gmina,kod_terc,miejscowosc,kod_simc,kod_pocztowy,cecha_ulicy,nazwa_ulicy,kod_ulic,numer_budynku,numer_lokalu,adres_uniwersalny,szerokosc_geograficzna,dlugosc_geograficzna,opis_lokalizacji,wewnatrz_budynku,kondygnacja,typ_dostepu,dostepny_24_7,godziny_dostepnosci,zabezpieczenie,instrukcja_dostepu,status_urzadzenia,producent,model,elektrody_pediatryczne,data_waznosci_elektrod,data_waznosci_baterii,data_ostatniego_przegladu,poziom_weryfikacji,data_weryfikacji,dysponent_nazwa,dysponent_regon,telefon_kontaktowy,email_kontaktowy,zrodlo_danych,zrodlo_url,data_aktualizacji
++CT-01,"Centrum targowe – hala A, wejście główne",kujawsko-pomorskie,Bydgoszcz,Bydgoszcz,0461011,Bydgoszcz,,85-001,ul.,Przykładowa,,187,,,53.150120,18.017350,"Parter, ściana po lewej od wejścia głównego, zielona szafka z alarmem",true,0,ograniczony,false,Mo-Su 07:00-22:00,szafka_z_alarmem,W godzinach otwarcia – bez ograniczeń; poza nimi ochrona obiektu,sprawny,,,true,2027-09-30,2029-03-31,2026-11-02,zweryfikowany_przez_dysponenta,2026-11-15,Centrum Targowe Przykład Sp. z o.o.,,525550101,aed@centrum-przyklad.example,dysponent,,2026-11-21T10:15:00
++UM-RYN-1,"Stary Rynek – ratusz, wejście od rynku",kujawsko-pomorskie,Bydgoszcz,Bydgoszcz,0461011,Bydgoszcz,,85-002,rynek,Stary Rynek,,1,,,53.122640,17.999870,"Na zewnątrz, elewacja przy drzwiach głównych, podświetlana szafka",false,0,publiczny,true,,szafka_z_alarmem,,sprawny,,,true,2028-01-31,2030-06-30,2026-11-10,zweryfikowany_w_terenie,2026-11-10,Gmina Przykładowa,000000000,525550102,,dysponent,https://gmina-przyklad.example/aed,2026-11-20T08:00:00
++SP99-1,Szkoła Podstawowa nr 99 – sala gimnastyczna,kujawsko-pomorskie,Bydgoszcz,Bydgoszcz,0461011,Bydgoszcz,,85-003,ul.,Szkolna,,5A,,,53.131870,18.034410,"Parter, korytarz przy wejściu do sali gimnastycznej",true,0,ograniczony,false,Mo-Fr 07:00-17:00,zamkniety_na_klucz,Klucz w sekretariacie szkoły,sprawny,,,true,2026-12-31,2028-08-31,2026-09-01,zweryfikowany_przez_dysponenta,2026-09-01,Szkoła Podstawowa nr 99 (przykład),,,,dysponent,,2026-09-01T12:00:00
++SP99-2,Szkoła Podstawowa nr 99 – pokój nauczycielski,kujawsko-pomorskie,Bydgoszcz,Bydgoszcz,0461011,Bydgoszcz,,85-003,ul.,Szkolna,,5A,,,53.131870,18.034410,"I piętro, pokój nauczycielski, szafka przy drzwiach",true,1,ograniczony,false,Mo-Fr 07:00-17:00,szafka_otwarta,,sprawny,,,true,2027-06-30,2029-06-30,2026-09-01,zweryfikowany_przez_dysponenta,2026-09-01,Szkoła Podstawowa nr 99 (przykład),,,,dysponent,,2026-09-01T12:00:00
++OSP-PRZ-1,OSP Przykładowo – remiza,kujawsko-pomorskie,Bydgoszcz,Bydgoszcz,0461011,Bydgoszcz,,85-004,ul.,Strażacka,,12,,,53.105530,18.069920,"Na zewnątrz, ściana boczna remizy od strony parkingu",false,0,publiczny,true,,szafka_na_kod,Kod do szafki podaje dyspozytor 112,w_serwisie,,,false,2027-02-28,2027-02-28,2026-11-18,zweryfikowany_przez_dysponenta,2026-11-18,Ochotnicza Straż Pożarna Przykładowo,,,,dysponent,,2026-11-18T19:30:00
++ZOO-2,Park miejski – pawilon kasowy,kujawsko-pomorskie,Bydgoszcz,Bydgoszcz,0461011,Bydgoszcz,,85-005,al.,Parkowa,,2,,,53.140210,17.977560,"Wewnątrz pawilonu kasowego, za ladą – poprosić kasjera",true,0,ograniczony,false,Apr-Oct: Mo-Su 09:00-19:00; Nov-Mar: Mo-Su 09:00-16:00,brak,Dostępny przez personel kasy,niesprawny,,,false,2026-08-31,2028-05-31,2026-04-15,zweryfikowany_przez_dysponenta,2026-10-20,Zarząd Terenów Zieleni (przykład),,,,rejestr_publiczny,,2026-10-20T09:00:00
++ZGL-2026-0017,Pływalnia osiedlowa – recepcja,kujawsko-pomorskie,Bydgoszcz,Bydgoszcz,0461011,Bydgoszcz,,85-006,ul.,Sportowa,,8,,,53.114470,18.006780,"Recepcja, na ścianie za ladą",true,0,ograniczony,false,"Mo-Fr 06:00-22:00; Sa,Su 08:00-20:00",brak,,,,,,,,,,,,,,,zgloszenie_obywatelskie,,2026-11-19T21:12:00
++UNI-B-3,"Uczelnia – budynek B, portiernia",kujawsko-pomorskie,Bydgoszcz,Bydgoszcz,0461011,Bydgoszcz,,85-007,ul.,Akademicka,,3,,,53.127990,18.011230,"Parter, portiernia całodobowa, szafka obok okienka",true,0,publiczny,true,,szafka_otwarta,Budynek otwarty całą dobę – portier na miejscu,sprawny,Przykładowy Producent,AED-1000,true,2027-11-30,2030-01-31,2026-11-05,zweryfikowany_w_terenie,2026-11-05,Uczelnia Przykładowa,,,bhp@uczelnia.example,dysponent,,2026-11-05T14:40:00
+diff --git a/portal/backend/data/test_samples/aed/aed_zestawienie_przyklad.csv b/portal/backend/data/test_samples/aed/aed_zestawienie_przyklad.csv
+new file mode 100644
+index 0000000..22efc12
+--- /dev/null
++++ b/portal/backend/data/test_samples/aed/aed_zestawienie_przyklad.csv
+@@ -0,0 +1,9 @@
++id_aed,id_zrodlowe,nazwa_lokalizacji,wojewodztwo,powiat,gmina,kod_terc,miejscowosc,kod_simc,kod_pocztowy,cecha_ulicy,nazwa_ulicy,kod_ulic,numer_budynku,numer_lokalu,adres_uniwersalny,szerokosc_geograficzna,dlugosc_geograficzna,opis_lokalizacji,wewnatrz_budynku,kondygnacja,typ_dostepu,dostepny_24_7,godziny_dostepnosci,zabezpieczenie,instrukcja_dostepu,status_urzadzenia,producent,model,elektrody_pediatryczne,data_waznosci_elektrod,data_waznosci_baterii,data_ostatniego_przegladu,poziom_weryfikacji,data_weryfikacji,dysponent_nazwa,dysponent_regon,telefon_kontaktowy,email_kontaktowy,zrodlo_danych,zrodlo_url,data_aktualizacji,wymaga_przegladu,dysponent_z_wydawcy,przetworzenie,wydawca_zasobu,licencja_zasobu,id_zasobu_zrodlowego,url_zasobu_zrodlowego,data_danych_zasobu,data_agregacji
++PL-AED-7e649367c1b8,CT-01,"Centrum targowe – hala A, wejście główne",kujawsko-pomorskie,Bydgoszcz,Bydgoszcz,0461011,Bydgoszcz,,85-001,ul.,Przykładowa,,187,,,53.150120,18.017350,"Parter, ściana po lewej od wejścia głównego, zielona szafka z alarmem",true,0,ograniczony,false,Mo-Su 07:00-22:00,szafka_z_alarmem,W godzinach otwarcia – bez ograniczeń; poza nimi ochrona obiektu,sprawny,,,true,2027-09-30,2029-03-31,2026-11-02,zweryfikowany_przez_dysponenta,2026-11-15,Centrum Targowe Przykład Sp. z o.o.,,525550101,aed@centrum-przyklad.example,dysponent,,2026-11-21T10:15:00,false,false,,Gmina Przykładowa (PRZYKŁAD),CC0 1.0,900001,https://dane.gov.pl/pl/dataset/1/resource/900001,2026-11-20,2026-11-22T04:15:00
++PL-AED-65383850a61c,UM-RYN-1,"Stary Rynek – ratusz, wejście od rynku",kujawsko-pomorskie,Bydgoszcz,Bydgoszcz,0461011,Bydgoszcz,,85-002,rynek,Stary Rynek,,1,,,53.122640,17.999870,"Na zewnątrz, elewacja przy drzwiach głównych, podświetlana szafka",false,0,publiczny,true,,szafka_z_alarmem,,sprawny,,,true,2028-01-31,2030-06-30,2026-11-10,zweryfikowany_w_terenie,2026-11-10,Gmina Przykładowa,000000000,525550102,,dysponent,https://gmina-przyklad.example/aed,2026-11-20T08:00:00,false,false,,Gmina Przykładowa (PRZYKŁAD),CC0 1.0,900001,https://dane.gov.pl/pl/dataset/1/resource/900001,2026-11-20,2026-11-22T04:15:00
++PL-AED-fa27645d35c8,SP99-1,Szkoła Podstawowa nr 99 – sala gimnastyczna,kujawsko-pomorskie,Bydgoszcz,Bydgoszcz,0461011,Bydgoszcz,,85-003,ul.,Szkolna,,5A,,,53.131870,18.034410,"Parter, korytarz przy wejściu do sali gimnastycznej",true,0,ograniczony,false,Mo-Fr 07:00-17:00,zamkniety_na_klucz,Klucz w sekretariacie szkoły,sprawny,,,true,2026-12-31,2028-08-31,2026-09-01,zweryfikowany_przez_dysponenta,2026-09-01,Szkoła Podstawowa nr 99 (przykład),,,,dysponent,,2026-09-01T12:00:00,false,false,,Gmina Przykładowa (PRZYKŁAD),CC0 1.0,900001,https://dane.gov.pl/pl/dataset/1/resource/900001,2026-11-20,2026-11-22T04:15:00
++PL-AED-ab85f7fc510a,SP99-2,Szkoła Podstawowa nr 99 – pokój nauczycielski,kujawsko-pomorskie,Bydgoszcz,Bydgoszcz,0461011,Bydgoszcz,,85-003,ul.,Szkolna,,5A,,,53.131870,18.034410,"I piętro, pokój nauczycielski, szafka przy drzwiach",true,1,ograniczony,false,Mo-Fr 07:00-17:00,szafka_otwarta,,sprawny,,,true,2027-06-30,2029-06-30,2026-09-01,zweryfikowany_przez_dysponenta,2026-09-01,Szkoła Podstawowa nr 99 (przykład),,,,dysponent,,2026-09-01T12:00:00,false,false,,Gmina Przykładowa (PRZYKŁAD),CC0 1.0,900001,https://dane.gov.pl/pl/dataset/1/resource/900001,2026-11-20,2026-11-22T04:15:00
++PL-AED-9f808a3622dd,OSP-PRZ-1,OSP Przykładowo – remiza,kujawsko-pomorskie,Bydgoszcz,Bydgoszcz,0461011,Bydgoszcz,,85-004,ul.,Strażacka,,12,,,53.105530,18.069920,"Na zewnątrz, ściana boczna remizy od strony parkingu",false,0,publiczny,true,,szafka_na_kod,Kod do szafki podaje dyspozytor 112,w_serwisie,,,false,2027-02-28,2027-02-28,2026-11-18,zweryfikowany_przez_dysponenta,2026-11-18,Ochotnicza Straż Pożarna Przykładowo,,,,dysponent,,2026-11-18T19:30:00,false,false,,Gmina Przykładowa (PRZYKŁAD),CC0 1.0,900001,https://dane.gov.pl/pl/dataset/1/resource/900001,2026-11-20,2026-11-22T04:15:00
++PL-AED-8816bdaddea4,ZOO-2,Park miejski – pawilon kasowy,kujawsko-pomorskie,Bydgoszcz,Bydgoszcz,0461011,Bydgoszcz,,85-005,al.,Parkowa,,2,,,53.140210,17.977560,"Wewnątrz pawilonu kasowego, za ladą – poprosić kasjera",true,0,ograniczony,false,Apr-Oct: Mo-Su 09:00-19:00; Nov-Mar: Mo-Su 09:00-16:00,brak,Dostępny przez personel kasy,niesprawny,,,false,2026-08-31,2028-05-31,2026-04-15,zweryfikowany_przez_dysponenta,2026-10-20,Zarząd Terenów Zieleni (przykład),,,,rejestr_publiczny,,2026-10-20T09:00:00,true,false,,Gmina Przykładowa (PRZYKŁAD),CC0 1.0,900001,https://dane.gov.pl/pl/dataset/1/resource/900001,2026-11-20,2026-11-22T04:15:00
++PL-AED-60706a121134,ZGL-2026-0017,Pływalnia osiedlowa – recepcja,kujawsko-pomorskie,Bydgoszcz,Bydgoszcz,0461011,Bydgoszcz,,85-006,ul.,Sportowa,,8,,,53.114470,18.006780,"Recepcja, na ścianie za ladą",true,0,ograniczony,false,"Mo-Fr 06:00-22:00; Sa,Su 08:00-20:00",brak,,nieznany,,,,,,,niezweryfikowany,,Gmina Przykładowa (PRZYKŁAD),,,,zgloszenie_obywatelskie,,2026-11-19T21:12:00,,true,domyslne;dysponent_z_wydawcy,Gmina Przykładowa (PRZYKŁAD),CC0 1.0,900001,https://dane.gov.pl/pl/dataset/1/resource/900001,2026-11-20,2026-11-22T04:15:00
++PL-AED-2f3b76fdceb2,UNI-B-3,"Uczelnia – budynek B, portiernia",kujawsko-pomorskie,Bydgoszcz,Bydgoszcz,0461011,Bydgoszcz,,85-007,ul.,Akademicka,,3,,,53.127990,18.011230,"Parter, portiernia całodobowa, szafka obok okienka",true,0,publiczny,true,,szafka_otwarta,Budynek otwarty całą dobę – portier na miejscu,sprawny,Przykładowy Producent,AED-1000,true,2027-11-30,2030-01-31,2026-11-05,zweryfikowany_w_terenie,2026-11-05,Uczelnia Przykładowa,,,,dysponent,,2026-11-05T14:40:00,false,false,kontakt_usuniety,Starostwo Powiatowe Przykład (PRZYKŁAD),CC BY 4.0,900002,https://dane.gov.pl/pl/dataset/2/resource/900002,2026-11-19,2026-11-22T04:15:00
+diff --git a/portal/backend/data/test_samples/aed/krosno_54632.csv b/portal/backend/data/test_samples/aed/krosno_54632.csv
+new file mode 100644
+index 0000000..f03db39
+--- /dev/null
++++ b/portal/backend/data/test_samples/aed/krosno_54632.csv
+@@ -0,0 +1,22 @@
++Długość geograficzna,Szerokość geograficzna, Nazwa, Lokalizacja, Adres, Numer Id
++21.72034402175176,49.718809346153336,"Defibrylator","Zespół  Krytych Pływalni","ul. Jasna, 38-400 Krosno","1"
++21.71133598253567,49.719088753029276,"Defibrylator","Kampus Sportowo-dydaktyczny, portiernia","ul. Stanisława Wyspiańskiego 20, 38-400 Krosno","2"
++21.715090873839404,49.72174399261284,"Defibrylator","OSP Turaszówka","ul. Rzeszowska, 38-400 Krosno","3"
++21.749909495737537,49.706695518375945,"Defibrylator","OSP Białobrzegi","ul. Mikołaja Kopernika 17, 38-400 Krosno","4"
++21.75611258614517,49.69465763621457,"Defibrylator","Biuro Obsługi Klienta PGNiG","ul. Augusta Lewakowskiego 11, 38-400 Krosno","5"
++21.754469690437958,49.69638043514565,"Defibrylator","Regionalne Centrum Kultur Pogranicza","ul. Kolejowa 1, 38-400 Krosno","6"
++21.746365639365692,49.684573184910604,"Defibrylator","Kampus Techniczny, portiernia","ul. Franciszka Żwirki i Stanisława Wigury, 38-400 Krosno","7"
++21.765759126782257,49.694119216437514,"Defibrylator","Rektorat Państwowa Akademia Nauk Stosowanych","ul. Rynek 1, 38-400 Krosno","8"
++21.764685474955883,49.69275307484104,"Defibrylator","Państwowa Akademia Nauk Stosowanych","ul. Kazimierza Wielkiego 4, , 38-400 Krosno","9"
++21.76504873040803,49.692489647485594,"Defibrylator","Państwowa Akademia Nauk Stosowanych","ul. Kazimierza Wielkiego 4, , 38-400 Krosno","10"
++21.770282628403308,49.69599910236438,"Defibrylator","MPGK Krosno","ul. Aleksandra Fredry, 38-400 Krosno","11"
++21.783098460710946,49.70152282974884,"Defibrylator","Wojewódzki Szpital Podkarpacki w Krośnie","ul. Korczyńska 57, 38-400 Krosno","12"
++21.77560126708233,49.69222165953797,"Defibrylator","Hala Mosir Bursaki","ul. Bursaki 29, 38-400 Krosno","13"
++21.775953730106846,49.68610377238189,"Defibrylator","Zespół Krytych Pływalni","ul. Wojska Polskiego 45, 38-400 Krosno","14"
++21.773223600840677,49.67751294467392,"Defibrylator","Regionalna Dyrekcja Lasów Państwowych w Krośnie","ul. Bieszczadzka, 38-400 Krosno","15"
++21.77610827089202,49.67697483192884,"Defibrylator","Centrum Handlowe VIVO!","ul. Bieszczadzka 29, 38-400 Krosno","16"
++21.773166067646468,49.66947168313232,"Defibrylator","Kampus Politechniczny, portiernia","ul. Profesora Doktora Jerzego Dmochowskiego 12, 38-400 Krosno","17"
++21.763678690888117,49.66885045220135,"Defibrylator","OSP Suchodół","ul. Grunwaldzka, 38-400 Krosno","18"
++21.779275196328467,49.6840970026165,"Defibrylator","ZSP nr 4 im. Ignacego Łukasiewicza","ul. Bohaterów Westerplatte 20, 38-400 Krosno","19"
++21.771130722297613,49.683990115416655,"Defibrylator","Urząd Miasta Krosna","ul. Lwowska 28a, 38-400 Krosno","22"
++21.747439987244785,49.69557115700829,"Defibrylator","Dworzec","ul. Naftowa 23, 38-400 Krosno","23"
+diff --git a/portal/backend/data/test_samples/aed/legionowo_2625221.csv b/portal/backend/data/test_samples/aed/legionowo_2625221.csv
+new file mode 100644
+index 0000000..4eb4f61
+--- /dev/null
++++ b/portal/backend/data/test_samples/aed/legionowo_2625221.csv
+@@ -0,0 +1,25 @@
++﻿nazwa,cecha_ulicy,nazwa_ulicy,nr_budynku,nr_lokalu,kod_pocztowy,miejscowosc,kod_terc,kod_simc,szerokosc_geograficzna,dlugosc_geograficzna
++Urząd Miasta Legionowo,ulica,Piłsudskiego,41,,05-120,Legionowo,140801,0920806,52.395198,20.931382
++Starostwo Powiatowe,ulica,Sikorskiego,11,,05-119,Legionowo,140801,0920806,52.421807,20.939056
++Arena Legionowo,ulica,Chrobrego,50B,,05-120,Legionowo,140801,0920806,52.400177,20.917295
++Centrum Komunikacyjne,ulica,Kościuszki,8A,,05-120,Legionowo,140801,0920806,52.401135,20.940969
++Komenda Powiatowa Państwowej Straży Pożarnej,ulica,Jagiellońska,71A,,05-120,Legionowo,140801,0920806,52.408839,20.916510
++Ochotnicza Straż Pożarna,ulica,Mickiewicza,11,,05-120,Legionowo,140801,0920806,52.403239,20.930048
++Komenda Powiatowa Policji,ulica,Jagiellońska,26B,,05-120,Legionowo,140801,0920806,52.402691,20.927850
++Straż Miejska,ulica,Jagiellońska,26B,,05-120,Legionowo,140801,0920806,52.402691,20.927850
++Centrum Szkolenia Policji,ulica,Zegrzyńska,121,,05-119,Legionowo,140801,0920806,52.414488,20.952687
++"Pływalnia ""Wodne Piaski""",ulica,Piaskowa,1A,,05-119,Legionowo,140801,0920806,52.410412,20.947626
++Zespół Szkolno-Przedszkolny nr 2,ulica,Jagiellońska,67,,05-120,Legionowo,140801,0920806,52.405901,20.918020
++Klinika Mediq,ulica,Piłsudskiego,20,,05-120,Legionowo,140801,0920806,52.397458,20.933695
++Wojskowy Instytut Medyczny Szpital w Legionowie,ulica,Zegrzyńska,8,,05-119,Legionowo,140801,0920806,52.404009,20.950132
++Legio-Med. NZOZ,ulica,Husarska,14,,05-120,Legionowo,140801,0920806,52.391494,20.918366
++"Przychodnia lekarska ""Puls""",aleja,1 Dywizji Zmechanizowanej,16,,05-119,Legionowo,140801,0920806,52.407905,20.951152
++Parafia Matki Bożej Fatimskiej,ulica,Orląt Lwowskich,8,,05-119,Legionowo,140801,0920806,52.403689,20.955478
++Szkoła Podstawowa nr 8,ulica,Zegrzyńska,3,,05-119,Legionowo,140801,0920806,52.410253,20.948494
++Liceum Ogólnokształczące,ulica,Piłsudskiego,26,,05-120,Legionowo,140801,0920806,52.395922,20.929996
++Powiatowy Zespół Szkół Ponadpodstawowych,ulica,Targowa,73A,,05-120,Legionowo,140801,0920806,52.411683,20.917855
++Powiatowy Zespół Szkół i Placówek Specjalnych,ulica,Jagiellońska,69,,05-120,Legionowo,140801,0920806,52.407280,20.917662
++Parafia Najświętszego Ciała i Krwi Chrystusa,ulica,Piłsudskiego,47,,05-120,Legionowo,140801,0920806,52.392091,20.926457
++Zespół Szkolno-Przedszkolny nr 3,ulica,Królowej Jadwigi,7,,05-120,Legionowo,140801,0920806,52.394028,20.926166
++Faktoria,ulica,Siwińskiego,11,,05-120,Legionowo,140801,0920806,52.389337,20.921079
++Centrum Integracji Organizacji Pozarządowych,aleja,3 Maja,28,,05-120,Legionowo,140801,0920806,52.397203,20.927590
+diff --git a/portal/backend/data/test_samples/aed/marki_68353.csv b/portal/backend/data/test_samples/aed/marki_68353.csv
+new file mode 100644
+index 0000000..87dae2a
+--- /dev/null
++++ b/portal/backend/data/test_samples/aed/marki_68353.csv
+@@ -0,0 +1,9 @@
++"Długość geograficzna,Szerokość geograficzna, Nazwa, Lokalizacja, Adres, Numer Id"
++"52.326697, 21.107557,""Defibrylator"",""Urząd Miasta Marki "",""Al.. Piłsudskiego 95, 05-270 Marki"",""1"""
++"52.323960, 21.098185,""Defibrylator"",""Szkoła Podstawowa nr 1 "",""ul. Okólna 14, 05-270 Marki"",""2"""
++"52.317014, 21.104131,""Defibrylator"",""Szkoła Podstawowa nr 2 "",""ul. Szkolna 9, 05-270 Marki"",""3"""
++"52.340344, 21.113589,""Defibrylator"",""Szkoła Podstawowa nr 2 "",""ul. Pomnikowa 21, 05-270 Marki"",""4"""
++"52.322235, 21.105177,""Defibrylator"",""Filia-Szkoła Podstawowa nr 3 "",""ul. Duza 3, 05-270 Marki"",""5"""
++"52.322235, 21.105177,""Defibrylator"",""Zespół Szkół nr im. Jana Pawła II (liceum) "",""Al.. Piłsudskiego 96, 05-270 Marki"",""6"""
++"21.72034402175176,49.718809346153336,""Defibrylator"",""Szkoła Podstawowa nr 5 "",""ul. Wczsowa 5, 05-270 Marki"",""7"""
++"52.325445, 21.108176,""Defibrylator"",""Komisariat Policji "",""ul. Sportowa 5, 05-270 Marki"",""8"""
+diff --git a/portal/backend/data/test_samples/aed/przemysl_62095.csv b/portal/backend/data/test_samples/aed/przemysl_62095.csv
+new file mode 100644
+index 0000000..545fa84
+--- /dev/null
++++ b/portal/backend/data/test_samples/aed/przemysl_62095.csv
+@@ -0,0 +1,22 @@
++﻿id;name;description;category;city;street;home_number;postcode;phone;email;www;youtube_url;panorama_url;geometry;gallery;attachments;links
++744;Defibrylator (AED 9485) w ADM Centrum;Defibrylator AED (Automated External Defibrillator) to przenośne urządzenie medyczne, które zostało zaprojektowane w celu ratowania życia osobom z nagłym zatrzymaniem akcji serca (NZK). AED jest łatwy w użyciu, dzięki czemu mogą z niego korzystać osoby bez specjalistycznego wykształcenia medycznego. Po włączeniu urządzenia użytkownik jest prowadzony krok po kroku poprzez instrukcje głosowe oraz wizualne, które pomagają prawidłowo przeprowadzić resuscytację. Defibrylator AED analizuje rytm serca poszkodowanego i automatycznie określa, czy konieczne jest wykonanie defibrylacji, czyli impulsu elektrycznego mającego na celu przywrócenie prawidłowego rytmu serca. W przypadku, gdy defibrylacja jest potrzebna, AED wydaje polecenie naciśnięcia przycisku, który wyzwala impuls elektryczny. Urządzenie posiada wbudowane zabezpieczenia, które uniemożliwiają wykonanie defibrylacji, jeśli rytm serca nie wymaga takiej interwencji, co zwiększa bezpieczeństwo użytkownika. Defibrylatory AED są często instalowane w miejscach publicznych, takich jak lotniska, centra handlowe, dworce, oraz w miejscach pracy, aby zapewnić szybki dostęp do sprzętu ratującego życie w sytuacjach nagłego zatrzymania krążenia.;Defibrylatory AED;Przemyśl;Juliusza Słowackiego;12;37-700;;;;;;{"type":"Point","coordinates":{"lat":"49.7812096","long":"22.7750936"}};[1][url:https://przemysl.skycms.com.pl/download/156869/defibrylator-aed-9485-w-adm-centrum][thumbUrl:https://przemysl.skycms.com.pl/download/thumbnailCustom/156869/auto/120/defibrylator-aed-9485-w-adm-centrum][thumbUrlMedium:https://przemysl.skycms.com.pl/download/thumbnailCustom/156869/300/auto/defibrylator-aed-9485-w-adm-centrum];;
++745;Defibrylator (AED 9556) w I Liecum Ogólnokształcącym w Przemyślu;Defibrylator AED (Automated External Defibrillator) to przenośne urządzenie medyczne, które zostało zaprojektowane w celu ratowania życia osobom z nagłym zatrzymaniem akcji serca (NZK). AED jest łatwy w użyciu, dzięki czemu mogą z niego korzystać osoby bez specjalistycznego wykształcenia medycznego. Po włączeniu urządzenia użytkownik jest prowadzony krok po kroku poprzez instrukcje głosowe oraz wizualne, które pomagają prawidłowo przeprowadzić resuscytację. Defibrylator AED analizuje rytm serca poszkodowanego i automatycznie określa, czy konieczne jest wykonanie defibrylacji, czyli impulsu elektrycznego mającego na celu przywrócenie prawidłowego rytmu serca. W przypadku, gdy defibrylacja jest potrzebna, AED wydaje polecenie naciśnięcia przycisku, który wyzwala impuls elektryczny. Urządzenie posiada wbudowane zabezpieczenia, które uniemożliwiają wykonanie defibrylacji, jeśli rytm serca nie wymaga takiej interwencji, co zwiększa bezpieczeństwo użytkownika. Defibrylatory AED są często instalowane w miejscach publicznych, takich jak lotniska, centra handlowe, dworce, oraz w miejscach pracy, aby zapewnić szybki dostęp do sprzętu ratującego życie w sytuacjach nagłego zatrzymania krążenia.;Defibrylatory AED;Przemyśl;Juliusza Słowackiego;21;37-700;;lo1@um.przemysl.pl;https://lo1.przemysl.edu.pl;;;{"type":"Point","coordinates":{"lat":"49.7806393","long":"22.7771083"}};[1][url:https://przemysl.skycms.com.pl/download/156869/defibrylator-aed-9556-w-i-liecum-ogolnoksztalcacym-w-przemyslu][thumbUrl:https://przemysl.skycms.com.pl/download/thumbnailCustom/156869/auto/120/defibrylator-aed-9556-w-i-liecum-ogolnoksztalcacym-w-przemyslu][thumbUrlMedium:https://przemysl.skycms.com.pl/download/thumbnailCustom/156869/300/auto/defibrylator-aed-9556-w-i-liecum-ogolnoksztalcacym-w-przemyslu];;[1][title:Strona Internetowa Szkoły][url:https://sp6.przemysl.edu.pl][link_type:Oficjalna strona]
++746;Defibrylator (AED 9579) w Szkole Podstawowej Nr 6 w Przemyślu;Defibrylator AED (Automated External Defibrillator) to przenośne urządzenie medyczne, które zostało zaprojektowane w celu ratowania życia osobom z nagłym zatrzymaniem akcji serca (NZK). AED jest łatwy w użyciu, dzięki czemu mogą z niego korzystać osoby bez specjalistycznego wykształcenia medycznego. Po włączeniu urządzenia użytkownik jest prowadzony krok po kroku poprzez instrukcje głosowe oraz wizualne, które pomagają prawidłowo przeprowadzić resuscytację. Defibrylator AED analizuje rytm serca poszkodowanego i automatycznie określa, czy konieczne jest wykonanie defibrylacji, czyli impulsu elektrycznego mającego na celu przywrócenie prawidłowego rytmu serca. W przypadku, gdy defibrylacja jest potrzebna, AED wydaje polecenie naciśnięcia przycisku, który wyzwala impuls elektryczny. Urządzenie posiada wbudowane zabezpieczenia, które uniemożliwiają wykonanie defibrylacji, jeśli rytm serca nie wymaga takiej interwencji, co zwiększa bezpieczeństwo użytkownika. Defibrylatory AED są często instalowane w miejscach publicznych, takich jak lotniska, centra handlowe, dworce, oraz w miejscach pracy, aby zapewnić szybki dostęp do sprzętu ratującego życie w sytuacjach nagłego zatrzymania krążenia.;Defibrylatory AED;Przemyśl;Generała Mieczysława Boruty Spiechowicza;1;37-700;+48166779500;sp6@um.przemysl.pl;https://sp6.przemysl.edu.pl;;;{"type":"Point","coordinates":{"lat":"49.7972693","long":"22.7582092"}};[1][url:https://przemysl.skycms.com.pl/download/156869/defibrylator-aed-9579-w-szkole-podstawowej-nr-6-w-przemyslu][thumbUrl:https://przemysl.skycms.com.pl/download/thumbnailCustom/156869/auto/120/defibrylator-aed-9579-w-szkole-podstawowej-nr-6-w-przemyslu][thumbUrlMedium:https://przemysl.skycms.com.pl/download/thumbnailCustom/156869/300/auto/defibrylator-aed-9579-w-szkole-podstawowej-nr-6-w-przemyslu];;[1][title:Strona Internetowa Szkoły][url:https://sp6.przemysl.edu.pl][link_type:Oficjalna strona]
++747;Defibrylator (AED 7664) ul. Zamkowa 1;Defibrylator AED (Automated External Defibrillator) to przenośne urządzenie medyczne, które zostało zaprojektowane w celu ratowania życia osobom z nagłym zatrzymaniem akcji serca (NZK). AED jest łatwy w użyciu, dzięki czemu mogą z niego korzystać osoby bez specjalistycznego wykształcenia medycznego. Po włączeniu urządzenia użytkownik jest prowadzony krok po kroku poprzez instrukcje głosowe oraz wizualne, które pomagają prawidłowo przeprowadzić resuscytację. Defibrylator AED analizuje rytm serca poszkodowanego i automatycznie określa, czy konieczne jest wykonanie defibrylacji, czyli impulsu elektrycznego mającego na celu przywrócenie prawidłowego rytmu serca. W przypadku, gdy defibrylacja jest potrzebna, AED wydaje polecenie naciśnięcia przycisku, który wyzwala impuls elektryczny. Urządzenie posiada wbudowane zabezpieczenia, które uniemożliwiają wykonanie defibrylacji, jeśli rytm serca nie wymaga takiej interwencji, co zwiększa bezpieczeństwo użytkownika. Defibrylatory AED są często instalowane w miejscach publicznych, takich jak lotniska, centra handlowe, dworce, oraz w miejscach pracy, aby zapewnić szybki dostęp do sprzętu ratującego życie w sytuacjach nagłego zatrzymania krążenia.;Defibrylatory AED;Przemyśl;Zamkowa;1;37-700;;;;;;{"type":"Point","coordinates":{"lat":"49.7806472","long":"22.7684537"}};[1][url:https://przemysl.skycms.com.pl/download/156869/defibrylator-aed-7664-ul-zamkowa-1][thumbUrl:https://przemysl.skycms.com.pl/download/thumbnailCustom/156869/auto/120/defibrylator-aed-7664-ul-zamkowa-1][thumbUrlMedium:https://przemysl.skycms.com.pl/download/thumbnailCustom/156869/300/auto/defibrylator-aed-7664-ul-zamkowa-1];;
++748;Defibrylator (AED 9469) Muzeum Dzwonów i Fajek;Defibrylator AED (Automated External Defibrillator) to przenośne urządzenie medyczne, które zostało zaprojektowane w celu ratowania życia osobom z nagłym zatrzymaniem akcji serca (NZK). AED jest łatwy w użyciu, dzięki czemu mogą z niego korzystać osoby bez specjalistycznego wykształcenia medycznego. Po włączeniu urządzenia użytkownik jest prowadzony krok po kroku poprzez instrukcje głosowe oraz wizualne, które pomagają prawidłowo przeprowadzić resuscytację. Defibrylator AED analizuje rytm serca poszkodowanego i automatycznie określa, czy konieczne jest wykonanie defibrylacji, czyli impulsu elektrycznego mającego na celu przywrócenie prawidłowego rytmu serca. W przypadku, gdy defibrylacja jest potrzebna, AED wydaje polecenie naciśnięcia przycisku, który wyzwala impuls elektryczny. Urządzenie posiada wbudowane zabezpieczenia, które uniemożliwiają wykonanie defibrylacji, jeśli rytm serca nie wymaga takiej interwencji, co zwiększa bezpieczeństwo użytkownika. Defibrylatory AED są często instalowane w miejscach publicznych, takich jak lotniska, centra handlowe, dworce, oraz w miejscach pracy, aby zapewnić szybki dostęp do sprzętu ratującego życie w sytuacjach nagłego zatrzymania krążenia.;Defibrylatory AED;Przemyśl;Władycze;3;37-700;;;;;;{"type":"Point","coordinates":{"lat":"49.7818519","long":"22.7736413"}};[1][url:https://przemysl.skycms.com.pl/download/156869/defibrylator-aed-9469-muzeum-dzwonow-i-fajek][thumbUrl:https://przemysl.skycms.com.pl/download/thumbnailCustom/156869/auto/120/defibrylator-aed-9469-muzeum-dzwonow-i-fajek][thumbUrlMedium:https://przemysl.skycms.com.pl/download/thumbnailCustom/156869/300/auto/defibrylator-aed-9469-muzeum-dzwonow-i-fajek];;
++749;Defibrylator (AED 9471) Hala Sportowa POSiR;Defibrylator AED (Automated External Defibrillator) to przenośne urządzenie medyczne, które zostało zaprojektowane w celu ratowania życia osobom z nagłym zatrzymaniem akcji serca (NZK). AED jest łatwy w użyciu, dzięki czemu mogą z niego korzystać osoby bez specjalistycznego wykształcenia medycznego. Po włączeniu urządzenia użytkownik jest prowadzony krok po kroku poprzez instrukcje głosowe oraz wizualne, które pomagają prawidłowo przeprowadzić resuscytację. Defibrylator AED analizuje rytm serca poszkodowanego i automatycznie określa, czy konieczne jest wykonanie defibrylacji, czyli impulsu elektrycznego mającego na celu przywrócenie prawidłowego rytmu serca. W przypadku, gdy defibrylacja jest potrzebna, AED wydaje polecenie naciśnięcia przycisku, który wyzwala impuls elektryczny. Urządzenie posiada wbudowane zabezpieczenia, które uniemożliwiają wykonanie defibrylacji, jeśli rytm serca nie wymaga takiej interwencji, co zwiększa bezpieczeństwo użytkownika. Defibrylatory AED są często instalowane w miejscach publicznych, takich jak lotniska, centra handlowe, dworce, oraz w miejscach pracy, aby zapewnić szybki dostęp do sprzętu ratującego życie w sytuacjach nagłego zatrzymania krążenia.;Defibrylatory AED;Przemyśl;Adama Mickiewicza;30;37-700;;;;;;{"type":"Point","coordinates":{"lat":"49.7823222","long":"22.7837857"}};[1][url:https://przemysl.skycms.com.pl/download/156869/defibrylator-aed-9471-hala-sportowa-posir][thumbUrl:https://przemysl.skycms.com.pl/download/thumbnailCustom/156869/auto/120/defibrylator-aed-9471-hala-sportowa-posir][thumbUrlMedium:https://przemysl.skycms.com.pl/download/thumbnailCustom/156869/300/auto/defibrylator-aed-9471-hala-sportowa-posir];;
++751;Defibrylator (AED 9531) Wybrzeże Ojca Świętego Jana Pawła II;Defibrylator AED (Automated External Defibrillator) to przenośne urządzenie medyczne, które zostało zaprojektowane w celu ratowania życia osobom z nagłym zatrzymaniem akcji serca (NZK). AED jest łatwy w użyciu, dzięki czemu mogą z niego korzystać osoby bez specjalistycznego wykształcenia medycznego. Po włączeniu urządzenia użytkownik jest prowadzony krok po kroku poprzez instrukcje głosowe oraz wizualne, które pomagają prawidłowo przeprowadzić resuscytację. Defibrylator AED analizuje rytm serca poszkodowanego i automatycznie określa, czy konieczne jest wykonanie defibrylacji, czyli impulsu elektrycznego mającego na celu przywrócenie prawidłowego rytmu serca. W przypadku, gdy defibrylacja jest potrzebna, AED wydaje polecenie naciśnięcia przycisku, który wyzwala impuls elektryczny. Urządzenie posiada wbudowane zabezpieczenia, które uniemożliwiają wykonanie defibrylacji, jeśli rytm serca nie wymaga takiej interwencji, co zwiększa bezpieczeństwo użytkownika. Defibrylatory AED są często instalowane w miejscach publicznych, takich jak lotniska, centra handlowe, dworce, oraz w miejscach pracy, aby zapewnić szybki dostęp do sprzętu ratującego życie w sytuacjach nagłego zatrzymania krążenia.;Defibrylatory AED;Przemyśl;Wybrzeże Ojca Świętego Jana Pawła II;70;37-700;;;;;;{"type":"Point","coordinates":{"lat":"49.782701","long":"22.7482498"}};[1][url:https://przemysl.skycms.com.pl/download/156869/defibrylator-aed-9531-wybrzeze-ojca-swietego-jana-pawla-ii][thumbUrl:https://przemysl.skycms.com.pl/download/thumbnailCustom/156869/auto/120/defibrylator-aed-9531-wybrzeze-ojca-swietego-jana-pawla-ii][thumbUrlMedium:https://przemysl.skycms.com.pl/download/thumbnailCustom/156869/300/auto/defibrylator-aed-9531-wybrzeze-ojca-swietego-jana-pawla-ii];;
++752;Defibrylator (AED 9509) 3 Maja 19 (DH Szpak);Defibrylator AED (Automated External Defibrillator) to przenośne urządzenie medyczne, które zostało zaprojektowane w celu ratowania życia osobom z nagłym zatrzymaniem akcji serca (NZK). AED jest łatwy w użyciu, dzięki czemu mogą z niego korzystać osoby bez specjalistycznego wykształcenia medycznego. Po włączeniu urządzenia użytkownik jest prowadzony krok po kroku poprzez instrukcje głosowe oraz wizualne, które pomagają prawidłowo przeprowadzić resuscytację. Defibrylator AED analizuje rytm serca poszkodowanego i automatycznie określa, czy konieczne jest wykonanie defibrylacji, czyli impulsu elektrycznego mającego na celu przywrócenie prawidłowego rytmu serca. W przypadku, gdy defibrylacja jest potrzebna, AED wydaje polecenie naciśnięcia przycisku, który wyzwala impuls elektryczny. Urządzenie posiada wbudowane zabezpieczenia, które uniemożliwiają wykonanie defibrylacji, jeśli rytm serca nie wymaga takiej interwencji, co zwiększa bezpieczeństwo użytkownika. Defibrylatory AED są często instalowane w miejscach publicznych, takich jak lotniska, centra handlowe, dworce, oraz w miejscach pracy, aby zapewnić szybki dostęp do sprzętu ratującego życie w sytuacjach nagłego zatrzymania krążenia.;Defibrylatory AED;Przemyśl;3 Maja;19;37-700;;;;;;{"type":"Point","coordinates":{"lat":"49.7877625","long":"22.7659058"}};[1][url:https://przemysl.skycms.com.pl/download/156869/defibrylator-aed-9509-3-maja-19-dh-szpak-][thumbUrl:https://przemysl.skycms.com.pl/download/thumbnailCustom/156869/auto/120/defibrylator-aed-9509-3-maja-19-dh-szpak-][thumbUrlMedium:https://przemysl.skycms.com.pl/download/thumbnailCustom/156869/300/auto/defibrylator-aed-9509-3-maja-19-dh-szpak-];;
++753;Defibrylator (AED 9480) Plac Konstytucji 3 Maja 19 (Szalety Miejskie);Defibrylator AED (Automated External Defibrillator) to przenośne urządzenie medyczne, które zostało zaprojektowane w celu ratowania życia osobom z nagłym zatrzymaniem akcji serca (NZK). AED jest łatwy w użyciu, dzięki czemu mogą z niego korzystać osoby bez specjalistycznego wykształcenia medycznego. Po włączeniu urządzenia użytkownik jest prowadzony krok po kroku poprzez instrukcje głosowe oraz wizualne, które pomagają prawidłowo przeprowadzić resuscytację. Defibrylator AED analizuje rytm serca poszkodowanego i automatycznie określa, czy konieczne jest wykonanie defibrylacji, czyli impulsu elektrycznego mającego na celu przywrócenie prawidłowego rytmu serca. W przypadku, gdy defibrylacja jest potrzebna, AED wydaje polecenie naciśnięcia przycisku, który wyzwala impuls elektryczny. Urządzenie posiada wbudowane zabezpieczenia, które uniemożliwiają wykonanie defibrylacji, jeśli rytm serca nie wymaga takiej interwencji, co zwiększa bezpieczeństwo użytkownika. Defibrylatory AED są często instalowane w miejscach publicznych, takich jak lotniska, centra handlowe, dworce, oraz w miejscach pracy, aby zapewnić szybki dostęp do sprzętu ratującego życie w sytuacjach nagłego zatrzymania krążenia.;Defibrylatory AED;Przemyśl;Plac Konstytucji 3 Maja;;37-700;;;;;;{"type":"Point","coordinates":{"lat":"49.785488428961415","long":"22.76658728175353"}};[1][url:https://przemysl.skycms.com.pl/download/156869/defibrylator-aed-9480-plac-konstytucji-3-maja-19-szalety-miejskie-][thumbUrl:https://przemysl.skycms.com.pl/download/thumbnailCustom/156869/auto/120/defibrylator-aed-9480-plac-konstytucji-3-maja-19-szalety-miejskie-][thumbUrlMedium:https://przemysl.skycms.com.pl/download/thumbnailCustom/156869/300/auto/defibrylator-aed-9480-plac-konstytucji-3-maja-19-szalety-miejskie-];;
++754;Defibrylator (AED 9508) ul. 22 Stycznia 8;Defibrylator AED (Automated External Defibrillator) to przenośne urządzenie medyczne, które zostało zaprojektowane w celu ratowania życia osobom z nagłym zatrzymaniem akcji serca (NZK). AED jest łatwy w użyciu, dzięki czemu mogą z niego korzystać osoby bez specjalistycznego wykształcenia medycznego. Po włączeniu urządzenia użytkownik jest prowadzony krok po kroku poprzez instrukcje głosowe oraz wizualne, które pomagają prawidłowo przeprowadzić resuscytację. Defibrylator AED analizuje rytm serca poszkodowanego i automatycznie określa, czy konieczne jest wykonanie defibrylacji, czyli impulsu elektrycznego mającego na celu przywrócenie prawidłowego rytmu serca. W przypadku, gdy defibrylacja jest potrzebna, AED wydaje polecenie naciśnięcia przycisku, który wyzwala impuls elektryczny. Urządzenie posiada wbudowane zabezpieczenia, które uniemożliwiają wykonanie defibrylacji, jeśli rytm serca nie wymaga takiej interwencji, co zwiększa bezpieczeństwo użytkownika. Defibrylatory AED są często instalowane w miejscach publicznych, takich jak lotniska, centra handlowe, dworce, oraz w miejscach pracy, aby zapewnić szybki dostęp do sprzętu ratującego życie w sytuacjach nagłego zatrzymania krążenia.;Defibrylatory AED;Przemyśl;22 Stycznia;8;37-700;;;;;;{"type":"Point","coordinates":{"lat":"49.7887978","long":"22.7744382"}};[1][url:https://przemysl.skycms.com.pl/download/156869/defibrylator-aed-9508-ul-22-stycznia-8][thumbUrl:https://przemysl.skycms.com.pl/download/thumbnailCustom/156869/auto/120/defibrylator-aed-9508-ul-22-stycznia-8][thumbUrlMedium:https://przemysl.skycms.com.pl/download/thumbnailCustom/156869/300/auto/defibrylator-aed-9508-ul-22-stycznia-8];;
++755;Defibrylator (AED 9479) - Przystanek Autobusowy (ul. Jagiellońska / pl. Pileckiego);Defibrylator AED (Automated External Defibrillator)to przenośne urządzenie medyczne, które zostało zaprojektowane w celu ratowania życia osobom z nagłym zatrzymaniem akcji serca (NZK). AED jest łatwy w użyciu, dzięki czemu mogą z niego korzystać osoby bez specjalistycznego wykształcenia medycznego. Po włączeniu urządzenia użytkownik jest prowadzony krok po kroku poprzez instrukcje głosowe oraz wizualne, które pomagają prawidłowo przeprowadzić resuscytację. Defibrylator AED analizuje rytm serca poszkodowanego i automatycznie określa, czy konieczne jest wykonanie defibrylacji, czyli impulsu elektrycznego mającego na celu przywrócenie prawidłowego rytmu serca. W przypadku, gdy defibrylacja jest potrzebna, AED wydaje polecenie naciśnięcia przycisku, który wyzwala impuls elektryczny. Urządzenie posiada wbudowane zabezpieczenia, które uniemożliwiają wykonanie defibrylacji, jeśli rytm serca nie wymaga takiej interwencji, co zwiększa bezpieczeństwo użytkownika. Defibrylatory AED są często instalowane w miejscach publicznych, takich jak lotniska, centra handlowe, dworce, oraz w miejscach pracy, aby zapewnić szybki dostęp do sprzętu ratującego życie w sytuacjach nagłego zatrzymania krążenia.;Defibrylatory AED;Przemyśl;Jagiellońska;;37-700;;;;;;{"type":"Point","coordinates":{"lat":"49.783946716458324","long":"22.771487178504195"}};[1][url:https://przemysl.skycms.com.pl/download/156869/defibrylator-aed-9479-przystanek-autobusowy-ul-jagiellonska-pl-pileckiego-][thumbUrl:https://przemysl.skycms.com.pl/download/thumbnailCustom/156869/auto/120/defibrylator-aed-9479-przystanek-autobusowy-ul-jagiellonska-pl-pileckiego-][thumbUrlMedium:https://przemysl.skycms.com.pl/download/thumbnailCustom/156869/300/auto/defibrylator-aed-9479-przystanek-autobusowy-ul-jagiellonska-pl-pileckiego-];;
++756;Defibrylator (AED 9481) - Targowisko Zielony Rynek;Defibrylator AED (Automated External Defibrillator) to przenośne urządzenie medyczne, które zostało zaprojektowane w celu ratowania życia osobom z nagłym zatrzymaniem akcji serca (NZK). AED jest łatwy w użyciu, dzięki czemu mogą z niego korzystać osoby bez specjalistycznego wykształcenia medycznego. Po włączeniu urządzenia użytkownik jest prowadzony krok po kroku poprzez instrukcje głosowe oraz wizualne, które pomagają prawidłowo przeprowadzić resuscytację. Defibrylator AED analizuje rytm serca poszkodowanego i automatycznie określa, czy konieczne jest wykonanie defibrylacji, czyli impulsu elektrycznego mającego na celu przywrócenie prawidłowego rytmu serca. W przypadku, gdy defibrylacja jest potrzebna, AED wydaje polecenie naciśnięcia przycisku, który wyzwala impuls elektryczny. Urządzenie posiada wbudowane zabezpieczenia, które uniemożliwiają wykonanie defibrylacji, jeśli rytm serca nie wymaga takiej interwencji, co zwiększa bezpieczeństwo użytkownika. Defibrylatory AED są często instalowane w miejscach publicznych, takich jak lotniska, centra handlowe, dworce, oraz w miejscach pracy, aby zapewnić szybki dostęp do sprzętu ratującego życie w sytuacjach nagłego zatrzymania krążenia.;Defibrylatory AED;Przemyśl;Sportowa;2;37-700;;;;;;{"type":"Point","coordinates":{"lat":"49.7851","long":"22.772605"}};[1][url:https://przemysl.skycms.com.pl/download/156869/defibrylator-aed-9481-targowisko-zielony-rynek][thumbUrl:https://przemysl.skycms.com.pl/download/thumbnailCustom/156869/auto/120/defibrylator-aed-9481-targowisko-zielony-rynek][thumbUrlMedium:https://przemysl.skycms.com.pl/download/thumbnailCustom/156869/300/auto/defibrylator-aed-9481-targowisko-zielony-rynek];;
++757;Defibrylator (AED7639) Biblioteka Szkolna (ul. Aleksandra Dworskiego 98);Defibrylator AED (Automated External Defibrillator) to przenośne urządzenie medyczne, które zostało zaprojektowane w celu ratowania życia osobom z nagłym zatrzymaniem akcji serca (NZK). AED jest łatwy w użyciu, dzięki czemu mogą z niego korzystać osoby bez specjalistycznego wykształcenia medycznego. Po włączeniu urządzenia użytkownik jest prowadzony krok po kroku poprzez instrukcje głosowe oraz wizualne, które pomagają prawidłowo przeprowadzić resuscytację. Defibrylator AED analizuje rytm serca poszkodowanego i automatycznie określa, czy konieczne jest wykonanie defibrylacji, czyli impulsu elektrycznego mającego na celu przywrócenie prawidłowego rytmu serca. W przypadku, gdy defibrylacja jest potrzebna, AED wydaje polecenie naciśnięcia przycisku, który wyzwala impuls elektryczny. Urządzenie posiada wbudowane zabezpieczenia, które uniemożliwiają wykonanie defibrylacji, jeśli rytm serca nie wymaga takiej interwencji, co zwiększa bezpieczeństwo użytkownika. Defibrylatory AED są często instalowane w miejscach publicznych, takich jak lotniska, centra handlowe, dworce, oraz w miejscach pracy, aby zapewnić szybki dostęp do sprzętu ratującego życie w sytuacjach nagłego zatrzymania krążenia.;Defibrylatory AED;Przemyśl;Aleksandra Dworskiego;98;37-700;;;;;;{"type":"Point","coordinates":{"lat":"49.7781797","long":"22.7912987"}};[1][url:https://przemysl.skycms.com.pl/download/156869/defibrylator-aed7639-biblioteka-szkolna-ul-aleksandra-dworskiego-98-][thumbUrl:https://przemysl.skycms.com.pl/download/thumbnailCustom/156869/auto/120/defibrylator-aed7639-biblioteka-szkolna-ul-aleksandra-dworskiego-98-][thumbUrlMedium:https://przemysl.skycms.com.pl/download/thumbnailCustom/156869/300/auto/defibrylator-aed7639-biblioteka-szkolna-ul-aleksandra-dworskiego-98-];;
++758;Defibrylator (AED 7653) ul. Św. Jana Nepomucena 3;Defibrylator AED (Automated External Defibrillator) to przenośne urządzenie medyczne, które zostało zaprojektowane w celu ratowania życia osobom z nagłym zatrzymaniem akcji serca (NZK). AED jest łatwy w użyciu, dzięki czemu mogą z niego korzystać osoby bez specjalistycznego wykształcenia medycznego. Po włączeniu urządzenia użytkownik jest prowadzony krok po kroku poprzez instrukcje głosowe oraz wizualne, które pomagają prawidłowo przeprowadzić resuscytację. Defibrylator AED analizuje rytm serca poszkodowanego i automatycznie określa, czy konieczne jest wykonanie defibrylacji, czyli impulsu elektrycznego mającego na celu przywrócenie prawidłowego rytmu serca. W przypadku, gdy defibrylacja jest potrzebna, AED wydaje polecenie naciśnięcia przycisku, który wyzwala impuls elektryczny. Urządzenie posiada wbudowane zabezpieczenia, które uniemożliwiają wykonanie defibrylacji, jeśli rytm serca nie wymaga takiej interwencji, co zwiększa bezpieczeństwo użytkownika. Defibrylatory AED są często instalowane w miejscach publicznych, takich jak lotniska, centra handlowe, dworce, oraz w miejscach pracy, aby zapewnić szybki dostęp do sprzętu ratującego życie w sytuacjach nagłego zatrzymania krążenia.;Defibrylatory AED;Przemyśl;Św. Jana Nepomucena;3;37-700;;;;;;{"type":"Point","coordinates":{"lat":"49.7870277","long":"22.7618273"}};[1][url:https://przemysl.skycms.com.pl/download/156869/defibrylator-aed-7653-ul-sw-jana-nepomucena-3][thumbUrl:https://przemysl.skycms.com.pl/download/thumbnailCustom/156869/auto/120/defibrylator-aed-7653-ul-sw-jana-nepomucena-3][thumbUrlMedium:https://przemysl.skycms.com.pl/download/thumbnailCustom/156869/300/auto/defibrylator-aed-7653-ul-sw-jana-nepomucena-3];;
++759;Defibrylator (AED 7622) ul. Biskupa Jakuba Glazera 9;Defibrylator AED (Automated External Defibrillator) to przenośne urządzenie medyczne, które zostało zaprojektowane w celu ratowania życia osobom z nagłym zatrzymaniem akcji serca (NZK). AED jest łatwy w użyciu, dzięki czemu mogą z niego korzystać osoby bez specjalistycznego wykształcenia medycznego. Po włączeniu urządzenia użytkownik jest prowadzony krok po kroku poprzez instrukcje głosowe oraz wizualne, które pomagają prawidłowo przeprowadzić resuscytację. Defibrylator AED analizuje rytm serca poszkodowanego i automatycznie określa, czy konieczne jest wykonanie defibrylacji, czyli impulsu elektrycznego mającego na celu przywrócenie prawidłowego rytmu serca. W przypadku, gdy defibrylacja jest potrzebna, AED wydaje polecenie naciśnięcia przycisku, który wyzwala impuls elektryczny. Urządzenie posiada wbudowane zabezpieczenia, które uniemożliwiają wykonanie defibrylacji, jeśli rytm serca nie wymaga takiej interwencji, co zwiększa bezpieczeństwo użytkownika. Defibrylatory AED są często instalowane w miejscach publicznych, takich jak lotniska, centra handlowe, dworce, oraz w miejscach pracy, aby zapewnić szybki dostęp do sprzętu ratującego życie w sytuacjach nagłego zatrzymania krążenia.;Defibrylatory AED;Przemyśl;Biskupa Jakuba Glazera;9;37-700;;;;;;{"type":"Point","coordinates":{"lat":"49.7869557","long":"22.7593319"}};[1][url:https://przemysl.skycms.com.pl/download/156869/defibrylator-aed-7622-ul-biskupa-jakuba-glazera-9][thumbUrl:https://przemysl.skycms.com.pl/download/thumbnailCustom/156869/auto/120/defibrylator-aed-7622-ul-biskupa-jakuba-glazera-9][thumbUrlMedium:https://przemysl.skycms.com.pl/download/thumbnailCustom/156869/300/auto/defibrylator-aed-7622-ul-biskupa-jakuba-glazera-9];;
++760;Defibrylator (AED 7650) ul. Wodna 11 (Budynek Urzedu Miejskiego w Przemyślu);Defibrylator AED (Automated External Defibrillator) to przenośne urządzenie medyczne, które zostało zaprojektowane w celu ratowania życia osobom z nagłym zatrzymaniem akcji serca (NZK). AED jest łatwy w użyciu, dzięki czemu mogą z niego korzystać osoby bez specjalistycznego wykształcenia medycznego. Po włączeniu urządzenia użytkownik jest prowadzony krok po kroku poprzez instrukcje głosowe oraz wizualne, które pomagają prawidłowo przeprowadzić resuscytację. Defibrylator AED analizuje rytm serca poszkodowanego i automatycznie określa, czy konieczne jest wykonanie defibrylacji, czyli impulsu elektrycznego mającego na celu przywrócenie prawidłowego rytmu serca. W przypadku, gdy defibrylacja jest potrzebna, AED wydaje polecenie naciśnięcia przycisku, który wyzwala impuls elektryczny. Urządzenie posiada wbudowane zabezpieczenia, które uniemożliwiają wykonanie defibrylacji, jeśli rytm serca nie wymaga takiej interwencji, co zwiększa bezpieczeństwo użytkownika. Defibrylatory AED są często instalowane w miejscach publicznych, takich jak lotniska, centra handlowe, dworce, oraz w miejscach pracy, aby zapewnić szybki dostęp do sprzętu ratującego życie w sytuacjach nagłego zatrzymania krążenia.;Defibrylatory AED;Przemyśl;Wodna;11;37-700;;;;;;{"type":"Point","coordinates":{"lat":"49.783874","long":"22.7692654"}};[1][url:https://przemysl.skycms.com.pl/download/156869/defibrylator-aed-7650-ul-wodna-11-budynek-urzedu-miejskiego-w-przemyslu-][thumbUrl:https://przemysl.skycms.com.pl/download/thumbnailCustom/156869/auto/120/defibrylator-aed-7650-ul-wodna-11-budynek-urzedu-miejskiego-w-przemyslu-][thumbUrlMedium:https://przemysl.skycms.com.pl/download/thumbnailCustom/156869/300/auto/defibrylator-aed-7650-ul-wodna-11-budynek-urzedu-miejskiego-w-przemyslu-];;
++761;Defibrylator (AED 7660) Plac Legionów (obok dworca PKP);Defibrylator AED (Automated External Defibrillator) to przenośne urządzenie medyczne, które zostało zaprojektowane w celu ratowania życia osobom z nagłym zatrzymaniem akcji serca (NZK). AED jest łatwy w użyciu, dzięki czemu mogą z niego korzystać osoby bez specjalistycznego wykształcenia medycznego. Po włączeniu urządzenia użytkownik jest prowadzony krok po kroku poprzez instrukcje głosowe oraz wizualne, które pomagają prawidłowo przeprowadzić resuscytację. Defibrylator AED analizuje rytm serca poszkodowanego i automatycznie określa, czy konieczne jest wykonanie defibrylacji, czyli impulsu elektrycznego mającego na celu przywrócenie prawidłowego rytmu serca. W przypadku, gdy defibrylacja jest potrzebna, AED wydaje polecenie naciśnięcia przycisku, który wyzwala impuls elektryczny. Urządzenie posiada wbudowane zabezpieczenia, które uniemożliwiają wykonanie defibrylacji, jeśli rytm serca nie wymaga takiej interwencji, co zwiększa bezpieczeństwo użytkownika. Defibrylatory AED są często instalowane w miejscach publicznych, takich jak lotniska, centra handlowe, dworce, oraz w miejscach pracy, aby zapewnić szybki dostęp do sprzętu ratującego życie w sytuacjach nagłego zatrzymania krążenia.;Defibrylatory AED;Przemyśl;Plac Legionów;6;37-700;;;;;;{"type":"Point","coordinates":{"lat":"49.783769","long":"22.77925"}};[1][url:https://przemysl.skycms.com.pl/download/156869/defibrylator-aed-7660-plac-legionow-obok-dworca-pkp-][thumbUrl:https://przemysl.skycms.com.pl/download/thumbnailCustom/156869/auto/120/defibrylator-aed-7660-plac-legionow-obok-dworca-pkp-][thumbUrlMedium:https://przemysl.skycms.com.pl/download/thumbnailCustom/156869/300/auto/defibrylator-aed-7660-plac-legionow-obok-dworca-pkp-];;
++762;Defibrylator (AED7646) - Rynek 1 (Gmach Główny Urzędu Miejskiego);Defibrylator AED (Automated External Defibrillator) to przenośne urządzenie medyczne, które zostało zaprojektowane w celu ratowania życia osobom z nagłym zatrzymaniem akcji serca (NZK). AED jest łatwy w użyciu, dzięki czemu mogą z niego korzystać osoby bez specjalistycznego wykształcenia medycznego. Po włączeniu urządzenia użytkownik jest prowadzony krok po kroku poprzez instrukcje głosowe oraz wizualne, które pomagają prawidłowo przeprowadzić resuscytację. Defibrylator AED analizuje rytm serca poszkodowanego i automatycznie określa, czy konieczne jest wykonanie defibrylacji, czyli impulsu elektrycznego mającego na celu przywrócenie prawidłowego rytmu serca. W przypadku, gdy defibrylacja jest potrzebna, AED wydaje polecenie naciśnięcia przycisku, który wyzwala impuls elektryczny. Urządzenie posiada wbudowane zabezpieczenia, które uniemożliwiają wykonanie defibrylacji, jeśli rytm serca nie wymaga takiej interwencji, co zwiększa bezpieczeństwo użytkownika. Defibrylatory AED są często instalowane w miejscach publicznych, takich jak lotniska, centra handlowe, dworce, oraz w miejscach pracy, aby zapewnić szybki dostęp do sprzętu ratującego życie w sytuacjach nagłego zatrzymania krążenia.;Defibrylatory AED;Przemyśl;Rynek;1;37-700;;;;;;{"type":"Point","coordinates":{"lat":"49.7827443","long":"22.7690008"}};[1][url:https://przemysl.skycms.com.pl/download/156869/defibrylator-aed7646-rynek-1-gmach-glowny-urzedu-miejskiego-][thumbUrl:https://przemysl.skycms.com.pl/download/thumbnailCustom/156869/auto/120/defibrylator-aed7646-rynek-1-gmach-glowny-urzedu-miejskiego-][thumbUrlMedium:https://przemysl.skycms.com.pl/download/thumbnailCustom/156869/300/auto/defibrylator-aed7646-rynek-1-gmach-glowny-urzedu-miejskiego-];;
++763;Defibrylator (AED 7654) Aleje XXV Polskiej Drużyny Strzeleckiej 1 (PCKiN ZAMEK);Defibrylator AED (Automated External Defibrillator) to przenośne urządzenie medyczne, które zostało zaprojektowane w celu ratowania życia osobom z nagłym zatrzymaniem akcji serca (NZK). AED jest łatwy w użyciu, dzięki czemu mogą z niego korzystać osoby bez specjalistycznego wykształcenia medycznego. Po włączeniu urządzenia użytkownik jest prowadzony krok po kroku poprzez instrukcje głosowe oraz wizualne, które pomagają prawidłowo przeprowadzić resuscytację. Defibrylator AED analizuje rytm serca poszkodowanego i automatycznie określa, czy konieczne jest wykonanie defibrylacji, czyli impulsu elektrycznego mającego na celu przywrócenie prawidłowego rytmu serca. W przypadku, gdy defibrylacja jest potrzebna, AED wydaje polecenie naciśnięcia przycisku, który wyzwala impuls elektryczny. Urządzenie posiada wbudowane zabezpieczenia, które uniemożliwiają wykonanie defibrylacji, jeśli rytm serca nie wymaga takiej interwencji, co zwiększa bezpieczeństwo użytkownika. Defibrylatory AED są często instalowane w miejscach publicznych, takich jak lotniska, centra handlowe, dworce, oraz w miejscach pracy, aby zapewnić szybki dostęp do sprzętu ratującego życie w sytuacjach nagłego zatrzymania krążenia.;Defibrylatory AED;Przemyśl;Aleje XXV Polskiej Drużyny Strzeleckiej;1;37-700;;;;;;{"type":"Point","coordinates":{"lat":"49.780317","long":"22.7656931"}};[1][url:https://przemysl.skycms.com.pl/download/156869/defibrylator-aed-7654-aleje-xxv-polskiej-druzyny-strzeleckiej-1-pckin-zamek-][thumbUrl:https://przemysl.skycms.com.pl/download/thumbnailCustom/156869/auto/120/defibrylator-aed-7654-aleje-xxv-polskiej-druzyny-strzeleckiej-1-pckin-zamek-][thumbUrlMedium:https://przemysl.skycms.com.pl/download/thumbnailCustom/156869/300/auto/defibrylator-aed-7654-aleje-xxv-polskiej-druzyny-strzeleckiej-1-pckin-zamek-];;
++764;Defibrylator (AED 7639) Grunwaldzka 81 (Szkoła Podstawowa Nr 16 w Przemyslu);Defibrylator AED (Automated External Defibrillator) to przenośne urządzenie medyczne, które zostało zaprojektowane w celu ratowania życia osobom z nagłym zatrzymaniem akcji serca (NZK). AED jest łatwy w użyciu, dzięki czemu mogą z niego korzystać osoby bez specjalistycznego wykształcenia medycznego. Po włączeniu urządzenia użytkownik jest prowadzony krok po kroku poprzez instrukcje głosowe oraz wizualne, które pomagają prawidłowo przeprowadzić resuscytację. Defibrylator AED analizuje rytm serca poszkodowanego i automatycznie określa, czy konieczne jest wykonanie defibrylacji, czyli impulsu elektrycznego mającego na celu przywrócenie prawidłowego rytmu serca. W przypadku, gdy defibrylacja jest potrzebna, AED wydaje polecenie naciśnięcia przycisku, który wyzwala impuls elektryczny. Urządzenie posiada wbudowane zabezpieczenia, które uniemożliwiają wykonanie defibrylacji, jeśli rytm serca nie wymaga takiej interwencji, co zwiększa bezpieczeństwo użytkownika. Defibrylatory AED są często instalowane w miejscach publicznych, takich jak lotniska, centra handlowe, dworce, oraz w miejscach pracy, aby zapewnić szybki dostęp do sprzętu ratującego życie w sytuacjach nagłego zatrzymania krążenia.;Defibrylatory AED;Przemyśl;Grunwaldzka;81;37-700;;;;;;{"type":"Point","coordinates":{"lat":"49.7844038","long":"22.7549412"}};[1][url:https://przemysl.skycms.com.pl/download/156869/defibrylator-aed-7639-grunwaldzka-81-szkola-podstawowa-nr-16-w-przemyslu-][thumbUrl:https://przemysl.skycms.com.pl/download/thumbnailCustom/156869/auto/120/defibrylator-aed-7639-grunwaldzka-81-szkola-podstawowa-nr-16-w-przemyslu-][thumbUrlMedium:https://przemysl.skycms.com.pl/download/thumbnailCustom/156869/300/auto/defibrylator-aed-7639-grunwaldzka-81-szkola-podstawowa-nr-16-w-przemyslu-];;
++765;Defibrylator (AED 7649) Bpa. Jakuba Glazera 44 (II Liceum Ogólnoksztalcące w Przemyślu);Defibrylator AED (Automated External Defibrillator) to przenośne urządzenie medyczne, które zostało zaprojektowane w celu ratowania życia osobom z nagłym zatrzymaniem akcji serca (NZK). AED jest łatwy w użyciu, dzięki czemu mogą z niego korzystać osoby bez specjalistycznego wykształcenia medycznego. Po włączeniu urządzenia użytkownik jest prowadzony krok po kroku poprzez instrukcje głosowe oraz wizualne, które pomagają prawidłowo przeprowadzić resuscytację. Defibrylator AED analizuje rytm serca poszkodowanego i automatycznie określa, czy konieczne jest wykonanie defibrylacji, czyli impulsu elektrycznego mającego na celu przywrócenie prawidłowego rytmu serca. W przypadku, gdy defibrylacja jest potrzebna, AED wydaje polecenie naciśnięcia przycisku, który wyzwala impuls elektryczny. Urządzenie posiada wbudowane zabezpieczenia, które uniemożliwiają wykonanie defibrylacji, jeśli rytm serca nie wymaga takiej interwencji, co zwiększa bezpieczeństwo użytkownika. Defibrylatory AED są często instalowane w miejscach publicznych, takich jak lotniska, centra handlowe, dworce, oraz w miejscach pracy, aby zapewnić szybki dostęp do sprzętu ratującego życie w sytuacjach nagłego zatrzymania krążenia.;Defibrylatory AED;Przemyśl;Bpa. Jakuba Glazera;44;37-700;;;;;;{"type":"Point","coordinates":{"lat":"49.7916725","long":"22.7531132"}};[1][url:https://przemysl.skycms.com.pl/download/156869/defibrylator-aed-7649-bpa-jakuba-glazera-44-ii-liceum-ogolnoksztalcace-w-przemyslu-][thumbUrl:https://przemysl.skycms.com.pl/download/thumbnailCustom/156869/auto/120/defibrylator-aed-7649-bpa-jakuba-glazera-44-ii-liceum-ogolnoksztalcace-w-przemyslu-][thumbUrlMedium:https://przemysl.skycms.com.pl/download/thumbnailCustom/156869/300/auto/defibrylator-aed-7649-bpa-jakuba-glazera-44-ii-liceum-ogolnoksztalcace-w-przemyslu-];;
+diff --git a/portal/backend/mcod/celeryapp.py b/portal/backend/mcod/celeryapp.py
+index 7e5ddce..0066b62 100644
+--- a/portal/backend/mcod/celeryapp.py
++++ b/portal/backend/mcod/celeryapp.py
+@@ -47,7 +47,10 @@ def update_beat_schedule(beat_schedule_to_update: dict, update_data: str) -> boo
+ 
+ 
+ def get_beat_schedule(
+-    enable_monthly_reports: bool, enable_create_xml_metadata_report: bool, update_beat_schedule_data: str = ""
++    enable_monthly_reports: bool,
++    enable_create_xml_metadata_report: bool,
++    update_beat_schedule_data: str = "",
++    enable_aed_aggregation: bool = False,
+ ) -> dict:
+     """Create a schedule for Celery Beat, with monthly reports
+     if `enable_monthly_reports` is `True`.
+@@ -165,6 +168,17 @@ def get_beat_schedule(
+             }
+         )
+ 
++    if enable_aed_aggregation:
++        beat_schedule.update(
++            {
++                "aed_main_resource_creation": {
++                    "task": "mcod.resources.tasks.create_main_aed_resource_task",
++                    "options": default_options,
++                    "schedule": crontab(minute=15, hour=4),
++                },
++            }
++        )
++
+     if update_beat_schedule_data:
+         update_beat_schedule(beat_schedule, update_beat_schedule_data)
+ 
+@@ -175,4 +189,5 @@ app.conf.beat_schedule = get_beat_schedule(
+     enable_monthly_reports=settings.ENABLE_MONTHLY_REPORTS,
+     enable_create_xml_metadata_report=settings.ENABLE_CREATE_XML_METADATA_REPORT,
+     update_beat_schedule_data=settings.UPDATE_TASKS_CELERY_BEAT_TIME,
++    enable_aed_aggregation=settings.AED_AGGREGATION_ENABLED,
+ )
+diff --git a/portal/backend/mcod/core/api/utils/views.py b/portal/backend/mcod/core/api/utils/views.py
+index e9f8530..9177dc1 100644
+--- a/portal/backend/mcod/core/api/utils/views.py
++++ b/portal/backend/mcod/core/api/utils/views.py
+@@ -99,6 +99,7 @@ class OpenApiSpec:
+             schema=res_responses.AggregatedDGAInfoApiResponse,
+             many=False,
+         )
++        spec.components.schema("AggregatedAEDInfo", schema=res_responses.AggregatedAEDInfoApiResponse, many=False)
+         spec.components.schema("Charts", schema=res_responses.ChartApiResponse, many=True)
+         spec.components.schema("Chart", schema=res_responses.ChartApiResponse, many=False)
+         spec.components.schema("ResourceTable", schema=res_responses.TableApiResponse, many=True)
+@@ -120,6 +121,7 @@ class OpenApiSpec:
+         spec.path(resource=res_views.ResourcesView)
+         spec.path(resource=res_views.ResourceView)
+         spec.path(resource=res_views.AggregatedDGAInfoView)
++        spec.path(resource=res_views.AggregatedAEDInfoView)
+         spec.path(resource=res_views.ResourceTableView)
+         spec.path(resource=res_views.ResourceTableRowView)
+         spec.path(resource=search_views.SearchView)
+diff --git a/portal/backend/mcod/core/tests/fixtures/__init__.py b/portal/backend/mcod/core/tests/fixtures/__init__.py
+index 9b89048..911d0f9 100644
+--- a/portal/backend/mcod/core/tests/fixtures/__init__.py
++++ b/portal/backend/mcod/core/tests/fixtures/__init__.py
+@@ -5,6 +5,7 @@ import requests_mock
+ from django.conf import settings
+ from falcon.util.structures import Context
+ 
++from mcod.core.tests.fixtures.aed import *  # noqa
+ from mcod.core.tests.fixtures.api_fixtures import *  # noqa
+ from mcod.core.tests.fixtures.bdd import *  # noqa
+ from mcod.core.tests.fixtures.beat_schedule import *  # noqa
+diff --git a/portal/backend/mcod/core/tests/fixtures/aed.py b/portal/backend/mcod/core/tests/fixtures/aed.py
+new file mode 100644
+index 0000000..5d88a3c
+--- /dev/null
++++ b/portal/backend/mcod/core/tests/fixtures/aed.py
+@@ -0,0 +1,58 @@
++from pathlib import Path
++from typing import Callable
++
++import factory
++import pytest
++from django.conf import settings
++
++from mcod.datasets.factories import DatasetFactory
++from mcod.datasets.models import Dataset
++from mcod.organizations.factories import OrganizationFactory
++from mcod.organizations.models import Organization
++from mcod.resources.factories import ResourceFactory
++from mcod.resources.models import Resource
++
++
++@pytest.fixture
++def aed_dataset() -> Dataset:
++    return DatasetFactory.create(customfields={"standard": "AED"}, status="published", license_chosen=Dataset.LICENSE_CC0)
++
++
++@pytest.fixture
++def aed_resource_factory(aed_dataset: Dataset) -> Callable[..., Resource]:
++    """Tworzy opublikowany zasób AED po udanej walidacji z pliku z `data/test_samples/aed/`."""
++
++    def create(file_name: str = "legionowo_2625221.csv", **kwargs) -> Resource:
++        params = {
++            "dataset": aed_dataset,
++            "type": "file",
++            "format": "csv",
++            "status": "published",
++            "data_tasks_last_status": "SUCCESS",
++            "file_tasks_last_status": "SUCCESS",
++            "link_tasks_last_status": "SUCCESS",
++            "main_file__file": factory.django.FileField(
++                from_path=Path(settings.TEST_SAMPLES_PATH, "aed", file_name),
++                filename=file_name,
++            ),
++        }
++        params.update(kwargs)
++        return ResourceFactory.create(**params)
++
++    return create
++
++
++@pytest.fixture
++def main_aed_owner_organization() -> Organization:
++    return OrganizationFactory.create(pk=settings.MAIN_AED_DATASET_OWNER_ORGANIZATION_PK)
++
++
++@pytest.fixture
++def main_aed_dataset(main_aed_owner_organization: Organization) -> Dataset:
++    return DatasetFactory.create(
++        organization=main_aed_owner_organization,
++        title=settings.MAIN_AED_DATASET_DEFAULT_TITLE,
++        customfields={"standard": "AED", "zestawienie": "AED-krajowe"},
++        license_chosen=Dataset.LICENSE_CC_BY,
++        status="published",
++    )
+diff --git a/portal/backend/mcod/datasets/forms.py b/portal/backend/mcod/datasets/forms.py
+index 1b74897..5f848c1 100644
+--- a/portal/backend/mcod/datasets/forms.py
++++ b/portal/backend/mcod/datasets/forms.py
+@@ -81,6 +81,13 @@ class DatasetForm(ModelFormWithKeywords, HighValueDataFormValidatorMixin):
+         label=_("Customfields"),
+         widget=JsonPairDatasetInputs(val_attrs={"size": 35}, key_attrs={"class": "large"}),
+         required=False,
++        help_text=(
++            "Wykaz AED: aby zasoby tego zbioru trafiły do krajowego Wykazu AED, dodaj pole "
++            "o nazwie <b>standard</b> i wartości <b>AED</b>. Zasoby muszą być plikami CSV lub XLSX "
++            "z kolumnami wzorcowego zakresu danych AED (co najmniej: nazwa_lokalizacji, miejscowosc, "
++            "szerokosc_geograficzna, dlugosc_geograficzna). Zbiór musi mieć licencję CC0 1.0 lub CC BY 4.0. "
++            "Kontakty podawaj wyłącznie instytucjonalne."
++        ),
+     )
+ 
+     status = forms.ChoiceField(
+diff --git a/portal/backend/mcod/datasets/tests/test_aed_customfields_help.py b/portal/backend/mcod/datasets/tests/test_aed_customfields_help.py
+new file mode 100644
+index 0000000..8a3be12
+--- /dev/null
++++ b/portal/backend/mcod/datasets/tests/test_aed_customfields_help.py
+@@ -0,0 +1,22 @@
++import pytest
++
++from mcod.datasets.forms import DatasetForm
++from mcod.lib.widgets import JsonPairDatasetInputs
++from mcod.resources.aed_constants import AED_MINIMUM_COLUMNS
++
++
++@pytest.mark.feat_main_aed
++def test_customfields_help_text_mentions_aed():
++    help_text = DatasetForm.base_fields["customfields"].help_text
++
++    assert "<b>standard</b>" in help_text
++    assert "<b>AED</b>" in help_text
++    assert all(column in help_text for column in AED_MINIMUM_COLUMNS)
++
++
++@pytest.mark.feat_main_aed
++def test_customfields_field_unchanged():
++    field = DatasetForm.base_fields["customfields"]
++
++    assert field.required is False
++    assert isinstance(field.widget, JsonPairDatasetInputs)
+diff --git a/portal/backend/mcod/resources/aed_aggregation.py b/portal/backend/mcod/resources/aed_aggregation.py
+new file mode 100644
+index 0000000..f2c0194
+--- /dev/null
++++ b/portal/backend/mcod/resources/aed_aggregation.py
+@@ -0,0 +1,253 @@
++"""
++Reguły budowy zasobu zbiorczego „Zestawienie AED”.
++
++Moduł nie importuje Django ani ORM portalu: przyjmuje `DataFrame` i słownik metadanych zasobu,
++dzięki czemu da się go testować i uruchamiać poza portalem (`demo/agreguj.py`).
++Implementacja referencyjna reguł: `format_danych/zrodla_wzorca/generuj_dane.py`
++(`_norm`, `id_aed`, `wymaga_przegladu`, `powod_pominiecia`, `zestaw`).
++"""
++
++import csv
++import datetime
++import hashlib
++import io
++import re
++import unicodedata
++from typing import Any, Dict, Iterable, List, Optional, Set, Tuple
++
++import pandas as pd
++
++from mcod.resources.aed_constants import (
++    AED_HEADER_ALIASES,
++    AED_ID_PREFIX,
++    AED_MINIMUM_COLUMNS,
++    AED_TEMPLATE_COLUMNS,
++    DEFAULT_STATUS,
++    DEFAULT_VERIFICATION,
++    LAT_RANGE,
++    LON_RANGE,
++    MAIN_AED_COLUMNS,
++    OSM_SOURCE_VALUE,
++    PROCESSING_AXES,
++    PROCESSING_CODES_ORDER,
++    PROCESSING_CONTACT_REMOVED,
++    PROCESSING_DEFAULTS,
++    PROCESSING_HEADERS,
++    PROCESSING_OPERATOR_FROM_PUBLISHER,
++)
++
++LAT = "szerokosc_geograficzna"
++LON = "dlugosc_geograficzna"
++TABULAR_EXTENSIONS: Tuple[str, ...] = ("csv", "xls", "xlsx")
++_COORDINATE_RE = re.compile(r"^-?\d+(\.\d+)?$")
++
++
++def _strip_accents(value: str) -> str:
++    value = unicodedata.normalize("NFKD", str(value).replace("ł", "l").replace("Ł", "L"))
++    return "".join(c for c in value if not unicodedata.combining(c))
++
++
++def _norm(value: str) -> str:
++    return " ".join(_strip_accents(value).lower().split())
++
++
++def normalize_header(name: str) -> str:
++    return re.sub(r"[^a-z0-9]+", "_", _strip_accents(name).lower()).strip("_")
++
++
++def rename_with_aliases(df: pd.DataFrame) -> Tuple[pd.DataFrame, Set[str]]:
++    """
++    Zwraca ramkę z kolumnami przemianowanymi na nazwy wzorca (kolumny spoza wzorca są pomijane)
++    oraz zbiór oryginalnych nazw kolumn, których nazwa się zmieniła.
++
++    Nazwa wzorca po normalizacji ma pierwszeństwo przed aliasem; przy dwóch kolumnach źródła
++    mapowanych na ten sam cel wygrywa pierwsza od lewej.
++    """
++    normalized = [normalize_header(col) for col in df.columns]
++    targets: Dict[int, str] = {}
++    taken: Set[str] = set()
++    for i, n in enumerate(normalized):
++        if n in AED_TEMPLATE_COLUMNS and n not in taken:
++            targets[i] = n
++            taken.add(n)
++    for i, n in enumerate(normalized):
++        alias = AED_HEADER_ALIASES.get(n)
++        if i not in targets and alias and alias not in taken:
++            targets[i] = alias
++            taken.add(alias)
++
++    positions = sorted(targets)
++    renamed = df.iloc[:, positions].copy()
++    renamed.columns = [targets[i] for i in positions]
++    changed = {str(df.columns[i]) for i in positions if str(df.columns[i]) != targets[i]}
++    return renamed, changed
++
++
++def missing_minimum_columns(columns: Iterable[str]) -> List[str]:
++    present = set(columns)
++    return [c for c in AED_MINIMUM_COLUMNS if c not in present]
++
++
++def to_text(value: Any) -> str:
++    if value is None or value is pd.NaT:
++        return ""
++    if pd.api.types.is_bool(value):
++        return "true" if value else "false"
++    if isinstance(value, (datetime.date, datetime.datetime)):
++        return value.isoformat()
++    if isinstance(value, float) and value != value:
++        return ""
++    return str(value).strip()
++
++
++def read_tabular_bytes(content: bytes, extension: str) -> pd.DataFrame:
++    """
++    Wczytuje plik CSV, XLS lub XLSX z wartościami jako tekst: bez rzutowania typów, żeby zachować
++    wartości literalne (np. zera wiodące w kodach SIMC i TERC). CSV: UTF-8 (z BOM lub bez), awaryjnie
++    CP1250; separator wykrywany spośród `,`, `;`, tabulatora i `|`.
++    """
++    if extension in ("xls", "xlsx"):
++        return pd.read_excel(io.BytesIO(content), dtype=object).applymap(to_text)
++    if extension != "csv":
++        raise ValueError(f"nieobsługiwany format: {extension}")
++    try:
++        text = content.decode("utf-8-sig")
++    except UnicodeDecodeError:
++        text = content.decode("cp1250")
++    try:
++        delimiter = csv.Sniffer().sniff(text[:65536], delimiters=",;\t|").delimiter
++    except csv.Error:
++        delimiter = ","
++    return pd.read_csv(io.StringIO(text), sep=delimiter, dtype=str, keep_default_na=False)
++
++
++def _parse_coordinate(value: str) -> Optional[float]:
++    return float(value) if _COORDINATE_RE.match(value or "") else None
++
++
++def fix_swapped_axes(row: Dict[str, str]) -> bool:
++    lat, lon = _parse_coordinate(row.get(LAT, "")), _parse_coordinate(row.get(LON, ""))
++    if lat is None or lon is None:
++        return False
++    lat_ok = LAT_RANGE[0] <= lat <= LAT_RANGE[1]
++    if not lat_ok and LAT_RANGE[0] <= lon <= LAT_RANGE[1] and LON_RANGE[0] <= lat <= LON_RANGE[1]:
++        row[LAT], row[LON] = row[LON], row[LAT]
++        return True
++    return False
++
++
++def skip_reason(row: Dict[str, str]) -> Optional[str]:
++    if (row.get("zrodlo_danych") or "").strip().lower() == OSM_SOURCE_VALUE:
++        return "licencja ODbL (OpenStreetMap)"
++    empty = [c for c in AED_MINIMUM_COLUMNS if not row.get(c)]
++    if empty:
++        return f"brak wartości: {', '.join(empty)}"
++    lat, lon = _parse_coordinate(row[LAT]), _parse_coordinate(row[LON])
++    if lat is None or lon is None:
++        return "nieprawidłowe współrzędne"
++    if not (LAT_RANGE[0] <= lat <= LAT_RANGE[1] and LON_RANGE[0] <= lon <= LON_RANGE[1]):
++        return "współrzędne poza Polską"
++    return None
++
++
++def compute_id_aed(institution_id: int, row: Dict[str, str]) -> str:
++    if row.get("id_zrodlowe"):
++        key = f"{institution_id}|{row['id_zrodlowe']}"
++    else:
++        key = f"{institution_id}|{_norm(row['nazwa_lokalizacji'])}|{float(row[LAT]):.5f}|{float(row[LON]):.5f}"
++    return AED_ID_PREFIX + hashlib.sha1(key.encode("utf-8")).hexdigest()[:12]
++
++
++def _parse_date(value: str) -> Optional[datetime.date]:
++    try:
++        return datetime.date.fromisoformat(value[:10])
++    except (TypeError, ValueError):
++        return None
++
++
++def needs_inspection(row: Dict[str, str], today: datetime.date) -> str:
++    electrodes, battery, inspection = (
++        _parse_date(row.get(k) or "") for k in ("data_waznosci_elektrod", "data_waznosci_baterii", "data_ostatniego_przegladu")
++    )
++    if not (electrodes or battery or inspection):
++        return ""
++    overdue = (
++        (electrodes is not None and electrodes < today)
++        or (battery is not None and battery < today)
++        or (inspection is not None and inspection < today - datetime.timedelta(days=365))
++    )
++    return "true" if overdue else "false"
++
++
++def _processing(codes: Set[str]) -> str:
++    return ";".join(code for code in PROCESSING_CODES_ORDER if code in codes)
++
++
++def build_aggregate_rows(
++    df: pd.DataFrame, source: Dict[str, Any], aggregated_at: str
++) -> Tuple[pd.DataFrame, List[Dict[str, Any]]]:
++    """
++    Zamienia ramkę zasobu dostawcy na wiersze zasobu zbiorczego (kolumny `MAIN_AED_COLUMNS`).
++
++    `source`: institution_id, publisher, license, resource_id, url, data_date, personal_data.
++    Zwraca też listę pominięć `{"wiersz": nr, "powod": ...}`; wiersz 0 oznacza cały zasób.
++    """
++    renamed, changed_headers = rename_with_aliases(df)
++    missing = missing_minimum_columns(renamed.columns)
++    if missing:
++        return pd.DataFrame(columns=MAIN_AED_COLUMNS), [{"wiersz": 0, "powod": f"brak kolumn: {', '.join(missing)}"}]
++
++    today = datetime.date.fromisoformat(aggregated_at[:10])
++    provenance = {
++        "wydawca_zasobu": to_text(source.get("publisher")),
++        "licencja_zasobu": to_text(source.get("license")),
++        "id_zasobu_zrodlowego": to_text(source.get("resource_id")),
++        "url_zasobu_zrodlowego": to_text(source.get("url")),
++        "data_danych_zasobu": to_text(source.get("data_date")),
++        "data_agregacji": aggregated_at,
++    }
++    rows: List[Dict[str, str]] = []
++    skipped: List[Dict[str, Any]] = []
++    for number, record in enumerate(renamed.to_dict("records"), start=2):
++        row = {c: to_text(record.get(c)) for c in AED_TEMPLATE_COLUMNS}
++        codes: Set[str] = {PROCESSING_HEADERS} if changed_headers else set()
++        if fix_swapped_axes(row):
++            codes.add(PROCESSING_AXES)
++        reason = skip_reason(row)
++        if reason:
++            skipped.append({"wiersz": number, "powod": reason})
++            continue
++
++        aed_id = compute_id_aed(source["institution_id"], row)
++        for column, default in (("status_urzadzenia", DEFAULT_STATUS), ("poziom_weryfikacji", DEFAULT_VERIFICATION)):
++            if not row[column]:
++                row[column] = default
++                codes.add(PROCESSING_DEFAULTS)
++        operator_from_publisher = not row["dysponent_nazwa"]
++        if operator_from_publisher:
++            row["dysponent_nazwa"] = provenance["wydawca_zasobu"]
++            codes.add(PROCESSING_OPERATOR_FROM_PUBLISHER)
++        if source.get("personal_data") and (row["telefon_kontaktowy"] or row["email_kontaktowy"]):
++            row["telefon_kontaktowy"] = row["email_kontaktowy"] = ""
++            codes.add(PROCESSING_CONTACT_REMOVED)
++
++        row.update(
++            id_aed=aed_id,
++            wymaga_przegladu=needs_inspection(row, today),
++            dysponent_z_wydawcy="true" if operator_from_publisher else "false",
++            przetworzenie=_processing(codes),
++            **provenance,
++        )
++        rows.append(row)
++
++    return pd.DataFrame(rows, columns=MAIN_AED_COLUMNS), skipped
++
++
++def to_csv_bytes(df: pd.DataFrame) -> bytes:
++    """CSV wg RFC 4180: przecinek, CRLF, jeden nagłówek, UTF-8 bez BOM."""
++    buffer = io.StringIO(newline="")
++    writer = csv.writer(buffer, delimiter=",", quotechar='"', quoting=csv.QUOTE_MINIMAL, lineterminator="\r\n")
++    writer.writerow(list(df.columns))
++    for values in df.itertuples(index=False, name=None):
++        writer.writerow([to_text(v) for v in values])
++    return buffer.getvalue().encode("utf-8")
+diff --git a/portal/backend/mcod/resources/aed_constants.py b/portal/backend/mcod/resources/aed_constants.py
+new file mode 100644
+index 0000000..959c2d0
+--- /dev/null
++++ b/portal/backend/mcod/resources/aed_constants.py
+@@ -0,0 +1,131 @@
++from typing import Dict, List, Tuple
++
++# Stałe dodatku „Zestawienie AED”. Plik importuje wyłącznie `typing`, bo korzysta z niego
++# również czysta logika agregacji (`aed_aggregation.py`) uruchamiana poza Django.
++#
++# Kolejność kolumn jest kontraktem: wzorzec dostawcy v2 (41 kolumn) i zasób zbiorczy (51 kolumn)
++# muszą odpowiadać schematom `format_danych/schemat/aed_punkty.tableschema.json`
++# i `format_danych/schemat/aed_zestawienie.tableschema.json`.
++
++AED_TEMPLATE_COLUMNS: List[str] = [
++    "id_zrodlowe",
++    "nazwa_lokalizacji",
++    "wojewodztwo",
++    "powiat",
++    "gmina",
++    "kod_terc",
++    "miejscowosc",
++    "kod_simc",
++    "kod_pocztowy",
++    "cecha_ulicy",
++    "nazwa_ulicy",
++    "kod_ulic",
++    "numer_budynku",
++    "numer_lokalu",
++    "adres_uniwersalny",
++    "szerokosc_geograficzna",
++    "dlugosc_geograficzna",
++    "opis_lokalizacji",
++    "wewnatrz_budynku",
++    "kondygnacja",
++    "typ_dostepu",
++    "dostepny_24_7",
++    "godziny_dostepnosci",
++    "zabezpieczenie",
++    "instrukcja_dostepu",
++    "status_urzadzenia",
++    "producent",
++    "model",
++    "elektrody_pediatryczne",
++    "data_waznosci_elektrod",
++    "data_waznosci_baterii",
++    "data_ostatniego_przegladu",
++    "poziom_weryfikacji",
++    "data_weryfikacji",
++    "dysponent_nazwa",
++    "dysponent_regon",
++    "telefon_kontaktowy",
++    "email_kontaktowy",
++    "zrodlo_danych",
++    "zrodlo_url",
++    "data_aktualizacji",
++]
++
++AED_COMPUTED_COLUMNS: List[str] = ["wymaga_przegladu", "dysponent_z_wydawcy", "przetworzenie"]
++
++AED_PROVENANCE_COLUMNS: List[str] = [
++    "wydawca_zasobu",
++    "licencja_zasobu",
++    "id_zasobu_zrodlowego",
++    "url_zasobu_zrodlowego",
++    "data_danych_zasobu",
++    "data_agregacji",
++]
++
++MAIN_AED_COLUMNS: List[str] = ["id_aed"] + AED_TEMPLATE_COLUMNS + AED_COMPUTED_COLUMNS + AED_PROVENANCE_COLUMNS
++
++# Bez tych kolumn zasób nie trafia do zestawienia, a bez tych wartości nie trafia wiersz.
++AED_MINIMUM_COLUMNS: List[str] = ["nazwa_lokalizacji", "miejscowosc", "szerokosc_geograficzna", "dlugosc_geograficzna"]
++
++# Klucz: znormalizowany nagłówek źródła (normalize_header), wartość: kolumna wzorca.
++# Tylko aliasy jednoznaczne; „lokalizacja”, „adres” czy „description” celowo pominięte.
++AED_HEADER_ALIASES: Dict[str, str] = {
++    "nazwa": "nazwa_lokalizacji",
++    "name": "nazwa_lokalizacji",
++    "nr_budynku": "numer_budynku",
++    "numer_domu": "numer_budynku",
++    "home_number": "numer_budynku",
++    "nr_lokalu": "numer_lokalu",
++    "szerokosc": "szerokosc_geograficzna",
++    "lat": "szerokosc_geograficzna",
++    "latitude": "szerokosc_geograficzna",
++    "dlugosc": "dlugosc_geograficzna",
++    "lon": "dlugosc_geograficzna",
++    "lng": "dlugosc_geograficzna",
++    "longitude": "dlugosc_geograficzna",
++    "miasto": "miejscowosc",
++    "city": "miejscowosc",
++    "ulica": "nazwa_ulicy",
++    "street": "nazwa_ulicy",
++    "kod": "kod_pocztowy",
++    "postcode": "kod_pocztowy",
++    "telefon": "telefon_kontaktowy",
++    "phone": "telefon_kontaktowy",
++    "email": "email_kontaktowy",
++    "e_mail": "email_kontaktowy",
++    "id": "id_zrodlowe",
++    "numer_id": "id_zrodlowe",
++}
++
++# Wartości zwracane przez `Dataset.license_name`. ODbL i licencje „share-alike” nie wchodzą do zestawienia.
++AED_ALLOWED_LICENSES: Tuple[str, ...] = ("CC0 1.0", "CC BY 4.0")
++
++# Oznaczenie zbiorów przez „Pola niestandardowe” (`Dataset.customfields`) – bez migracji.
++AED_CUSTOMFIELD_STANDARD_KEY = "standard"
++AED_CUSTOMFIELD_STANDARD_VALUE = "AED"
++AED_CUSTOMFIELD_AGGREGATE_KEY = "zestawienie"
++AED_CUSTOMFIELD_AGGREGATE_VALUE = "AED-krajowe"
++
++# Kody kolumny `przetworzenie` (art. 15 ust. 1 pkt 2 ustawy); kolejność = kolejność w kolumnie.
++PROCESSING_HEADERS = "naglowki"
++PROCESSING_AXES = "osie"
++PROCESSING_DEFAULTS = "domyslne"
++PROCESSING_OPERATOR_FROM_PUBLISHER = "dysponent_z_wydawcy"
++PROCESSING_CONTACT_REMOVED = "kontakt_usuniety"
++PROCESSING_CODES_ORDER: List[str] = [
++    PROCESSING_HEADERS,
++    PROCESSING_AXES,
++    PROCESSING_DEFAULTS,
++    PROCESSING_OPERATOR_FROM_PUBLISHER,
++    PROCESSING_CONTACT_REMOVED,
++]
++
++# Brak wiedzy nie oznacza „sprawny”.
++DEFAULT_STATUS = "nieznany"
++DEFAULT_VERIFICATION = "niezweryfikowany"
++OSM_SOURCE_VALUE = "openstreetmap"
++
++LAT_RANGE: Tuple[float, float] = (49.0, 54.9)
++LON_RANGE: Tuple[float, float] = (14.1, 24.2)
++
++AED_ID_PREFIX = "PL-AED-"
+diff --git a/portal/backend/mcod/resources/aed_utils.py b/portal/backend/mcod/resources/aed_utils.py
+new file mode 100644
+index 0000000..cc96788
+--- /dev/null
++++ b/portal/backend/mcod/resources/aed_utils.py
+@@ -0,0 +1,451 @@
++import datetime
++import json
++import logging
++import os
++from mimetypes import guess_all_extensions
++from pathlib import Path
++from typing import TYPE_CHECKING, Any, Dict, Iterable, List, Optional, Set, Tuple
++
++import pandas as pd
++import requests
++import sentry_sdk
++from cache_memoize import cache_memoize
++from django.apps import apps
++from django.conf import settings
++from django.core.cache import caches
++from django.core.exceptions import ObjectDoesNotExist
++from django.core.files.uploadedfile import SimpleUploadedFile
++from django.db import transaction
++
++from mcod.resources.aed_aggregation import (
++    LAT,
++    LON,
++    TABULAR_EXTENSIONS,
++    build_aggregate_rows,
++    read_tabular_bytes,
++    to_csv_bytes,
++    to_text,
++)
++from mcod.resources.aed_constants import (
++    AED_ALLOWED_LICENSES,
++    AED_CUSTOMFIELD_AGGREGATE_KEY,
++    AED_CUSTOMFIELD_AGGREGATE_VALUE,
++    AED_CUSTOMFIELD_STANDARD_KEY,
++    AED_CUSTOMFIELD_STANDARD_VALUE,
++    MAIN_AED_COLUMNS,
++)
++from mcod.resources.dga_utils import request_remote_dga
++
++if TYPE_CHECKING:
++    from mcod.categories.models import Category
++    from mcod.datasets.models import Dataset
++    from mcod.resources.models import Resource
++    from mcod.tags.models import Tag
++
++logger = logging.getLogger("mcod")
++
++
++class AEDSourceReadError(Exception):
++    """Zasobu źródłowego AED nie da się odczytać jako tabeli."""
++
++
++def _customfields(dataset: "Dataset") -> Dict[str, str]:
++    """Pola niestandardowe zbioru z kluczami po `strip().lower()`; `customfields` bywa None, słownikiem lub napisem JSON."""
++    value = getattr(dataset, "customfields", None)
++    if isinstance(value, str):
++        try:
++            value = json.loads(value)
++        except ValueError:
++            return {}
++    if not isinstance(value, dict):
++        return {}
++    return {str(key).strip().lower(): str(val).strip() for key, val in value.items() if val is not None}
++
++
++def is_aed_dataset(dataset: "Dataset") -> bool:
++    value = _customfields(dataset).get(AED_CUSTOMFIELD_STANDARD_KEY, "").upper()
++    return value == AED_CUSTOMFIELD_STANDARD_VALUE or value.startswith(AED_CUSTOMFIELD_STANDARD_VALUE + " ")
++
++
++def is_main_aed_dataset(dataset: "Dataset") -> bool:
++    value = _customfields(dataset).get(AED_CUSTOMFIELD_AGGREGATE_KEY, "")
++    return value.lower() == AED_CUSTOMFIELD_AGGREGATE_VALUE.lower()
++
++
++def get_aed_source_resources() -> List["Resource"]:
++    """
++    Zasoby źródłowe wykazu AED: opublikowane, z poprawnym plikiem i linkiem, ze zbiorów oznaczonych
++    `standard = AED` (poza zbiorem zbiorczym), z licencją CC0 lub CC BY 4.0 i w formacie tabelarycznym.
++
++    W odróżnieniu od DGA nie wymagamy `data_tasks_last_status = SUCCESS`: walidacja danych portalu sprawdza
++    typy zgadywane z pierwszych wierszy (np. "5A" w `numer_budynku` po wierszach z liczbami), więc odrzuca
++    pliki zgodne ze wzorcem. Zgodność ze wzorcem sprawdza agregacja (kolumny, wartości, powód pominięcia).
++    """
++    Resource = apps.get_model("resources", "Resource")
++    candidates = (
++        Resource.objects.filter(
++            status="published",
++            dataset__status="published",
++            file_tasks_last_status="SUCCESS",
++            link_tasks_last_status="SUCCESS",
++            dataset__customfields__isnull=False,
++        )
++        .select_related("dataset__organization")
++        .order_by("dataset__organization__title", "pk")
++    )
++    selected: List["Resource"] = []
++    for resource in candidates:
++        dataset = resource.dataset
++        if not is_aed_dataset(dataset) or is_main_aed_dataset(dataset):
++            continue
++        reason: Optional[str] = None
++        if dataset.license_name not in AED_ALLOWED_LICENSES:
++            reason = f"licencja {dataset.license_name} nie pozwala na włączenie do wykazu"
++        elif not resource.has_tabular_format():
++            reason = f"format {resource.format} nie jest tabelaryczny"
++        if reason:
++            logger.info("Pomijam zasób %s zbioru AED %s: %s", resource.pk, dataset.pk, reason)
++            continue
++        selected.append(resource)
++    return selected
++
++
++def get_source_meta(resource: "Resource") -> Dict[str, Any]:
++    return {
++        "institution_id": resource.institution.pk,
++        "publisher": resource.institution.title,
++        "license": resource.dataset.license_name,
++        "resource_id": resource.pk,
++        "url": resource.frontend_absolute_url,
++        "data_date": resource.data_date.isoformat() if resource.data_date else "",
++        "personal_data": bool(resource.dataset.license_condition_personal_data),
++    }
++
++
++def _remote_tabular_extension(response: requests.models.Response) -> Optional[str]:
++    content_type = response.headers.get("Content-Type", "").split(";")[0].strip()
++    extensions = [ext.lstrip(".") for ext in guess_all_extensions(content_type)] if content_type else []
++    return next((ext for ext in TABULAR_EXTENSIONS if ext in extensions), None)
++
++
++def _get_ckan_aed_source_df(resource: "Resource") -> pd.DataFrame:
++    if not resource.link:
++        raise AEDSourceReadError("zasób z CKAN nie ma linku")
++    try:
++        response = request_remote_dga(resource.link)
++    except requests.exceptions.RequestException as exc:
++        raise AEDSourceReadError(f"serwer dostawcy nie odpowiada: {exc}") from exc
++    extension = _remote_tabular_extension(response) if response.status_code == 200 else None
++    if extension is None:
++        raise AEDSourceReadError("zasób nie jest plikiem tabelarycznym")
++    try:
++        return read_tabular_bytes(response.content, extension)
++    except Exception as exc:
++        raise AEDSourceReadError(f"nie można odczytać pliku {extension}: {exc}") from exc
++
++
++def _get_local_file_aed_source_df(resource: "Resource") -> pd.DataFrame:
++    extension = (resource.format or "").lower()
++    if not resource.main_file or extension not in TABULAR_EXTENSIONS:
++        raise AEDSourceReadError("zasób nie ma danych tabelarycznych w portalu")
++    try:
++        with open(resource.main_file.path, "rb") as source_file:
++            return read_tabular_bytes(source_file.read(), extension)
++    except Exception as exc:
++        raise AEDSourceReadError(f"nie można odczytać pliku {extension}: {exc}") from exc
++
++
++def get_aed_source_df(resource: "Resource") -> pd.DataFrame:
++    """
++    Dane zasobu jako tekst; zasoby z CKAN pobierane spod `resource.link`, pozostałe z danych tabelarycznych
++    portalu, a gdy ich brak (np. walidacja danych portalu odrzuciła zgadnięte typy), wprost z pliku zasobu.
++    """
++    if resource.is_imported_from_ckan:
++        return _get_ckan_aed_source_df(resource)
++    tabular_data = resource.tabular_data
++    if tabular_data is None:
++        return _get_local_file_aed_source_df(resource)
++    try:
++        rows = tabular_data.table.read(keyed=True, cast=False)
++    except Exception as exc:
++        raise AEDSourceReadError(f"nie można odczytać danych tabelarycznych: {exc}") from exc
++    return pd.DataFrame(rows).applymap(to_text)
++
++
++def create_main_aed_df(resources: Iterable["Resource"], aggregated_at: str) -> Tuple[pd.DataFrame, Dict[str, Any]]:
++    """
++    Buduje ramkę zasobu zbiorczego AED. Zasób, którego nie da się odczytać lub który nie ma kolumn minimum,
++    jest pomijany z powodem w `stats` i nie przerywa agregacji.
++    """
++    stats: Dict[str, Any] = {"zasoby_przyjete": 0, "zasoby_pominiete": [], "wiersze": 0, "wiersze_pominiete": 0}
++    parts: List[pd.DataFrame] = []
++    for resource in resources:
++        try:
++            df = get_aed_source_df(resource)
++        except AEDSourceReadError as exc:
++            sentry_sdk.api.capture_exception(exc)
++            logger.error("Pomijam zasób źródłowy AED %s, bo nie da się go odczytać: %s", resource.pk, exc)
++            stats["zasoby_pominiete"].append({"resource_id": resource.pk, "powod": str(exc)})
++            continue
++
++        rows, skipped = build_aggregate_rows(df, get_source_meta(resource), aggregated_at)
++        resource_skips = [skip for skip in skipped if skip["wiersz"] == 0]
++        if resource_skips:
++            reason = resource_skips[0]["powod"]
++            logger.warning("Pomijam zasób źródłowy AED %s: %s", resource.pk, reason)
++            stats["zasoby_pominiete"].append({"resource_id": resource.pk, "powod": reason})
++            continue
++
++        for skip in skipped:
++            logger.info("Pomijam wiersz %s zasobu AED %s: %s", skip["wiersz"], resource.pk, skip["powod"])
++        stats["zasoby_przyjete"] += 1
++        stats["wiersze_pominiete"] += len(skipped)
++        parts.append(rows)
++
++    main_df = pd.concat(parts, ignore_index=True) if parts else pd.DataFrame(columns=MAIN_AED_COLUMNS)
++    stats["wiersze"] = len(main_df)
++    logger.info(
++        "Wykaz AED: przyjęte zasoby %s, pominięte %s, wiersze %s, pominięte wiersze %s.",
++        stats["zasoby_przyjete"],
++        len(stats["zasoby_pominiete"]),
++        stats["wiersze"],
++        stats["wiersze_pominiete"],
++    )
++    return main_df, stats
++
++
++def get_main_aed_dataset() -> Optional["Dataset"]:
++    Dataset = apps.get_model("datasets", "Dataset")
++    datasets = Dataset.objects.filter(
++        organization_id=settings.MAIN_AED_DATASET_OWNER_ORGANIZATION_PK,
++        status="published",
++        is_removed=False,
++    ).order_by("-pk")
++    return next((dataset for dataset in datasets if is_main_aed_dataset(dataset)), None)
++
++
++def get_main_aed_resource() -> Optional["Resource"]:
++    dataset = get_main_aed_dataset()
++    if dataset is None:
++        return None
++    return dataset.resources.filter(status="published", is_removed=False).order_by("-pk").first()
++
++
++def key_generator_for_create_main_aed_file(*args, **kwargs) -> str:
++    return "main_aed_csv_path_to_clean"
++
++
++def get_or_create_main_aed_path() -> Path:
++    directory = Path(settings.MAIN_AED_RESOURCE_CSV_CREATION_ROOT)
++    directory.mkdir(parents=True, exist_ok=True)
++    today_date = datetime.datetime.now().strftime("%Y%m%d")
++    return directory / f"{settings.MAIN_AED_CSV_FILE_NAME_PREFIX} {today_date}.csv"
++
++
++@cache_memoize(
++    timeout=settings.MAIN_AED_RESOURCE_CSV_CREATION_CACHE_TIMEOUT,
++    hit_callable=lambda *args, **kwargs: logger.info("Using cache for main AED file path."),
++    key_generator_callable=key_generator_for_create_main_aed_file,
++)
++def create_main_aed_file() -> Path:
++    """Zapisuje CSV zasobu zbiorczego AED (51 kolumn, RFC 4180) i zwraca ścieżkę pliku."""
++    aggregated_at = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
++    main_df, stats = create_main_aed_df(get_aed_source_resources(), aggregated_at)
++    file_path = get_or_create_main_aed_path()
++    file_path.write_bytes(to_csv_bytes(main_df))
++    logger.info("Created main AED file %s; stats: %s", file_path, stats)
++    return file_path
++
++
++def build_aed_tabular_schema(columns: List[str]) -> Dict[str, Any]:
++    """
++    Schemat Table Schema zasobu zbiorczego: wszystkie kolumny tekstowe (wartości literalne) i mapowanie mapy
++    w formacie `ResourceMapsAndPlotsWidget`. `missingValues` = [] (zasób bez znaków specjalnych), więc potok
++    `process_resource_file_data_task` nie nadpisuje schematu.
++    """
++    fields: List[Dict[str, Any]] = [{"name": column, "type": "string", "format": "default"} for column in columns]
++    geo: Dict[str, Dict[str, Any]] = {}
++    for geo_type, column in (("b", LAT), ("l", LON), ("label", "nazwa_lokalizacji")):
++        index = columns.index(column)
++        fields[index]["geo"] = geo_type
++        geo[geo_type] = {"col_name": column, "col_index": index}
++    return {"fields": fields, "missingValues": [], "geo": geo}
++
++
++def get_default_main_aed_dataset_categories() -> List["Category"]:
++    Category = apps.get_model("categories", "Category")
++    titles: List[str] = settings.MAIN_AED_DATASET_CATEGORIES_TITLES
++    found = list(Category.objects.filter(title__in=titles))
++    missing: Set[str] = set(titles) - {category.title for category in found}
++    for title in missing:
++        logger.warning(f"No category with title {title} found.")
++    return found
++
++
++def get_or_create_default_main_aed_dataset_tags() -> List["Tag"]:
++    Tag = apps.get_model("tags", "Tag")
++    pl_lang = settings.LANGUAGES[0][0]
++    tags = []
++    for name in settings.MAIN_AED_DATASET_TAGS_NAMES:
++        tag, created = Tag.objects.get_or_create(name=name, language=pl_lang)
++        if created:
++            logger.info(f"Created Tag with name {name}.")
++        tags.append(tag)
++    return tags
++
++
++def create_main_aed_dataset() -> int:
++    """Tworzy zbiór zbiorczy Wykazu AED rozpoznawany po polach niestandardowych (bez nowego modelu)."""
++    Organization = apps.get_model("organizations", "Organization")
++    Dataset = apps.get_model("datasets", "Dataset")
++
++    organization_pk: int = settings.MAIN_AED_DATASET_OWNER_ORGANIZATION_PK
++    try:
++        institution = Organization.objects.get(pk=organization_pk)
++    except Organization.DoesNotExist:
++        logger.error(f"Can't create main AED dataset. Institution with pk {organization_pk} not found.")
++        raise ObjectDoesNotExist("Main AED Owner Institution not found.")
++
++    with transaction.atomic():
++        dataset = Dataset.objects.create(
++            title=settings.MAIN_AED_DATASET_DEFAULT_TITLE,
++            notes=settings.MAIN_AED_DATASET_DEFAULT_DESC,
++            organization=institution,
++            customfields={
++                AED_CUSTOMFIELD_STANDARD_KEY: AED_CUSTOMFIELD_STANDARD_VALUE,
++                AED_CUSTOMFIELD_AGGREGATE_KEY: AED_CUSTOMFIELD_AGGREGATE_VALUE,
++            },
++            license_chosen=Dataset.LICENSE_CC_BY,
++            update_notification_recipient_email=settings.MAIN_AED_DATASET_UPDATE_NOTIFICATION_EMAIL,
++            has_dynamic_data=False,
++            has_high_value_data=False,
++            has_high_value_data_from_ec_list=False,
++            has_research_data=False,
++            update_frequency="daily",
++            status="published",
++        )
++        dataset.categories.set(get_default_main_aed_dataset_categories())
++        dataset.tags.set(get_or_create_default_main_aed_dataset_tags())
++        dataset.save()
++
++    logger.info(f"Created main AED dataset {dataset.pk}.")
++    return dataset.pk
++
++
++def key_generator_for_create_main_aed_resource(*args, **kwargs) -> str:
++    return "main_aed_to_clean"
++
++
++@cache_memoize(
++    timeout=settings.MAIN_AED_RESOURCE_CREATION_CACHE_TIMEOUT,
++    hit_callable=lambda *args, **kwargs: logger.info("AED objects get from cache."),
++    key_generator_callable=key_generator_for_create_main_aed_resource,
++)
++def create_main_aed_resource_with_dataset(file_path: Path) -> Tuple[int, Optional[int]]:
++    """
++    Tworzy nowy zasób zbiorczy AED z plikiem CSV (i zbiór zbiorczy, jeśli go brak). Poprzedni zasób zostaje
++    do czasu udanej walidacji nowego (`replace_old_main_aed_resource`).
++
++    Returns:
++        int: klucz nowego zasobu.
++        Optional[int]: klucz zbioru, jeśli został utworzony.
++    """
++    Resource = apps.get_model("resources", "Resource")
++    ResourceFile = apps.get_model("resources", "ResourceFile")
++    Dataset = apps.get_model("datasets", "Dataset")
++
++    old_resource = get_main_aed_resource()
++    dataset = get_main_aed_dataset()
++
++    if not os.path.exists(file_path):
++        caches["default"].delete(key_generator_for_create_main_aed_file())
++        logger.warning("Main AED file %s does not exist anymore. Regenerating it before resource creation.", file_path)
++        file_path = create_main_aed_file()
++
++    if not os.path.exists(file_path):
++        raise FileNotFoundError(file_path)
++
++    dataset_created = False
++    with transaction.atomic():
++        if dataset is None:
++            dataset = Dataset.objects.get(pk=create_main_aed_dataset())
++            dataset_created = True
++
++        resource = Resource.objects.create(
++            title=old_resource.title if old_resource else settings.MAIN_AED_RESOURCE_DEFAULT_TITLE,
++            description=old_resource.description if old_resource else settings.MAIN_AED_RESOURCE_DEFAULT_DESC,
++            dataset=dataset,
++            has_dynamic_data=False,
++            has_high_value_data=False,
++            has_high_value_data_from_ec_list=False,
++            has_research_data=False,
++            status="published",
++            data_date=datetime.date.today(),
++            tabular_data_schema=build_aed_tabular_schema(MAIN_AED_COLUMNS),
++        )
++        logger.debug(f"Created Main AED resource {resource.pk}")
++
++        with open(file_path, "rb") as file:
++            django_file = SimpleUploadedFile(name=os.path.basename(file.name), content=file.read(), content_type="text/csv")
++        # post_save pliku uruchamia walidację zasobu
++        resource_file = ResourceFile.objects.create(resource=resource, is_main=True, file=django_file)
++        logger.debug(f"Created Main AED resource file {resource_file.pk}")
++
++    return resource.pk, dataset.pk if dataset_created else None
++
++
++def replace_old_main_aed_resource(new_resource: "Resource") -> None:
++    """Usuwa pozostałe opublikowane zasoby zbioru zbiorczego, tak żeby aktualny był tylko `new_resource`."""
++    Resource = apps.get_model("resources", "Resource")
++    with transaction.atomic():
++        old_resources = Resource.objects.filter(dataset_id=new_resource.dataset_id, status="published").exclude(
++            pk=new_resource.pk
++        )
++        for old_resource in old_resources:
++            old_resource.delete()
++            logger.info(f"Previous Main AED Resource {old_resource.pk} deleted.")
++
++
++def clean_up_after_main_aed_resource_creation(exception_occurred: bool) -> None:
++    """
++    Po błędzie usuwa zasób i zbiór utworzone przez zadanie; zawsze usuwa tymczasowy plik CSV
++    i zwalnia klucze cache.
++    """
++    logger.info("Starting clean up process after main AED Resource creation.")
++
++    cache = caches["default"]
++    clean_objects_key = key_generator_for_create_main_aed_resource()
++    clean_file_path_key = key_generator_for_create_main_aed_file()
++
++    resource_created, dataset_created = cache.get(clean_objects_key, (None, None))
++    file_path: Optional[str] = cache.get(clean_file_path_key, None)
++
++    try:
++        if exception_occurred and resource_created:
++            Resource = apps.get_model("resources", "Resource")
++            Resource.raw.filter(pk=resource_created).delete()
++
++        if exception_occurred and dataset_created:
++            Dataset = apps.get_model("datasets", "Dataset")
++            Dataset.raw.filter(pk=dataset_created).delete()
++
++        cache.delete(clean_objects_key)
++
++    except Exception as exc:
++        logger.error(f"Clean up failed. Reason: {exc}")
++        sentry_sdk.api.capture_exception(exc)
++
++    try:
++        if file_path:
++            if os.path.exists(file_path):
++                os.remove(file_path)
++                logger.info(f"File {file_path} has been deleted successfully.")
++            else:
++                logger.warning(f"Main AED temp file {file_path} was already missing during cleanup.")
++
++    except Exception as e:
++        logger.error(f"An error occurred while deleting the file {file_path}: {e}")
++    finally:
++        cache.delete(clean_file_path_key)
++
++    logger.info("Clean up completed.")
+diff --git a/portal/backend/mcod/resources/management/commands/create_main_aed_resource.py b/portal/backend/mcod/resources/management/commands/create_main_aed_resource.py
+new file mode 100644
+index 0000000..2384a97
+--- /dev/null
++++ b/portal/backend/mcod/resources/management/commands/create_main_aed_resource.py
+@@ -0,0 +1,65 @@
++import csv
++
++from django.conf import settings
++from django.core.cache import caches
++from django.core.management.base import BaseCommand
++
++from mcod.resources.aed_utils import (
++    clean_up_after_main_aed_resource_creation,
++    create_main_aed_file,
++    create_main_aed_resource_with_dataset,
++    key_generator_for_create_main_aed_file,
++    replace_old_main_aed_resource,
++)
++from mcod.resources.models import Resource
++from mcod.resources.tasks import create_main_aed_resource_task
++
++
++def count_csv_rows(file_path) -> int:
++    with open(file_path, encoding="utf-8", newline="") as file:
++        return max(sum(1 for _ in csv.reader(file)) - 1, 0)
++
++
++class Command(BaseCommand):
++    help = (
++        "Buduje zasób zbiorczy Wykazu AED. Bez opcji zleca zadanie Celery; --eager tworzy plik i zasób od razu "
++        "i wycofuje poprzedni zasób zbiorczy (walidację dokończą workery portalu); --dry-run tylko zapisuje CSV, "
++        "bez obiektów w bazie."
++    )
++
++    def add_arguments(self, parser):
++        group = parser.add_mutually_exclusive_group()
++        group.add_argument("--eager", action="store_true", help="Utwórz plik CSV i zasób zbiorczy synchronicznie.")
++        group.add_argument("--dry-run", action="store_true", help="Utwórz tylko plik CSV, bez obiektów w bazie.")
++
++    def handle(self, *args, **options):
++        if not settings.AED_AGGREGATION_ENABLED:
++            self.stdout.write("Wykaz AED wyłączony (AED_AGGREGATION_ENABLED=False).")
++            return
++
++        if options["dry_run"]:
++            file_path = create_main_aed_file()
++            # Plik zostaje do wglądu; zwolnienie klucza cache, żeby nocne zadanie zbudowało świeży plik.
++            caches["default"].delete(key_generator_for_create_main_aed_file())
++            self.stdout.write(f"Plik CSV: {file_path}")
++            self.stdout.write(f"Wiersze: {count_csv_rows(file_path)}")
++            return
++
++        if options["eager"]:
++            try:
++                file_path = create_main_aed_file()
++                rows = count_csv_rows(file_path)
++                resource_pk, created_dataset_pk = create_main_aed_resource_with_dataset(file_path=file_path)
++            except Exception:
++                clean_up_after_main_aed_resource_creation(exception_occurred=True)
++                raise
++            clean_up_after_main_aed_resource_creation(exception_occurred=False)
++            resource = Resource.objects.get(pk=resource_pk)
++            replace_old_main_aed_resource(resource)
++            self.stdout.write(f"Zbiór: {resource.dataset_id}{' (utworzony)' if created_dataset_pk else ''}")
++            self.stdout.write(f"Zasób: {resource_pk}")
++            self.stdout.write(f"Wiersze: {rows}")
++            return
++
++        create_main_aed_resource_task.delay()
++        self.stdout.write("Zlecono zadanie create_main_aed_resource_task.")
+diff --git a/portal/backend/mcod/resources/serializers.py b/portal/backend/mcod/resources/serializers.py
+index 556b15c..58bb021 100644
+--- a/portal/backend/mcod/resources/serializers.py
++++ b/portal/backend/mcod/resources/serializers.py
+@@ -694,3 +694,10 @@ class AggregatedDGAInfoApiResponse(ExtSchema):
+     dataset_slug = fields.Str(attribute="resource.dataset.slug", data_key="dataset_slug")
+     resource_id = fields.Int(attribute="resource.id", data_key="resource_id")
+     resource_slug = fields.Str(attribute="resource.slug", data_key="resource_slug")
++
++
++class AggregatedAEDInfoApiResponse(ExtSchema):
++    dataset_id = fields.Int(attribute="dataset.id", data_key="dataset_id")
++    dataset_slug = fields.Str(attribute="dataset.slug", data_key="dataset_slug")
++    resource_id = fields.Int(attribute="id", data_key="resource_id")
++    resource_slug = fields.Str(attribute="slug", data_key="resource_slug")
+diff --git a/portal/backend/mcod/resources/tasks/__init__.py b/portal/backend/mcod/resources/tasks/__init__.py
+index 3309d6b..ece7c57 100644
+--- a/portal/backend/mcod/resources/tasks/__init__.py
++++ b/portal/backend/mcod/resources/tasks/__init__.py
+@@ -1,3 +1,4 @@
++from mcod.resources.tasks.aed import create_main_aed_resource_task
+ from mcod.resources.tasks.dga import clean_dga_temp_directory, create_main_dga_resource_task
+ from mcod.resources.tasks.entrypoint_res import entrypoint_process_resource_validation_task
+ from mcod.resources.tasks.entrypoint_res_file import (
+@@ -33,6 +34,7 @@ if is_enabled("S69_resource_link_validation_chunk"):
+     __all__ = (
+         "clean_dga_temp_directory",
+         "create_main_dga_resource_task",
++        "create_main_aed_resource_task",
+         "entrypoint_process_resource_validation_task",
+         "entrypoint_process_resource_file_validation_task",
+         "process_resource_res_file_task",
+@@ -60,6 +62,7 @@ else:
+     __all__ = (
+         "clean_dga_temp_directory",
+         "create_main_dga_resource_task",
++        "create_main_aed_resource_task",
+         "entrypoint_process_resource_validation_task",
+         "entrypoint_process_resource_file_validation_task",
+         "process_resource_res_file_task",
+diff --git a/portal/backend/mcod/resources/tasks/aed.py b/portal/backend/mcod/resources/tasks/aed.py
+new file mode 100644
+index 0000000..524f30b
+--- /dev/null
++++ b/portal/backend/mcod/resources/tasks/aed.py
+@@ -0,0 +1,80 @@
++import logging
++from pathlib import Path
++
++from django.apps import apps
++from django.conf import settings
++
++from mcod.core.tasks import extended_shared_task
++from mcod.resources.aed_utils import (
++    clean_up_after_main_aed_resource_creation,
++    create_main_aed_file,
++    create_main_aed_resource_with_dataset,
++    replace_old_main_aed_resource,
++)
++from mcod.resources.dga_utils import (
++    FailedValidationException,
++    PendingValidationException,
++    check_all_resource_validations_status,
++)
++
++logger = logging.getLogger("mcod")
++
++
++@extended_shared_task(
++    max_retries=5,
++    atomic=False,
++    retry_countdown=20,
++    retry_on_errors=(PendingValidationException,),
++    bind=True,
++    name="mcod.resources.tasks.create_main_aed_resource_task",
++)
++def create_main_aed_resource_task(self) -> None:
++    """
++    Buduje zasób zbiorczy Wykazu AED (wzór: `create_main_dga_resource_task`):
++
++    1. CSV z zasobów zbiorów oznaczonych `standard = AED`.
++    2. Nowy zasób z plikiem (i zbiór zbiorczy, jeśli go brak).
++    3. Sprawdzenie walidacji zasobu; przy walidacji w toku zadanie jest ponawiane.
++    4. Usunięcie poprzedniego zasobu zbiorczego.
++
++    Przy błędzie albo walidacji niezakończonej w ostatniej próbie utworzone obiekty są usuwane.
++    Przy `AED_AGGREGATION_ENABLED = False` zadanie nic nie robi.
++    """
++    if not settings.AED_AGGREGATION_ENABLED:
++        logger.info("Wykaz AED wyłączony (AED_AGGREGATION_ENABLED=False).")
++        return
++
++    logger.info("Starting main AED resource creation.")
++    Resource = apps.get_model("resources", "Resource")
++
++    try:
++        logger.info("Step 1/4: Creating Main AED csv file.")
++        file_path: Path = create_main_aed_file()
++
++        logger.info("Step 2/4: Creating Main AED resource with files.")
++        new_resource_pk, _ = create_main_aed_resource_with_dataset(file_path=file_path)
++        new_resource = Resource.objects.get(pk=new_resource_pk)
++
++        logger.info("Step 3/4: Checking resource validations.")
++        check_all_resource_validations_status(new_resource)
++
++        logger.info("Step 4/4: Deleting previous Main AED resource.")
++        replace_old_main_aed_resource(new_resource)
++
++        logger.info("Main AED Resource successfully created.")
++        clean_up_after_main_aed_resource_creation(exception_occurred=False)
++
++    except PendingValidationException:
++        if self.request.retries == self.max_retries:
++            logger.info("Cleaning after main AED resource creation task due to still pending resource validation(s).")
++            clean_up_after_main_aed_resource_creation(exception_occurred=True)
++        raise
++
++    except FailedValidationException:
++        clean_up_after_main_aed_resource_creation(exception_occurred=True)
++        raise
++
++    except Exception as exc:
++        logger.error(f"Cleaning after main AED resource creation task due to unexpected error: {exc}")
++        clean_up_after_main_aed_resource_creation(exception_occurred=True)
++        raise
+diff --git a/portal/backend/mcod/resources/tests/test_aed_aggregation.py b/portal/backend/mcod/resources/tests/test_aed_aggregation.py
+new file mode 100644
+index 0000000..64e4d42
+--- /dev/null
++++ b/portal/backend/mcod/resources/tests/test_aed_aggregation.py
+@@ -0,0 +1,367 @@
++import datetime
++import io
++from pathlib import Path
++
++import pandas as pd
++import pytest
++from django.conf import settings
++
++from mcod.resources.aed_aggregation import (
++    build_aggregate_rows,
++    compute_id_aed,
++    fix_swapped_axes,
++    missing_minimum_columns,
++    needs_inspection,
++    normalize_header,
++    read_tabular_bytes,
++    rename_with_aliases,
++    skip_reason,
++    to_csv_bytes,
++    to_text,
++)
++from mcod.resources.aed_constants import MAIN_AED_COLUMNS
++
++AGGREGATED_AT = "2026-11-22T04:15:00"
++SOURCE_MUNICIPALITY = {
++    "institution_id": 1001,
++    "publisher": "Gmina Przykładowa (PRZYKŁAD)",
++    "license": "CC0 1.0",
++    "resource_id": 900001,
++    "url": "https://dane.gov.pl/pl/dataset/1/resource/900001",
++    "data_date": "2026-11-20",
++    "personal_data": False,
++}
++SOURCE_COUNTY = {
++    "institution_id": 1002,
++    "publisher": "Starostwo Powiatowe Przykład (PRZYKŁAD)",
++    "license": "CC BY 4.0",
++    "resource_id": 900002,
++    "url": "https://dane.gov.pl/pl/dataset/2/resource/900002",
++    "data_date": "2026-11-19",
++    "personal_data": True,
++}
++
++
++@pytest.fixture
++def aed_samples() -> Path:
++    return Path(settings.TEST_SAMPLES_PATH, "aed")
++
++
++def read_sample(path: Path, **kwargs) -> pd.DataFrame:
++    return pd.read_csv(path, dtype=str, keep_default_na=False, **kwargs)
++
++
++def minimal_row(**values) -> dict:
++    row = {
++        "id_zrodlowe": "A-1",
++        "nazwa_lokalizacji": "Ratusz",
++        "miejscowosc": "Legionowo",
++        "szerokosc_geograficzna": "52.400000",
++        "dlugosc_geograficzna": "20.930000",
++        "status_urzadzenia": "sprawny",
++        "poziom_weryfikacji": "zweryfikowany_w_terenie",
++        "dysponent_nazwa": "Urząd Miasta",
++    }
++    row.update(values)
++    return row
++
++
++@pytest.mark.feat_main_aed
++@pytest.mark.parametrize(
++    ("header", "expected"),
++    [
++        ("Długość geograficzna", "dlugosc_geograficzna"),
++        (" Nr_Budynku ", "nr_budynku"),
++        ("Łódź", "lodz"),
++        ("\ufeffnazwa", "nazwa"),
++        (" Numer Id", "numer_id"),
++    ],
++)
++def test_normalize_header(header, expected):
++    assert normalize_header(header) == expected
++
++
++@pytest.mark.feat_main_aed
++@pytest.mark.parametrize(
++    ("value", "expected"),
++    [
++        (None, ""),
++        (True, "true"),
++        (False, "false"),
++        (datetime.date(2026, 1, 2), "2026-01-02"),
++        (float("nan"), ""),
++        (" x ", "x"),
++        (52.5, "52.5"),
++    ],
++)
++def test_to_text(value, expected):
++    assert to_text(value) == expected
++
++
++@pytest.mark.feat_main_aed
++def test_compute_id_aed_deterministic():
++    row = {"id_zrodlowe": "A"}
++    assert compute_id_aed(1, row) == compute_id_aed(1, dict(row))
++    assert compute_id_aed(1, row).startswith("PL-AED-")
++    assert len(compute_id_aed(1, row)) == len("PL-AED-") + 12
++
++
++@pytest.mark.feat_main_aed
++def test_compute_id_aed_fallback_without_source_id():
++    row = {
++        "id_zrodlowe": "",
++        "nazwa_lokalizacji": "Ratusz  Łódź",
++        "szerokosc_geograficzna": "51.7",
++        "dlugosc_geograficzna": "19.4",
++    }
++    assert compute_id_aed(1, row) == compute_id_aed(1, dict(row, nazwa_lokalizacji="ratusz lodz"))
++    assert compute_id_aed(1, row) != compute_id_aed(1, dict(row, szerokosc_geograficzna="51.8"))
++
++
++@pytest.mark.feat_main_aed
++def test_compute_id_aed_differs_by_institution():
++    assert compute_id_aed(1, {"id_zrodlowe": "A"}) != compute_id_aed(2, {"id_zrodlowe": "A"})
++
++
++@pytest.mark.feat_main_aed
++@pytest.mark.parametrize(
++    ("row", "expected"),
++    [
++        ({}, ""),
++        ({"data_waznosci_elektrod": "2026-11-21"}, "true"),
++        ({"data_ostatniego_przegladu": "2025-11-21"}, "true"),
++        ({"data_ostatniego_przegladu": "2025-11-23", "data_waznosci_baterii": "2027-01-01"}, "false"),
++    ],
++)
++def test_needs_inspection(row, expected):
++    assert needs_inspection(row, datetime.date(2026, 11, 22)) == expected
++
++
++@pytest.mark.feat_main_aed
++def test_needs_inspection_ignores_unparseable_dates():
++    assert needs_inspection({"data_waznosci_baterii": "31.12.2020"}, datetime.date(2026, 11, 22)) == ""
++
++
++@pytest.mark.feat_main_aed
++def test_skip_reason_osm():
++    assert skip_reason(minimal_row(zrodlo_danych="openstreetmap")).startswith("licencja ODbL")
++
++
++@pytest.mark.feat_main_aed
++def test_skip_reason_missing_minimum():
++    assert skip_reason(minimal_row(miejscowosc="")) == "brak wartości: miejscowosc"
++
++
++@pytest.mark.feat_main_aed
++@pytest.mark.parametrize("latitude", ["52,4", "abc", "52.4N"])
++def test_skip_reason_bad_coordinates(latitude):
++    assert skip_reason(minimal_row(szerokosc_geograficzna=latitude)) == "nieprawidłowe współrzędne"
++
++
++@pytest.mark.feat_main_aed
++def test_skip_reason_outside_poland():
++    assert skip_reason(minimal_row(szerokosc_geograficzna="48.1")) == "współrzędne poza Polską"
++
++
++@pytest.mark.feat_main_aed
++def test_skip_reason_valid_row():
++    assert skip_reason(minimal_row()) is None
++
++
++@pytest.mark.feat_main_aed
++def test_fix_swapped_axes():
++    row = minimal_row(szerokosc_geograficzna="21.1", dlugosc_geograficzna="52.3")
++    assert fix_swapped_axes(row) is True
++    assert (row["szerokosc_geograficzna"], row["dlugosc_geograficzna"]) == ("52.3", "21.1")
++    assert fix_swapped_axes(row) is False
++
++    df = pd.DataFrame([minimal_row(szerokosc_geograficzna="21.1", dlugosc_geograficzna="52.3")])
++    result, skipped = build_aggregate_rows(df, SOURCE_MUNICIPALITY, AGGREGATED_AT)
++    assert skipped == []
++    assert result.loc[0, "szerokosc_geograficzna"] == "52.3"
++    assert result.loc[0, "przetworzenie"] == "osie"
++
++
++@pytest.mark.feat_main_aed
++def test_defaults_operator_contacts():
++    df = pd.DataFrame(
++        [minimal_row(status_urzadzenia="", poziom_weryfikacji="", dysponent_nazwa="", telefon_kontaktowy="123456789")]
++    )
++    result, skipped = build_aggregate_rows(df, dict(SOURCE_MUNICIPALITY, personal_data=True), AGGREGATED_AT)
++    row = result.iloc[0]
++    assert skipped == []
++    assert row["status_urzadzenia"] == "nieznany"
++    assert row["poziom_weryfikacji"] == "niezweryfikowany"
++    assert row["dysponent_nazwa"] == SOURCE_MUNICIPALITY["publisher"]
++    assert row["dysponent_z_wydawcy"] == "true"
++    assert row["telefon_kontaktowy"] == ""
++    assert row["przetworzenie"] == "domyslne;dysponent_z_wydawcy;kontakt_usuniety"
++
++
++@pytest.mark.feat_main_aed
++def test_contacts_kept_without_personal_data():
++    df = pd.DataFrame([minimal_row(telefon_kontaktowy="123456789")])
++    result, _ = build_aggregate_rows(df, SOURCE_MUNICIPALITY, AGGREGATED_AT)
++    assert result.loc[0, "telefon_kontaktowy"] == "123456789"
++
++
++@pytest.mark.feat_main_aed
++def test_unchanged_row_has_empty_processing():
++    result, skipped = build_aggregate_rows(pd.DataFrame([minimal_row()]), SOURCE_MUNICIPALITY, AGGREGATED_AT)
++    assert skipped == []
++    assert result.loc[0, "przetworzenie"] == ""
++    assert result.loc[0, "dysponent_z_wydawcy"] == "false"
++    assert list(result.columns) == MAIN_AED_COLUMNS
++
++
++@pytest.mark.feat_main_aed
++def test_provenance_columns():
++    result, _ = build_aggregate_rows(pd.DataFrame([minimal_row()]), SOURCE_COUNTY, AGGREGATED_AT)
++    row = result.iloc[0]
++    assert row["wydawca_zasobu"] == SOURCE_COUNTY["publisher"]
++    assert row["licencja_zasobu"] == "CC BY 4.0"
++    assert row["id_zasobu_zrodlowego"] == "900002"
++    assert row["url_zasobu_zrodlowego"] == SOURCE_COUNTY["url"]
++    assert row["data_danych_zasobu"] == "2026-11-19"
++    assert row["data_agregacji"] == AGGREGATED_AT
++
++
++@pytest.mark.feat_main_aed
++def test_skipped_rows_are_reported_with_row_number():
++    df = pd.DataFrame([minimal_row(), minimal_row(id_zrodlowe="A-2", zrodlo_danych="openstreetmap"), minimal_row(miejscowosc="")])
++    result, skipped = build_aggregate_rows(df, SOURCE_MUNICIPALITY, AGGREGATED_AT)
++    assert len(result) == 1
++    assert skipped == [
++        {"wiersz": 3, "powod": "licencja ODbL (OpenStreetMap)"},
++        {"wiersz": 4, "powod": "brak wartości: miejscowosc"},
++    ]
++
++
++@pytest.mark.feat_main_aed
++def test_golden_matches_reference(aed_samples):
++    df = read_sample(aed_samples / "aed_punkty_przyklad.csv")
++    parts = []
++    for _, record in df.iterrows():
++        source = SOURCE_COUNTY if record["id_zrodlowe"] == "UNI-B-3" else SOURCE_MUNICIPALITY
++        rows, skipped = build_aggregate_rows(record.to_frame().T, source, AGGREGATED_AT)
++        assert skipped == []
++        parts.append(rows)
++
++    result = to_csv_bytes(pd.concat(parts, ignore_index=True))
++
++    assert result == (aed_samples / "aed_zestawienie_przyklad.csv").read_bytes()
++
++
++@pytest.mark.feat_main_aed
++def test_to_csv_bytes_format():
++    data = to_csv_bytes(pd.DataFrame([{"a": "x, y", "b": "z"}]))
++    assert data == b'a,b\r\n"x, y",z\r\n'
++    assert not data.startswith(b"\xef\xbb\xbf")
++
++
++@pytest.mark.feat_main_aed
++def test_legionowo_aliases(aed_samples):
++    df = read_sample(aed_samples / "legionowo_2625221.csv", encoding="utf-8-sig")
++    result, skipped = build_aggregate_rows(df, SOURCE_MUNICIPALITY, AGGREGATED_AT)
++    assert skipped == []
++    assert len(result) == 24
++    assert result["przetworzenie"].str.split(";").map(lambda codes: "naglowki" in codes).all()
++    assert (result["nazwa_lokalizacji"] != "").all()
++    assert (result["numer_budynku"] != "").all()
++    assert result.loc[0, "nazwa_lokalizacji"] == "Urząd Miasta Legionowo"
++    assert result.loc[0, "szerokosc_geograficzna"] == "52.395198"
++
++
++@pytest.mark.feat_main_aed
++def test_krosno_skipped_missing_minimum(aed_samples):
++    df = read_sample(aed_samples / "krosno_54632.csv")
++    result, skipped = build_aggregate_rows(df, SOURCE_MUNICIPALITY, AGGREGATED_AT)
++    assert result.empty
++    assert list(result.columns) == MAIN_AED_COLUMNS
++    assert skipped == [{"wiersz": 0, "powod": "brak kolumn: miejscowosc"}]
++
++
++@pytest.mark.feat_main_aed
++def test_przemysl_skipped_missing_coordinates(aed_samples):
++    df = read_sample(aed_samples / "przemysl_62095.csv", sep=";", encoding="utf-8-sig")
++    assert "geometry" in df.columns
++    result, skipped = build_aggregate_rows(df, SOURCE_MUNICIPALITY, AGGREGATED_AT)
++    assert result.empty
++    assert skipped == [{"wiersz": 0, "powod": "brak kolumn: szerokosc_geograficzna, dlugosc_geograficzna"}]
++
++
++@pytest.mark.feat_main_aed
++def test_marki_single_column_skipped(aed_samples):
++    df = read_sample(aed_samples / "marki_68353.csv")
++    assert len(df.columns) == 1
++    result, skipped = build_aggregate_rows(df, SOURCE_MUNICIPALITY, AGGREGATED_AT)
++    assert result.empty
++    assert len(skipped) == 1
++    assert skipped[0]["powod"].startswith("brak kolumn")
++
++
++@pytest.mark.feat_main_aed
++def test_exact_name_wins_over_alias():
++    df = pd.DataFrame([{"nazwa": "Alias", "nazwa_lokalizacji": "Oryginał"}])
++    renamed, changed = rename_with_aliases(df)
++    assert list(renamed.columns) == ["nazwa_lokalizacji"]
++    assert renamed.loc[0, "nazwa_lokalizacji"] == "Oryginał"
++    assert changed == set()
++
++
++@pytest.mark.feat_main_aed
++def test_first_alias_from_left_wins():
++    df = pd.DataFrame([{"lat": "52.1", "latitude": "52.2"}])
++    renamed, changed = rename_with_aliases(df)
++    assert list(renamed.columns) == ["szerokosc_geograficzna"]
++    assert renamed.loc[0, "szerokosc_geograficzna"] == "52.1"
++    assert changed == {"lat"}
++
++
++@pytest.mark.feat_main_aed
++@pytest.mark.parametrize(
++    ("file_name", "shape", "first_column"),
++    [
++        ("legionowo_2625221.csv", (24, 11), "nazwa"),
++        ("krosno_54632.csv", (21, 6), "Długość geograficzna"),
++        ("przemysl_62095.csv", (21, 17), "id"),
++        ("marki_68353.csv", (8, 1), "Długość geograficzna,Szerokość geograficzna, Nazwa, Lokalizacja, Adres, Numer Id"),
++    ],
++)
++def test_read_tabular_bytes_real_csv(aed_samples, file_name, shape, first_column):
++    df = read_tabular_bytes((aed_samples / file_name).read_bytes(), "csv")
++    assert df.shape == shape
++    assert df.columns[0] == first_column
++
++
++@pytest.mark.feat_main_aed
++def test_read_tabular_bytes_keeps_literal_values(aed_samples):
++    df = read_tabular_bytes((aed_samples / "legionowo_2625221.csv").read_bytes(), "csv")
++    assert df.loc[0, "kod_simc"] == "0920806"
++    assert df.loc[0, "nr_lokalu"] == ""
++    assert df.loc[0, "szerokosc_geograficzna"] == "52.395198"
++
++
++@pytest.mark.feat_main_aed
++def test_read_tabular_bytes_cp1250_fallback():
++    df = read_tabular_bytes("nazwa;miasto\r\nŁódź;Łódź\r\n".encode("cp1250"), "csv")
++    assert df.to_dict("records") == [{"nazwa": "Łódź", "miasto": "Łódź"}]
++
++
++@pytest.mark.feat_main_aed
++def test_read_tabular_bytes_xlsx_as_text():
++    buffer = io.BytesIO()
++    pd.DataFrame({"kod_simc": ["0920806"], "lat": [52.39], "pusta": [None]}).to_excel(buffer, index=False)
++    df = read_tabular_bytes(buffer.getvalue(), "xlsx")
++    assert df.to_dict("records") == [{"kod_simc": "0920806", "lat": "52.39", "pusta": ""}]
++
++
++@pytest.mark.feat_main_aed
++def test_read_tabular_bytes_rejects_other_formats():
++    with pytest.raises(ValueError):
++        read_tabular_bytes(b"{}", "json")
++
++
++@pytest.mark.feat_main_aed
++def test_missing_minimum_columns():
++    assert missing_minimum_columns(["nazwa_lokalizacji", "miejscowosc"]) == ["szerokosc_geograficzna", "dlugosc_geograficzna"]
+diff --git a/portal/backend/mcod/resources/tests/test_aed_api.py b/portal/backend/mcod/resources/tests/test_aed_api.py
+new file mode 100644
+index 0000000..111b822
+--- /dev/null
++++ b/portal/backend/mcod/resources/tests/test_aed_api.py
+@@ -0,0 +1,90 @@
++from typing import Any, Dict
++
++import pytest
++from django.test import override_settings
++from falcon import HTTP_NOT_FOUND, HTTP_OK
++from falcon.testing import TestClient
++
++from mcod.datasets.models import Dataset
++from mcod.resources.factories import ResourceFactory
++
++
++@pytest.mark.feat_main_aed
++def test_api_aed_aggregated_ok(client: TestClient, main_aed_dataset: Dataset):
++    resource = ResourceFactory.create(dataset=main_aed_dataset, status="published")
++
++    resp = client.simulate_get("/aed-aggregated/")
++
++    assert resp.status == HTTP_OK, resp.json
++    assert resp.json == {
++        "dataset_id": main_aed_dataset.id,
++        "dataset_slug": main_aed_dataset.slug,
++        "resource_id": resource.id,
++        "resource_slug": resource.slug,
++    }
++
++
++@pytest.mark.feat_main_aed
++def test_api_aed_aggregated_returns_newest_resource(client: TestClient, main_aed_dataset: Dataset):
++    ResourceFactory.create(dataset=main_aed_dataset, status="published")
++    newest = ResourceFactory.create(dataset=main_aed_dataset, status="published")
++
++    resp = client.simulate_get("/aed-aggregated/")
++
++    assert resp.status == HTTP_OK, resp.json
++    assert resp.json["resource_id"] == newest.id
++
++
++@pytest.mark.feat_main_aed
++def test_api_aed_aggregated_not_found_without_dataset(client: TestClient):
++    resp = client.simulate_get("/aed-aggregated/")
++
++    assert resp.status == HTTP_NOT_FOUND, resp.json
++
++
++@pytest.mark.feat_main_aed
++def test_api_aed_aggregated_not_found_without_resource(client: TestClient, main_aed_dataset: Dataset):
++    resp = client.simulate_get("/aed-aggregated/")
++
++    assert resp.status == HTTP_NOT_FOUND, resp.json
++
++
++@pytest.mark.feat_main_aed
++@pytest.mark.parametrize(
++    "resource_params, status_code",
++    [
++        (dict(is_removed=True), HTTP_NOT_FOUND),
++        (dict(is_removed=False), HTTP_OK),
++        (dict(status="draft"), HTTP_NOT_FOUND),
++        (dict(status="published"), HTTP_OK),
++    ],
++)
++def test_api_aed_aggregated_draft_or_removed(
++    client: TestClient, main_aed_dataset: Dataset, resource_params: Dict[str, Any], status_code: str
++):
++    ResourceFactory.create(dataset=main_aed_dataset, **{"status": "published", **resource_params})
++
++    resp = client.simulate_get("/aed-aggregated/")
++
++    assert resp.status == status_code, resp.json
++
++
++@pytest.mark.feat_main_aed
++def test_api_aed_aggregated_disabled(client: TestClient, main_aed_dataset: Dataset):
++    ResourceFactory.create(dataset=main_aed_dataset, status="published")
++
++    with override_settings(AED_AGGREGATION_ENABLED=False):
++        resp = client.simulate_get("/aed-aggregated/")
++
++    assert resp.status == HTTP_NOT_FOUND, resp.json
++
++
++@pytest.mark.feat_main_aed
++def test_openapi_spec_documents_aed_aggregated(client: TestClient):
++    resp = client.simulate_get("/spec", headers={"X-API-VERSION": "1.4"})
++
++    assert resp.status == HTTP_OK
++    assert resp.json["paths"]["/aed-aggregated"]["get"]["responses"]["200"]["content"]["application/vnd.api+json"]["schema"] == {
++        "$ref": "#/components/schemas/AggregatedAEDInfo"
++    }
++    assert "AggregatedAEDInfo" in resp.json["components"]["schemas"]
+diff --git a/portal/backend/mcod/resources/tests/test_aed_constants.py b/portal/backend/mcod/resources/tests/test_aed_constants.py
+new file mode 100644
+index 0000000..242f789
+--- /dev/null
++++ b/portal/backend/mcod/resources/tests/test_aed_constants.py
+@@ -0,0 +1,59 @@
++import pytest
++
++from mcod.resources.aed_aggregation import normalize_header
++from mcod.resources.aed_constants import (
++    AED_ALLOWED_LICENSES,
++    AED_HEADER_ALIASES,
++    AED_MINIMUM_COLUMNS,
++    AED_TEMPLATE_COLUMNS,
++    MAIN_AED_COLUMNS,
++)
++
++
++@pytest.mark.feat_main_aed
++def test_template_columns_count_and_unique():
++    assert len(AED_TEMPLATE_COLUMNS) == 41
++    assert len(set(AED_TEMPLATE_COLUMNS)) == 41
++    assert AED_TEMPLATE_COLUMNS[0] == "id_zrodlowe"
++    assert AED_TEMPLATE_COLUMNS[-1] == "data_aktualizacji"
++
++
++@pytest.mark.feat_main_aed
++def test_main_columns_count_order():
++    assert len(MAIN_AED_COLUMNS) == 51
++    assert len(set(MAIN_AED_COLUMNS)) == 51
++    assert MAIN_AED_COLUMNS[0] == "id_aed"
++    assert MAIN_AED_COLUMNS[-1] == "data_agregacji"
++    assert MAIN_AED_COLUMNS[1:42] == AED_TEMPLATE_COLUMNS
++
++
++@pytest.mark.feat_main_aed
++def test_minimum_subset_of_template():
++    assert set(AED_MINIMUM_COLUMNS) <= set(AED_TEMPLATE_COLUMNS)
++
++
++@pytest.mark.feat_main_aed
++def test_aliases_target_template_columns():
++    assert set(AED_HEADER_ALIASES.values()) <= set(AED_TEMPLATE_COLUMNS)
++
++
++@pytest.mark.feat_main_aed
++def test_alias_keys_are_normalized():
++    for key in AED_HEADER_ALIASES:
++        assert normalize_header(key) == key
++
++
++@pytest.mark.feat_main_aed
++def test_alias_keys_do_not_shadow_template():
++    assert not set(AED_HEADER_ALIASES) & set(AED_TEMPLATE_COLUMNS)
++
++
++@pytest.mark.feat_main_aed
++def test_ambiguous_headers_have_no_alias():
++    for ambiguous in ("lokalizacja", "adres", "description"):
++        assert ambiguous not in AED_HEADER_ALIASES
++
++
++@pytest.mark.feat_main_aed
++def test_allowed_licenses_exclude_share_alike():
++    assert AED_ALLOWED_LICENSES == ("CC0 1.0", "CC BY 4.0")
+diff --git a/portal/backend/mcod/resources/tests/test_aed_settings.py b/portal/backend/mcod/resources/tests/test_aed_settings.py
+new file mode 100644
+index 0000000..9786007
+--- /dev/null
++++ b/portal/backend/mcod/resources/tests/test_aed_settings.py
+@@ -0,0 +1,30 @@
++import pytest
++from django.conf import settings
++
++from mcod.settings import base as base_settings
++
++
++@pytest.mark.feat_main_aed
++def test_aed_settings_defaults():
++    assert isinstance(settings.AED_AGGREGATION_ENABLED, bool)
++    assert isinstance(settings.MAIN_AED_DATASET_OWNER_ORGANIZATION_PK, int)
++    assert settings.MAIN_AED_RESOURCE_CSV_CREATION_ROOT.endswith("main_aed")
++    assert settings.MAIN_AED_DATASET_DEFAULT_TITLE == "Wykaz defibrylatorów AED – wykaz zbiorczy"
++    assert settings.MAIN_AED_RESOURCE_DEFAULT_TITLE == "Wykaz defibrylatorów AED"
++    assert "standard = AED" in settings.MAIN_AED_DATASET_DEFAULT_DESC
++    assert "standard = AED" in settings.MAIN_AED_RESOURCE_DEFAULT_DESC
++    assert settings.MAIN_AED_DATASET_CATEGORIES_TITLES == ["Zdrowie"]
++    assert "AED" in settings.MAIN_AED_DATASET_TAGS_NAMES
++    assert settings.MAIN_AED_DATASET_UPDATE_NOTIFICATION_EMAIL
++
++
++@pytest.mark.feat_main_aed
++def test_aed_aggregation_enabled_by_default():
++    assert base_settings.AED_AGGREGATION_ENABLED is True
++
++
++@pytest.mark.feat_main_aed
++def test_aed_task_route_registered():
++    # test.py nadpisuje CELERY_TASK_ROUTES pustym słownikiem, więc trasę sprawdzamy w ustawieniach bazowych.
++    route = base_settings.CELERY_TASK_ROUTES["mcod.resources.tasks.create_main_aed_resource_task"]
++    assert route == {"queue": "resources"}
+diff --git a/portal/backend/mcod/resources/tests/test_aed_sources.py b/portal/backend/mcod/resources/tests/test_aed_sources.py
+new file mode 100644
+index 0000000..a7194bf
+--- /dev/null
++++ b/portal/backend/mcod/resources/tests/test_aed_sources.py
+@@ -0,0 +1,243 @@
++import datetime
++from pathlib import Path
++from types import SimpleNamespace
++from unittest.mock import MagicMock, patch
++
++import pytest
++import requests
++from django.conf import settings
++
++from mcod.datasets.factories import DatasetFactory
++from mcod.datasets.models import Dataset
++from mcod.resources.aed_utils import (
++    create_main_aed_df,
++    get_aed_source_df,
++    get_aed_source_resources,
++    get_source_meta,
++    is_aed_dataset,
++    is_main_aed_dataset,
++)
++from mcod.resources.models import Resource
++from mcod.resources.tasks import process_resource_file_data_task
++
++AGGREGATED_AT = "2026-11-22T04:15:00"
++LEGIONOWO_ROWS = 24
++
++
++def legionowo_bytes() -> bytes:
++    return Path(settings.TEST_SAMPLES_PATH, "aed", "legionowo_2625221.csv").read_bytes()
++
++
++def make_resource(pk: int, rows=None, read_error: Exception = None, ckan: bool = False) -> MagicMock:
++    resource = MagicMock(spec_set=Resource)
++    resource.pk = pk
++    resource.is_imported_from_ckan = ckan
++    resource.link = f"https://ckan.example.com/{pk}.csv"
++    resource.institution.pk = 100 + pk
++    resource.institution.title = f"Gmina {pk}"
++    resource.dataset.license_name = "CC0 1.0"
++    resource.dataset.license_condition_personal_data = None
++    resource.frontend_absolute_url = f"https://dane.gov.pl/pl/dataset/1/resource/{pk}"
++    resource.data_date = datetime.date(2026, 11, 20)
++    if read_error:
++        resource.tabular_data.table.read.side_effect = read_error
++    else:
++        resource.tabular_data.table.read.return_value = rows
++    return resource
++
++
++def remote_response(content_type: str, content: bytes = b"", status_code: int = 200) -> MagicMock:
++    return MagicMock(status_code=status_code, headers={"Content-Type": content_type}, content=content)
++
++
++@pytest.mark.feat_main_aed
++@pytest.mark.parametrize(
++    ("customfields", "expected"),
++    [
++        ({"standard": "AED"}, True),
++        ({"Standard": "aed 1.1"}, True),
++        ({" standard ": " AED "}, True),
++        ('{"standard": "AED"}', True),
++        ({"standard": "AEDX"}, False),
++        ({"standard": "DGA"}, False),
++        (None, False),
++        ({}, False),
++        ("nie-json", False),
++    ],
++)
++def test_is_aed_dataset(customfields, expected):
++    assert is_aed_dataset(SimpleNamespace(customfields=customfields)) is expected
++
++
++@pytest.mark.feat_main_aed
++@pytest.mark.parametrize(
++    ("customfields", "expected"),
++    [
++        ({"zestawienie": "AED-krajowe"}, True),
++        ({"Zestawienie": "aed-krajowe", "standard": "AED"}, True),
++        ({"standard": "AED"}, False),
++        (None, False),
++    ],
++)
++def test_is_main_aed_dataset(customfields, expected):
++    assert is_main_aed_dataset(SimpleNamespace(customfields=customfields)) is expected
++
++
++@pytest.mark.feat_main_aed
++def test_get_aed_source_resources_filters(aed_resource_factory):
++    selected = aed_resource_factory()
++
++    aed_resource_factory(dataset=DatasetFactory.create(status="published", customfields={"inne": "pole"}))
++    aed_resource_factory(
++        dataset=DatasetFactory.create(status="published", customfields={"standard": "AED", "zestawienie": "AED-krajowe"})
++    )
++    aed_resource_factory(file_tasks_last_status="FAILURE")
++    aed_resource_factory(link_tasks_last_status="FAILURE")
++    aed_resource_factory(status="draft")
++    aed_resource_factory(
++        dataset=DatasetFactory.create(
++            status="published", customfields={"standard": "AED"}, license_chosen=Dataset.LICENSE_CC_BY_SA
++        )
++    )
++    aed_resource_factory(format="json")
++
++    assert get_aed_source_resources() == [selected]
++
++
++@pytest.mark.feat_main_aed
++def test_get_aed_source_resources_ignores_portal_data_validation(aed_resource_factory):
++    # Plik zgodny ze wzorcem może nie przejść walidacji typów zgadywanych przez portal
++    # (np. "5A" w numer_budynku, puste pole w kolumnie uznanej za liczbę); zgodność sprawdza agregacja.
++    failed_type_inference = aed_resource_factory("aed_punkty_przyklad.csv", data_tasks_last_status="FAILURE")
++    pending = aed_resource_factory(data_tasks_last_status="PENDING")
++
++    assert get_aed_source_resources() == [failed_type_inference, pending]
++
++
++@pytest.mark.feat_main_aed
++def test_get_source_meta_personal_data(aed_resource_factory):
++    dataset = DatasetFactory.create(
++        status="published",
++        customfields={"standard": "AED"},
++        license_condition_personal_data="Dane kontaktowe nie są przetwarzane dalej.",
++    )
++    resource = aed_resource_factory(dataset=dataset)
++
++    meta = get_source_meta(resource)
++
++    assert meta["personal_data"] is True
++    assert meta["institution_id"] == dataset.organization.pk
++    assert meta["publisher"] == dataset.organization.title
++    assert meta["license"] == dataset.license_name
++    assert meta["resource_id"] == resource.pk
++    assert meta["url"] == resource.frontend_absolute_url
++    assert meta["data_date"] == resource.data_date.isoformat()
++
++
++@pytest.mark.feat_main_aed
++def test_create_main_aed_df_with_mocks():
++    rows = [
++        {
++            "nazwa": "Ratusz",
++            "miejscowosc": "Legionowo",
++            "szerokosc_geograficzna": "52.4",
++            "dlugosc_geograficzna": "20.9",
++            "kod_simc": "0920806",
++        },
++        {"nazwa": "Bez współrzędnych", "miejscowosc": "Legionowo", "szerokosc_geograficzna": "", "dlugosc_geograficzna": ""},
++    ]
++    readable = make_resource(1, rows=rows)
++    unreadable = make_resource(2, read_error=ValueError("uszkodzony plik"))
++    no_minimum = make_resource(3, rows=[{"nazwa": "X"}])
++
++    df, stats = create_main_aed_df([readable, unreadable, no_minimum], AGGREGATED_AT)
++
++    assert len(df) == 1
++    assert df.loc[0, "nazwa_lokalizacji"] == "Ratusz"
++    assert df.loc[0, "kod_simc"] == "0920806"
++    assert df.loc[0, "wydawca_zasobu"] == "Gmina 1"
++    assert df.loc[0, "data_danych_zasobu"] == "2026-11-20"
++    assert stats == {
++        "zasoby_przyjete": 1,
++        "zasoby_pominiete": [
++            {"resource_id": 2, "powod": "nie można odczytać danych tabelarycznych: uszkodzony plik"},
++            {"resource_id": 3, "powod": "brak kolumn: miejscowosc, szerokosc_geograficzna, dlugosc_geograficzna"},
++        ],
++        "wiersze": 1,
++        "wiersze_pominiete": 1,
++    }
++
++
++@pytest.mark.feat_main_aed
++def test_missing_tabular_data_is_skipped():
++    resource = make_resource(1)
++    resource.tabular_data = None
++    resource.main_file = ""
++    _, stats = create_main_aed_df([resource], AGGREGATED_AT)
++    assert stats["zasoby_pominiete"] == [{"resource_id": 1, "powod": "zasób nie ma danych tabelarycznych w portalu"}]
++
++
++@pytest.mark.feat_main_aed
++@pytest.mark.parametrize(
++    "response",
++    [
++        remote_response("text/html; charset=utf-8", b"<html></html>"),
++        remote_response("text/csv", b"nazwa\r\nX\r\n", status_code=404),
++    ],
++    ids=["html-page", "not-found"],
++)
++def test_ckan_html_link_skipped(response):
++    resource = make_resource(7, ckan=True)
++    with patch("mcod.resources.aed_utils.request_remote_dga", return_value=response):
++        df, stats = create_main_aed_df([resource], AGGREGATED_AT)
++    assert df.empty
++    assert stats["zasoby_pominiete"] == [{"resource_id": 7, "powod": "zasób nie jest plikiem tabelarycznym"}]
++
++
++@pytest.mark.feat_main_aed
++def test_ckan_connection_error_skipped():
++    resource = make_resource(7, ckan=True)
++    with patch("mcod.resources.aed_utils.request_remote_dga", side_effect=requests.exceptions.ConnectTimeout("timeout")):
++        _, stats = create_main_aed_df([resource], AGGREGATED_AT)
++    assert stats["zasoby_pominiete"][0]["powod"].startswith("serwer dostawcy nie odpowiada")
++
++
++@pytest.mark.feat_main_aed
++def test_ckan_csv_read_as_text():
++    resource = make_resource(7, ckan=True)
++    with patch(
++        "mcod.resources.aed_utils.request_remote_dga", return_value=remote_response("text/csv; charset=utf-8", legionowo_bytes())
++    ):
++        df, stats = create_main_aed_df([resource], AGGREGATED_AT)
++    assert stats["zasoby_przyjete"] == 1
++    assert len(df) == LEGIONOWO_ROWS
++    assert df.loc[0, "kod_simc"] == "0920806"
++
++
++@pytest.mark.elasticsearch
++@pytest.mark.feat_main_aed
++def test_template_file_read_without_portal_tabular_data(aed_resource_factory):
++    # Walidacja danych portalu odrzuca "5A" w numer_budynku, więc portal nie ma danych tabelarycznych;
++    # wykaz czyta wtedy plik zasobu wprost, jako tekst.
++    resource = aed_resource_factory("aed_punkty_przyklad.csv", data_tasks_last_status="FAILURE")
++    assert resource.tabular_data is None
++
++    df = get_aed_source_df(resource)
++
++    assert len(df) == 8
++    assert "5A" in df["numer_budynku"].tolist()
++    assert df.loc[0, "kod_terc"] == "0461011"
++
++
++@pytest.mark.elasticsearch
++@pytest.mark.feat_main_aed
++def test_real_legionowo_csv_read(aed_resource_factory):
++    resource = aed_resource_factory("legionowo_2625221.csv")
++    process_resource_file_data_task(resource.pk)
++    resource.refresh_from_db()
++
++    df = get_aed_source_df(resource)
++
++    assert "nazwa" in df.columns
++    assert len(df) == LEGIONOWO_ROWS
++    assert df.loc[0, "kod_simc"] == "0920806"
+diff --git a/portal/backend/mcod/resources/tests/test_aed_task.py b/portal/backend/mcod/resources/tests/test_aed_task.py
+new file mode 100644
+index 0000000..f5a3278
+--- /dev/null
++++ b/portal/backend/mcod/resources/tests/test_aed_task.py
+@@ -0,0 +1,220 @@
++from io import StringIO
++from pathlib import Path
++from unittest import mock
++from unittest.mock import MagicMock
++
++import pytest
++from celery.schedules import crontab
++from django.core.management import call_command
++from django.test import override_settings
++
++import mcod.resources.tasks as resources_tasks
++from mcod.celeryapp import get_beat_schedule
++from mcod.resources.dga_utils import FailedValidationException, PendingValidationException
++from mcod.resources.tasks import create_main_aed_resource_task
++
++COMMAND_MODULE = "mcod.resources.management.commands.create_main_aed_resource"
++
++
++@pytest.mark.feat_main_aed
++class TestMainAEDResourceCreationTask:
++
++    @pytest.fixture(autouse=True)
++    def setup_mocks(self):
++        self.resource_mock = MagicMock()
++        self.resource_objects_get_mock = MagicMock()
++        self.resource_mock.objects = MagicMock(get=self.resource_objects_get_mock)
++        with mock.patch("mcod.resources.tasks.aed.apps.get_model", return_value=self.resource_mock), mock.patch(
++            "mcod.resources.tasks.aed.create_main_aed_file"
++        ) as self.mock_create_file, mock.patch(
++            "mcod.resources.tasks.aed.create_main_aed_resource_with_dataset"
++        ) as self.mock_create_resource, mock.patch(
++            "mcod.resources.tasks.aed.check_all_resource_validations_status"
++        ) as self.mock_check_status, mock.patch(
++            "mcod.resources.tasks.aed.replace_old_main_aed_resource"
++        ) as self.mock_replace, mock.patch(
++            "mcod.resources.tasks.aed.clean_up_after_main_aed_resource_creation"
++        ) as self.mock_clean_up:
++            self.mock_create_file.return_value = "/path/to/wykaz_aed.csv"
++            self.mock_create_resource.return_value = (10, 2)
++            yield
++
++    def test_main_aed_resource_creation_task(self):
++        manager = MagicMock()
++        for name in ("mock_create_file", "mock_create_resource", "mock_check_status", "mock_replace", "mock_clean_up"):
++            manager.attach_mock(getattr(self, name), name)
++
++        create_main_aed_resource_task()
++
++        new_resource = self.resource_objects_get_mock.return_value
++        self.resource_objects_get_mock.assert_called_once_with(pk=10)
++        assert manager.mock_calls == [
++            mock.call.mock_create_file(),
++            mock.call.mock_create_resource(file_path="/path/to/wykaz_aed.csv"),
++            mock.call.mock_check_status(new_resource),
++            mock.call.mock_replace(new_resource),
++            mock.call.mock_clean_up(exception_occurred=False),
++        ]
++
++    def test_file_creation_exception(self):
++        self.mock_create_file.side_effect = Exception()
++
++        with pytest.raises(Exception):
++            create_main_aed_resource_task()
++
++        self.mock_create_resource.assert_not_called()
++        self.mock_clean_up.assert_called_once_with(exception_occurred=True)
++
++    def test_resource_creation_exception(self):
++        self.mock_create_resource.side_effect = Exception()
++
++        with pytest.raises(Exception):
++            create_main_aed_resource_task()
++
++        self.mock_create_resource.assert_called_once_with(file_path="/path/to/wykaz_aed.csv")
++        self.mock_replace.assert_not_called()
++        self.mock_clean_up.assert_called_once_with(exception_occurred=True)
++
++    @pytest.mark.parametrize("exception", [Exception, PendingValidationException, FailedValidationException])
++    def test_validations_exception(self, exception):
++        self.mock_check_status.side_effect = exception
++
++        with pytest.raises(exception):
++            create_main_aed_resource_task()
++
++        self.mock_check_status.assert_called_once_with(self.resource_objects_get_mock.return_value)
++        self.mock_replace.assert_not_called()
++        if exception is PendingValidationException:
++            self.mock_clean_up.assert_not_called()
++        else:
++            self.mock_clean_up.assert_called_once_with(exception_occurred=True)
++
++    def test_replace_exception(self):
++        self.mock_replace.side_effect = Exception()
++
++        with pytest.raises(Exception):
++            create_main_aed_resource_task()
++
++        self.mock_clean_up.assert_called_once_with(exception_occurred=True)
++
++    @override_settings(AED_AGGREGATION_ENABLED=False)
++    def test_disabled_does_nothing(self):
++        create_main_aed_resource_task()
++
++        for mocked in (self.mock_create_file, self.mock_create_resource, self.mock_check_status, self.mock_replace):
++            mocked.assert_not_called()
++        self.mock_clean_up.assert_not_called()
++
++
++@pytest.mark.feat_main_aed
++def test_beat_schedule_has_aed_entry_when_enabled():
++    schedule = get_beat_schedule(
++        enable_monthly_reports=False, enable_create_xml_metadata_report=True, enable_aed_aggregation=True
++    )
++
++    entry = schedule["aed_main_resource_creation"]
++    assert entry["task"] == "mcod.resources.tasks.create_main_aed_resource_task"
++    assert entry["options"] == {"queue": "periodic"}
++    assert entry["schedule"] == crontab(minute=15, hour=4)
++
++
++@pytest.mark.feat_main_aed
++def test_beat_schedule_without_aed_entry_when_disabled():
++    enabled = get_beat_schedule(enable_monthly_reports=False, enable_create_xml_metadata_report=True, enable_aed_aggregation=True)
++    disabled = get_beat_schedule(enable_monthly_reports=False, enable_create_xml_metadata_report=True)
++
++    assert "aed_main_resource_creation" not in disabled
++    enabled.pop("aed_main_resource_creation")
++    assert enabled == disabled
++    assert disabled["dga_main_resource_creation"]["schedule"] == crontab(minute=30, hour=3)
++
++
++@pytest.mark.feat_main_aed
++def test_task_exported():
++    assert resources_tasks.create_main_aed_resource_task is create_main_aed_resource_task
++    assert "create_main_aed_resource_task" in resources_tasks.__all__
++    assert create_main_aed_resource_task.name == "mcod.resources.tasks.create_main_aed_resource_task"
++
++
++def run_command(*args) -> str:
++    out = StringIO()
++    call_command("create_main_aed_resource", *args, stdout=out)
++    return out.getvalue()
++
++
++@pytest.fixture
++def csv_with_two_rows(tmp_path) -> Path:
++    path = tmp_path / "wykaz_aed.csv"
++    path.write_bytes('id_aed,nazwa_lokalizacji\r\nPL-AED-1,"Ratusz\r\nparter"\r\nPL-AED-2,Szkoła\r\n'.encode("utf-8"))
++    return path
++
++
++@pytest.mark.feat_main_aed
++def test_command_delay():
++    with mock.patch(f"{COMMAND_MODULE}.create_main_aed_resource_task") as task:
++        output = run_command()
++
++    task.delay.assert_called_once_with()
++    assert "Zlecono zadanie" in output
++
++
++@pytest.mark.feat_main_aed
++def test_command_eager(csv_with_two_rows):
++    resource = MagicMock(dataset_id=5)
++    with mock.patch(f"{COMMAND_MODULE}.create_main_aed_file", return_value=csv_with_two_rows), mock.patch(
++        f"{COMMAND_MODULE}.create_main_aed_resource_with_dataset", return_value=(77, None)
++    ) as create_resource, mock.patch(f"{COMMAND_MODULE}.Resource.objects.get", return_value=resource) as get, mock.patch(
++        f"{COMMAND_MODULE}.clean_up_after_main_aed_resource_creation"
++    ) as clean_up, mock.patch(
++        f"{COMMAND_MODULE}.replace_old_main_aed_resource"
++    ) as replace:
++        output = run_command("--eager")
++
++    create_resource.assert_called_once_with(file_path=csv_with_two_rows)
++    get.assert_called_once_with(pk=77)
++    clean_up.assert_called_once_with(exception_occurred=False)
++    replace.assert_called_once_with(resource)
++    assert "Zbiór: 5\n" in output
++    assert "Zasób: 77" in output
++    assert "Wiersze: 2" in output
++
++
++@pytest.mark.feat_main_aed
++def test_command_eager_cleans_up_on_error(csv_with_two_rows):
++    with mock.patch(f"{COMMAND_MODULE}.create_main_aed_file", return_value=csv_with_two_rows), mock.patch(
++        f"{COMMAND_MODULE}.create_main_aed_resource_with_dataset", side_effect=RuntimeError("błąd")
++    ), mock.patch(f"{COMMAND_MODULE}.clean_up_after_main_aed_resource_creation") as clean_up, mock.patch(
++        f"{COMMAND_MODULE}.replace_old_main_aed_resource"
++    ) as replace:
++        with pytest.raises(RuntimeError):
++            run_command("--eager")
++
++    clean_up.assert_called_once_with(exception_occurred=True)
++    replace.assert_not_called()
++
++
++@pytest.mark.feat_main_aed
++def test_command_dry_run(csv_with_two_rows):
++    with mock.patch(f"{COMMAND_MODULE}.create_main_aed_file", return_value=csv_with_two_rows), mock.patch(
++        f"{COMMAND_MODULE}.create_main_aed_resource_with_dataset"
++    ) as create_resource, mock.patch(f"{COMMAND_MODULE}.caches") as caches:
++        output = run_command("--dry-run")
++
++    create_resource.assert_not_called()
++    caches.__getitem__.return_value.delete.assert_called_once_with("main_aed_csv_path_to_clean")
++    assert f"Plik CSV: {csv_with_two_rows}" in output
++    assert "Wiersze: 2" in output
++    assert csv_with_two_rows.exists()
++
++
++@pytest.mark.feat_main_aed
++@override_settings(AED_AGGREGATION_ENABLED=False)
++def test_command_disabled():
++    with mock.patch(f"{COMMAND_MODULE}.create_main_aed_file") as create_file, mock.patch(
++        f"{COMMAND_MODULE}.create_main_aed_resource_task"
++    ) as task:
++        output = run_command("--eager")
++
++    create_file.assert_not_called()
++    task.delay.assert_not_called()
++    assert "Wykaz AED wyłączony" in output
+diff --git a/portal/backend/mcod/resources/tests/test_main_aed_resource.py b/portal/backend/mcod/resources/tests/test_main_aed_resource.py
+new file mode 100644
+index 0000000..b01aa67
+--- /dev/null
++++ b/portal/backend/mcod/resources/tests/test_main_aed_resource.py
+@@ -0,0 +1,252 @@
++from pathlib import Path
++from typing import Optional
++from unittest import mock
++from unittest.mock import MagicMock, call
++
++import pandas as pd
++import pytest
++from django.conf import settings
++
++from mcod.categories.factories import CategoryFactory
++from mcod.categories.models import Category
++from mcod.datasets.factories import DatasetFactory
++from mcod.datasets.models import Dataset
++from mcod.lib.model_sanitization import sanitize_html
++from mcod.organizations.models import Organization
++from mcod.resources.aed_constants import MAIN_AED_COLUMNS
++from mcod.resources.aed_utils import (
++    build_aed_tabular_schema,
++    clean_up_after_main_aed_resource_creation,
++    create_main_aed_dataset,
++    create_main_aed_file,
++    create_main_aed_resource_with_dataset,
++    get_main_aed_dataset,
++    get_main_aed_resource,
++    replace_old_main_aed_resource,
++)
++from mcod.resources.factories import ResourceFactory
++from mcod.resources.models import Resource, ResourceFile
++from mcod.resources.tasks import (
++    process_resource_file_data_task,
++    process_resource_res_file_task,
++    update_resource_has_table_has_map_task,
++)
++
++
++@pytest.fixture
++def small_main_aed_csv(tmp_path: Path) -> Path:
++    """Nagłówek i dwa wiersze z referencyjnego przykładu zasobu zbiorczego."""
++    lines = Path(settings.TEST_SAMPLES_PATH, "aed", "aed_zestawienie_przyklad.csv").read_bytes().split(b"\r\n")
++    path = tmp_path / "wykaz_aed.csv"
++    path.write_bytes(b"\r\n".join(lines[:3]) + b"\r\n")
++    return path
++
++
++@pytest.mark.feat_main_aed
++def test_build_aed_tabular_schema():
++    schema = build_aed_tabular_schema(MAIN_AED_COLUMNS)
++
++    assert len(schema["fields"]) == 51
++    assert all(field["type"] == "string" for field in schema["fields"])
++    assert schema["missingValues"] == []
++    for geo_type, column in (("b", "szerokosc_geograficzna"), ("l", "dlugosc_geograficzna"), ("label", "nazwa_lokalizacji")):
++        index = MAIN_AED_COLUMNS.index(column)
++        assert schema["geo"][geo_type] == {"col_name": column, "col_index": index}
++        assert schema["fields"][index]["geo"] == geo_type
++    assert sum("geo" in field for field in schema["fields"]) == 3
++
++
++@pytest.mark.feat_main_aed
++def test_create_main_aed_dataset(main_aed_owner_organization: Organization):
++    if not Category.objects.filter(title="Zdrowie").exists():
++        CategoryFactory.create(title="Zdrowie")
++
++    dataset = Dataset.objects.get(pk=create_main_aed_dataset())
++
++    assert dataset.title == settings.MAIN_AED_DATASET_DEFAULT_TITLE
++    assert dataset.notes == sanitize_html(settings.MAIN_AED_DATASET_DEFAULT_DESC)
++    assert dataset.organization == main_aed_owner_organization
++    assert dataset.customfields == {"standard": "AED", "zestawienie": "AED-krajowe"}
++    assert dataset.license_name == "CC BY 4.0"
++    assert dataset.status == "published"
++    assert dataset.update_frequency == "daily"
++    assert dataset.update_notification_recipient_email == settings.MAIN_AED_DATASET_UPDATE_NOTIFICATION_EMAIL
++    assert {category.title for category in dataset.categories.all()} == {"Zdrowie"}
++    assert sorted(tag.name for tag in dataset.tags.all()) == sorted(settings.MAIN_AED_DATASET_TAGS_NAMES)
++    assert get_main_aed_dataset() == dataset
++
++
++@pytest.mark.feat_main_aed
++def test_create_main_aed_dataset_without_category(main_aed_owner_organization: Organization, settings):
++    settings.MAIN_AED_DATASET_CATEGORIES_TITLES = ["Kategoria spoza bazy AED"]
++
++    with mock.patch("mcod.resources.aed_utils.logger") as logger:
++        dataset = Dataset.objects.get(pk=create_main_aed_dataset())
++
++    assert dataset.categories.count() == 0
++    logger.warning.assert_called_once_with("No category with title Kategoria spoza bazy AED found.")
++
++
++@pytest.mark.feat_main_aed
++def test_get_main_aed_dataset_and_resource(main_aed_dataset: Dataset):
++    DatasetFactory.create(organization=main_aed_dataset.organization, status="published", customfields={"standard": "AED"})
++    ResourceFactory.create(dataset=main_aed_dataset, status="published")
++    newest = ResourceFactory.create(dataset=main_aed_dataset, status="published")
++    ResourceFactory.create(dataset=main_aed_dataset, status="draft")
++
++    assert get_main_aed_dataset() == main_aed_dataset
++    assert get_main_aed_resource() == newest
++
++
++@pytest.mark.feat_main_aed
++def test_get_main_aed_dataset_none_without_aggregate_marker(main_aed_owner_organization: Organization):
++    DatasetFactory.create(organization=main_aed_owner_organization, status="published", customfields={"standard": "AED"})
++    assert get_main_aed_dataset() is None
++    assert get_main_aed_resource() is None
++
++
++@pytest.mark.feat_main_aed
++def test_create_main_aed_file():
++    row = {column: "" for column in MAIN_AED_COLUMNS}
++    row.update(id_aed="PL-AED-000000000001", nazwa_lokalizacji="Ratusz, parter")
++    main_df = pd.DataFrame([row], columns=MAIN_AED_COLUMNS)
++    stats = {"zasoby_przyjete": 1, "zasoby_pominiete": [], "wiersze": 1, "wiersze_pominiete": 0}
++
++    with mock.patch("mcod.resources.aed_utils.get_aed_source_resources", return_value=[]), mock.patch(
++        "mcod.resources.aed_utils.create_main_aed_df", return_value=(main_df, stats)
++    ) as create_df:
++        file_path = create_main_aed_file()
++
++    try:
++        content = Path(file_path).read_bytes()
++        assert Path(file_path).name.startswith(settings.MAIN_AED_CSV_FILE_NAME_PREFIX)
++        assert Path(file_path).suffix == ".csv"
++        assert not content.startswith(b"\xef\xbb\xbf")
++        header, first_row = content.split(b"\r\n")[:2]
++        assert header.decode("utf-8").split(",") == MAIN_AED_COLUMNS
++        assert b'"Ratusz, parter"' in first_row
++        assert create_df.call_args[0][0] == []
++    finally:
++        Path(file_path).unlink()
++
++
++@pytest.mark.feat_main_aed
++def test_create_main_aed_resource_with_dataset(main_aed_owner_organization: Organization, small_main_aed_csv: Path):
++    resource_pk, dataset_pk = create_main_aed_resource_with_dataset(small_main_aed_csv)
++
++    assert dataset_pk
++    resource = Resource.objects.get(pk=resource_pk)
++    assert resource.title == settings.MAIN_AED_RESOURCE_DEFAULT_TITLE
++    assert resource.description == sanitize_html(settings.MAIN_AED_RESOURCE_DEFAULT_DESC)
++    assert resource.dataset.pk == dataset_pk
++    assert resource.dataset.institution == main_aed_owner_organization
++    assert resource.contains_protected_data is False
++    assert resource.status == "published"
++    assert set(resource.tabular_data_schema["geo"]) == {"b", "l", "label"}
++
++    resource_files = ResourceFile.objects.filter(resource=resource)
++    assert resource_files.count() == 1
++    assert resource_files.first().is_main is True
++
++
++@pytest.mark.feat_main_aed
++def test_create_main_aed_resource_reuses_dataset_and_metadata(main_aed_dataset: Dataset, small_main_aed_csv: Path):
++    old = ResourceFactory.create(dataset=main_aed_dataset, status="published", title="Wykaz AED (edytowany)")
++
++    resource_pk, dataset_pk = create_main_aed_resource_with_dataset(small_main_aed_csv)
++
++    assert dataset_pk is None
++    resource = Resource.objects.get(pk=resource_pk)
++    assert resource.dataset == main_aed_dataset
++    assert resource.title == old.title
++    assert Resource.objects.filter(pk=old.pk, status="published").exists()
++
++
++@pytest.mark.feat_main_aed
++def test_replace_old_main_aed_resource(main_aed_dataset: Dataset):
++    old = ResourceFactory.create(dataset=main_aed_dataset, status="published")
++    other_dataset_resource = ResourceFactory.create(status="published")
++    new = ResourceFactory.create(dataset=main_aed_dataset, status="published")
++
++    replace_old_main_aed_resource(new)
++
++    old.refresh_from_db()
++    new.refresh_from_db()
++    other_dataset_resource.refresh_from_db()
++    assert old.is_removed is True
++    assert new.is_removed is False
++    assert other_dataset_resource.is_removed is False
++    assert get_main_aed_resource() == new
++
++
++@pytest.mark.feat_main_aed
++@pytest.mark.parametrize(
++    ("resource_id", "dataset_id", "exc_occurred", "file_exists"),
++    [
++        (123, 456, False, True),
++        (123, 456, True, True),
++        (123, None, False, True),
++        (123, None, True, True),
++        (None, None, True, True),
++        (None, None, False, True),
++        (None, None, False, False),
++    ],
++)
++@mock.patch("mcod.resources.aed_utils.sentry_sdk.api.capture_exception")
++@mock.patch("mcod.resources.aed_utils.os.remove")
++@mock.patch("mcod.resources.aed_utils.caches")
++def test_clean_up_after_main_aed_resource_creation(
++    mock_caches: MagicMock,
++    mock_os_remove: MagicMock,
++    mock_sentry: MagicMock,
++    resource_id: Optional[int],
++    dataset_id: Optional[int],
++    exc_occurred: bool,
++    file_exists: bool,
++):
++    dataset: Optional[Dataset] = DatasetFactory.create(pk=dataset_id) if dataset_id else None
++    if resource_id:
++        ResourceFactory.create(pk=resource_id, dataset=dataset) if dataset else ResourceFactory.create(pk=resource_id)
++
++    values = {"main_aed_to_clean": (resource_id, dataset_id), "main_aed_csv_path_to_clean": "/tmp/wykaz_aed.csv"}
++    mock_cache = MagicMock()
++    mock_cache.get.side_effect = lambda key, default=None: values.get(key, default)
++    mock_caches.__getitem__.return_value = mock_cache
++
++    with mock.patch("mcod.resources.aed_utils.os.path.exists", return_value=file_exists):
++        clean_up_after_main_aed_resource_creation(exc_occurred)
++
++    if exc_occurred:
++        assert Resource.raw.filter(pk=resource_id).exists() is False
++        assert Dataset.raw.filter(pk=dataset_id).exists() is False
++    else:
++        assert bool(resource_id) is Resource.raw.filter(pk=resource_id).exists()
++        assert bool(dataset_id) is Dataset.raw.filter(pk=dataset_id).exists()
++
++    if file_exists:
++        mock_os_remove.assert_called_once_with("/tmp/wykaz_aed.csv")
++    else:
++        mock_os_remove.assert_not_called()
++    mock_cache.delete.assert_has_calls([call("main_aed_to_clean"), call("main_aed_csv_path_to_clean")])
++    mock_sentry.assert_not_called()
++
++
++@pytest.mark.elasticsearch
++@pytest.mark.feat_main_aed
++def test_main_aed_resource_has_map_after_processing(main_aed_owner_organization: Organization, small_main_aed_csv: Path):
++    resource_pk, _ = create_main_aed_resource_with_dataset(small_main_aed_csv)
++    resource_file = ResourceFile.objects.get(resource_id=resource_pk, is_main=True)
++
++    process_resource_res_file_task.apply(args=(resource_file.pk,), kwargs={"update_link": False})
++    process_resource_file_data_task.apply(args=(resource_pk,))
++    update_resource_has_table_has_map_task(resource_pk)
++
++    resource = Resource.objects.get(pk=resource_pk)
++    assert set(resource.tabular_data_schema["geo"]) == {"b", "l", "label"}
++    assert resource.has_table is True
++    assert resource.has_map is True
++    rows = resource.tabular_data.table.read(keyed=True, cast=False)
++    expected = pd.read_csv(small_main_aed_csv, dtype=str, keep_default_na=False).to_dict("records")
++    assert len(rows) == 2
++    for column in ("id_aed", "kod_simc", "kod_terc", "szerokosc_geograficzna", "dlugosc_geograficzna"):
++        assert rows[0][column] == expected[0][column]
+diff --git a/portal/backend/mcod/resources/views.py b/portal/backend/mcod/resources/views.py
+index f01eca0..cb4ae37 100644
+--- a/portal/backend/mcod/resources/views.py
++++ b/portal/backend/mcod/resources/views.py
+@@ -36,6 +36,7 @@ from mcod.core.api.views import JsonAPIView, RDFView, VocabEntryRDFView, VocabRD
+ from mcod.core.versioning import versioned
+ from mcod.counters.lib import Counter
+ from mcod.lib.encoders import DateTimeToISOEncoder
++from mcod.resources.aed_utils import get_main_aed_resource
+ from mcod.resources.deserializers import (
+     ChartApiRequest,
+     CreateCommentRequest,
+@@ -49,6 +50,7 @@ from mcod.resources.deserializers import (
+ from mcod.resources.documents import ResourceDocument
+ from mcod.resources.models import RESOURCE_TYPE_FILE, AggregatedDGAInfo, ResourceFile
+ from mcod.resources.serializers import (
++    AggregatedAEDInfoApiResponse,
+     AggregatedDGAInfoApiResponse,
+     ChartApiResponse,
+     CommentApiResponse,
+@@ -775,6 +777,34 @@ class AggregatedDGAInfoView(JsonAPIView):
+             return self.serializer.dump(self.response.context.data)
+ 
+ 
++class AggregatedAEDInfoView(JsonAPIView):
++
++    @falcon.before(login_optional)
++    @versioned
++    def on_get(self, request, response, *args, **kwargs):
++        """
++        ---
++        doc_template: docs/resources/aggregated_aed_info_view.yml
++        """
++        self.handle(request, response, self.GET, *args, **kwargs)
++
++    class GET(BaseHdlr):
++        database_model = apps.get_model("resources", "Resource")
++        serializer_schema = AggregatedAEDInfoApiResponse
++
++        def _get_data(self, cleaned, *args, **kwargs) -> Resource:
++            if not settings.AED_AGGREGATION_ENABLED:
++                raise falcon.HTTPNotFound
++            resource = get_main_aed_resource()
++            if resource is None:
++                raise falcon.HTTPNotFound
++            return resource
++
++        def serialize(self, *args, **kwargs):
++            self.prepare_context(*args, **kwargs)
++            return self.serializer.dump(self.response.context.data)
++
++
+ class ResourceAutocompleteView(autocomplete.Select2QuerySetView):
+     def get_result_label(self, result):
+         return result.label_from_instance
+diff --git a/portal/backend/mcod/routes.py b/portal/backend/mcod/routes.py
+index 1c2468c..909fac3 100644
+--- a/portal/backend/mcod/routes.py
++++ b/portal/backend/mcod/routes.py
+@@ -147,6 +147,8 @@ routes = [
+     ("/resources/{id:int},{slug}/comments", res_views.ResourceCommentsView()),
+     # DGA
+     ("/dga-aggregated", res_views.AggregatedDGAInfoView()),
++    # Wykaz AED
++    ("/aed-aggregated", res_views.AggregatedAEDInfoView()),
+     # Depricated views
+     ("/resources/{id:int}/incr_download_count", res_views.ResourceDownloadCounter()),
+     (
+diff --git a/portal/backend/mcod/settings/base.py b/portal/backend/mcod/settings/base.py
+index a88e90b..e852bdf 100644
+--- a/portal/backend/mcod/settings/base.py
++++ b/portal/backend/mcod/settings/base.py
+@@ -970,6 +970,7 @@ CELERY_TASK_ROUTES = {
+     "mcod.submissions.tasks.generate_statistical_report_for_all_submissions_task": {"queue": "reports"},
+     "mcod.resources.tasks.check_link_protocol": {"queue": "resources"},
+     "mcod.resources.tasks.create_main_dga_resource_task": {"queue": "resources"},
++    "mcod.resources.tasks.create_main_aed_resource_task": {"queue": "resources"},
+     "mcod.resources.tasks.delete_es_resource_tabular_data_index": {"queue": "indexing_data"},
+     "mcod.resources.tasks.delete_es_resource_tabular_data_indexes_for_organization": {"queue": "indexing_data"},
+     "mcod.resources.tasks.entrypoint_process_resource_file_validation_task": {"queue": "resources"},
+@@ -1747,6 +1748,38 @@ MAIN_DGA_DATASET_TAGS_NAMES = [
+     "chronione dane",
+ ]
+ 
++# Wykaz AED – dodatek na wzór zbiorczego wykazu DGA (docs/06, docs/07).
++# Przy AED_AGGREGATION_ENABLED = False zadanie nic nie robi, harmonogram nie ma wpisu, a endpoint zwraca 404.
++AED_AGGREGATION_ENABLED = env.bool("AED_AGGREGATION_ENABLED", default=True)
++MAIN_AED_DATASET_OWNER_ORGANIZATION_PK = int(
++    env("MAIN_AED_DATASET_OWNER_ORGANIZATION_PK", default=MAIN_DGA_DATASET_OWNER_ORGANIZATION_PK)
++)
++MAIN_AED_RESOURCE_CSV_CREATION_ROOT = str(ROOT_DIR.path(MEDIA_ROOT, "main_aed"))
++MAIN_AED_CSV_FILE_NAME_PREFIX = "Wykaz defibrylatorów AED – wykaz zbiorczy"
++# None: blokada zwalniana dopiero po sprzątaniu (jak MAIN_DGA_RESOURCE_CREATION_CACHE_TIMEOUT).
++MAIN_AED_RESOURCE_CREATION_CACHE_TIMEOUT = None
++MAIN_AED_RESOURCE_CSV_CREATION_CACHE_TIMEOUT = 60 * 60  # 60 minutes
++MAIN_AED_RESOURCE_DEFAULT_TITLE = "Wykaz defibrylatorów AED"
++MAIN_AED_RESOURCE_DEFAULT_DESC = (
++    "Zasób zbiorczy budowany codziennie przez portal z zasobów dostawców, których zbiory w Polach "
++    "niestandardowych deklarują zgodność ze wzorcem AED (standard = AED). Licencja CC BY 4.0; każdy wiersz "
++    "ma atrybucję źródła: wydawcę, licencję, identyfikator i adres zasobu źródłowego oraz datę danych.\n\n"
++    "Pominięte są wiersze z OpenStreetMap (licencja ODbL), wiersze bez minimum danych (nazwa lokalizacji, "
++    "miejscowość, współrzędne) oraz kontakty ze zbiorów deklarujących dane osobowe. Brak statusu urządzenia "
++    "oznacza „nieznany”, a nie „sprawny”."
++)
++MAIN_AED_DATASET_DEFAULT_TITLE = "Wykaz defibrylatorów AED – wykaz zbiorczy"
++MAIN_AED_DATASET_DEFAULT_DESC = (
++    "Ogólnopolski wykaz defibrylatorów AED budowany codziennie przez portal z zasobów dostawców, których zbiory "
++    "w Polach niestandardowych mają wpis standard = AED. Licencja CC BY 4.0; każdy wiersz ma atrybucję źródła "
++    "(wydawca, licencja, link do zasobu źródłowego, data danych).\n\n"
++    "Pominięte są wiersze z OpenStreetMap (licencja ODbL), wiersze bez minimum danych oraz kontakty ze zbiorów "
++    "deklarujących dane osobowe. Brak statusu urządzenia oznacza „nieznany”, a nie „sprawny”."
++)
++MAIN_AED_DATASET_CATEGORIES_TITLES = ["Zdrowie"]
++MAIN_AED_DATASET_TAGS_NAMES = ["AED", "defibrylatory", "wykaz AED"]
++MAIN_AED_DATASET_UPDATE_NOTIFICATION_EMAIL = MAIN_DGA_DATASET_UPDATE_NOTIFICATION_EMAIL
++
+ PASSWORD_RESET_PATH = "/user/reset-password/%s/"
+ EMAIL_VALIDATION_PATH = "/user/verify-email/%s/"
+ 
+diff --git a/portal/backend/mcod/settings/test.py b/portal/backend/mcod/settings/test.py
+index 2e1d2fb..df2ab08 100644
+--- a/portal/backend/mcod/settings/test.py
++++ b/portal/backend/mcod/settings/test.py
+@@ -89,6 +89,7 @@ NEWSLETTER_MEDIA_ROOT = str(os.path.join(MEDIA_ROOT, "newsletter"))
+ RESOURCES_MEDIA_ROOT = str(os.path.join(MEDIA_ROOT, "resources"))
+ BROKEN_LINKS_CREATION_STAGING_ROOT = str(ROOT_DIR.path(MEDIA_ROOT, "broken_links_temp"))
+ MAIN_DGA_RESOURCE_XLSX_CREATION_ROOT = str(ROOT_DIR.path(MEDIA_ROOT, "main_dga"))
++MAIN_AED_RESOURCE_CSV_CREATION_ROOT = str(ROOT_DIR.path(MEDIA_ROOT, "main_aed"))
+ RESOURCES_FILES_TO_REMOVE_ROOT = str(ROOT_DIR.path(MEDIA_ROOT, "to_be_removed", "resources"))
+ REPORTS_MEDIA_ROOT = str(os.path.join(MEDIA_ROOT, "reports"))
+ SHOWCASES_MEDIA_ROOT = str(os.path.join(MEDIA_ROOT, "showcases"))
+@@ -98,6 +99,8 @@ METADATA_MEDIA_ROOT = str(ROOT_DIR.path(MEDIA_ROOT, "datasets", "catalog"))
+ # Do not use cache in tests
+ MAIN_DGA_RESOURCE_CREATION_CACHE_TIMEOUT = 0
+ MAIN_DGA_RESOURCE_XLSX_CREATION_CACHE_TIMEOUT = 0
++MAIN_AED_RESOURCE_CREATION_CACHE_TIMEOUT = 0
++MAIN_AED_RESOURCE_CSV_CREATION_CACHE_TIMEOUT = 0
+ 
+ CACHES.update({"test": {"BACKEND": "django.core.cache.backends.locmem.LocMemCache"}})
+ 
+@@ -183,6 +186,7 @@ DISCOURSE_FORUM_ENABLED = False
+ FIELD_ENCRYPTION_KEYS = ["c2d95c58322ca6ddcf8b0c304c8131f6b515ff5f3a297dcdadeda1a82cb4ec9b"]
+ 
+ MAIN_DGA_DATASET_OWNER_ORGANIZATION_PK = 99
++MAIN_AED_DATASET_OWNER_ORGANIZATION_PK = 99
+ 
+ # Set unique cache prefix for each pytest worker to isolate session clearing
+ # in a shared cache environment, preventing conflicts between workers.
+diff --git a/portal/backend/mcod/templates/docs/resources/aggregated_aed_info_view.yml b/portal/backend/mcod/templates/docs/resources/aggregated_aed_info_view.yml
+new file mode 100644
+index 0000000..2981576
+--- /dev/null
++++ b/portal/backend/mcod/templates/docs/resources/aggregated_aed_info_view.yml
+@@ -0,0 +1,17 @@
++{% load i18n %}
++---
++tags:
++   - API Endpoints
++summary: Returns info about the aggregated AED list resource (Wykaz AED)
++description: |
++  {% spaceless %}
++      <p>Returns data about the aggregated AED list resource (Wykaz AED) - especially resource_id and dataset_id.</p>
++      <p>Returns 404 when the AED list is disabled or has not been built yet.</p>
++  {% endspaceless %}
++responses:
++  200:
++    description: valid response in jsonapi format
++    content:
++      application/vnd.api+json:
++        schema:
++          $ref: '#/components/schemas/AggregatedAEDInfo'
