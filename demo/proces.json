@@ -1,0 +1,61 @@
+{
+  "proces": "Wykaz AED w portalu dane.gov.pl",
+  "opis": "Opis kroków prototypu demo/index.html w postaci do odczytu maszynowego. Ścieżki są względem katalogu głównego repozytorium; weryfikator demo/sprawdz.py sprawdza, czy każdy plik istnieje, a liczba kroków zgadza się ze stroną.",
+  "kroki": [
+    {
+      "nr": 1, "tytul": "Problem: dane o AED są rozproszone",
+      "wejscie": ["references/dane_gov_pl_aed/"], "wyjscie": [],
+      "dowody": ["references/dane_gov_pl_aed/README.md"], "zrzuty": []
+    },
+    {
+      "nr": 2, "tytul": "Dostawca oznacza zbiór: standard = AED",
+      "wejscie": ["Dataset.customfields"], "wyjscie": ["zbiór z deklaracją standardu"],
+      "dowody": ["docs/05_DECYZJA_OZNACZENIE_AED.md"], "zrzuty": ["demo/zrzuty/01_formularz_zbioru_standard_aed.png"]
+    },
+    {
+      "nr": 3, "tytul": "Dostawca publikuje zasób we wzorcowym formacie (CSV, XLSX)",
+      "wejscie": ["format_danych/wzorcowy_zakres_danych.xlsx"], "wyjscie": ["zasób CSV lub XLSX"],
+      "dowody": ["format_danych/przyklady/aed_punkty_przyklad.csv"], "zrzuty": ["demo/zrzuty/02_zasoby_dostawcow.png"]
+    },
+    {
+      "nr": 4, "tytul": "Dane z zewnątrz: XML z serwera dostawcy i walidacja XSD",
+      "wejscie": ["https://<serwer dostawcy>/aed.xml", "format_danych/schemat/aed_punkty.xsd"],
+      "wyjscie": ["zasób z linkiem (typ api, format xml)", "raport walidacji XSD"],
+      "dowody": ["format_danych/przyklady/xml/aed_poprawny.xml", "format_danych/przyklady/xml/aed_bledny.xml",
+                 "demo/wynik/walidacja_xml.json", "portal/backend/mcod/resources/aed_xml.py",
+                 "portal/backend/mcod/resources/management/commands/import_aed_xml.py"],
+      "zrzuty": ["demo/zrzuty/10_zewnetrzny_xml.png", "demo/zrzuty/12_zasob_xml_w_panelu.png",
+                 "demo/zrzuty/13_komenda_wykaz_z_xml.png", "demo/zrzuty/14_wykaz_z_xml_tabela.png"]
+    },
+    {
+      "nr": 5, "tytul": "Portal sprawdza zasoby i co noc buduje Wykaz AED",
+      "wejscie": ["zasoby zbiorów standard = AED (CSV, XLSX, XML)"], "wyjscie": ["zasób zbiorczy CSV, 51 kolumn"],
+      "dowody": ["portal/backend/mcod/resources/aed_utils.py", "portal/backend/mcod/resources/tasks/aed.py",
+                 "demo/wynik/komenda_create_main_aed_resource.txt", "demo/wynik/komenda_create_main_aed_resource_xml.txt"],
+      "zrzuty": ["demo/zrzuty/03_komenda_wykaz_statystyki.png"]
+    },
+    {
+      "nr": 6, "tytul": "Odbiorca przegląda Wykaz AED (tabela, mapa, filtry)",
+      "wejscie": ["demo/wynik/zestawienie_aed.csv"], "wyjscie": [],
+      "dowody": ["demo/wynik/zestawienie_aed.csv", "demo/wynik/wykaz_xml_i_csv.csv"],
+      "zrzuty": ["demo/zrzuty/04_wykaz_tabela.png", "demo/zrzuty/05_wykaz_mapa.png", "demo/zrzuty/15_wykaz_z_xml_mapa.png"]
+    },
+    {
+      "nr": 7, "tytul": "Pobieranie i API",
+      "wejscie": [], "wyjscie": ["CSV", "JSON-LD", "API /1.4/aed-aggregated"],
+      "dowody": ["demo/wynik/api_aed_aggregated.json"],
+      "zrzuty": ["demo/zrzuty/06_api_aed_aggregated.png", "demo/zrzuty/07_api_dane_zasobu.png"]
+    },
+    {
+      "nr": 8, "tytul": "Co zmieniliśmy w portalu",
+      "wejscie": [], "wyjscie": [],
+      "dowody": ["ZMIANY_W_PORTALU.md", "portal/backend/CHANGELOG.md", "demo/wynik/testy.txt"],
+      "zrzuty": ["demo/zrzuty/09_testy.png"]
+    },
+    {
+      "nr": 9, "tytul": "Dodatek: integrator dla dostawców bez wzorcowego formatu",
+      "wejscie": [], "wyjscie": [],
+      "dowody": ["integrator/README.md", "demo/integrator/README.md"], "zrzuty": []
+    }
+  ]
+}

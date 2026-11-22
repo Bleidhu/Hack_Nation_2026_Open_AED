@@ -16,6 +16,7 @@ from django.core.cache import caches
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db import transaction
+from django.db.models import Q
 
 from mcod.resources.aed_aggregation import (
     LAT,
@@ -34,6 +35,7 @@ from mcod.resources.aed_constants import (
     AED_CUSTOMFIELD_STANDARD_VALUE,
     MAIN_AED_COLUMNS,
 )
+from mcod.resources.aed_xml import AEDXmlInvalid, aed_xml_to_df
 from mcod.resources.dga_utils import request_remote_dga
 
 if TYPE_CHECKING:
@@ -82,12 +84,16 @@ def get_aed_source_resources() -> List["Resource"]:
     pliki zgodne ze wzorcem. Zgodność ze wzorcem sprawdza agregacja (kolumny, wartości, powód pominięcia).
     """
     Resource = apps.get_model("resources", "Resource")
+    # Zasób XML z linkiem do zewnętrznego serwera jest w portalu typem `api` (bez pliku), więc nie ma statusu
+    # zadań plikowych; wystarczy poprawny link. Pozostałe zasoby: jak dotąd.
+    ready = Q(file_tasks_last_status="SUCCESS", link_tasks_last_status="SUCCESS") | Q(
+        format="xml", link_tasks_last_status="SUCCESS"
+    )
     candidates = (
         Resource.objects.filter(
+            ready,
             status="published",
             dataset__status="published",
-            file_tasks_last_status="SUCCESS",
-            link_tasks_last_status="SUCCESS",
             dataset__customfields__isnull=False,
         )
         .select_related("dataset__organization")
@@ -101,13 +107,17 @@ def get_aed_source_resources() -> List["Resource"]:
         reason: Optional[str] = None
         if dataset.license_name not in AED_ALLOWED_LICENSES:
             reason = f"licencja {dataset.license_name} nie pozwala na włączenie do wykazu"
-        elif not resource.has_tabular_format():
+        elif not (resource.has_tabular_format() or is_aed_xml_resource(resource)):
             reason = f"format {resource.format} nie jest tabelaryczny"
         if reason:
             logger.info("Pomijam zasób %s zbioru AED %s: %s", resource.pk, dataset.pk, reason)
             continue
         selected.append(resource)
     return selected
+
+
+def is_aed_xml_resource(resource: "Resource") -> bool:
+    return (resource.format or "").lower() == "xml"
 
 
 def get_source_meta(resource: "Resource") -> Dict[str, Any]:
@@ -155,11 +165,38 @@ def _get_local_file_aed_source_df(resource: "Resource") -> pd.DataFrame:
         raise AEDSourceReadError(f"nie można odczytać pliku {extension}: {exc}") from exc
 
 
+def _get_xml_aed_source_df(resource: "Resource") -> pd.DataFrame:
+    """XML dostawcy: pobierany spod `resource.link` przy każdym budowaniu wykazu (albo z pliku zasobu, gdy portal go ma)
+    i sprawdzany schematem XSD. Niezgodny plik jest pomijany z powodem, a nie zamieniany na dane."""
+    if resource.main_file:
+        try:
+            with open(resource.main_file.path, "rb") as source_file:
+                content = source_file.read()
+        except OSError as exc:
+            raise AEDSourceReadError(f"nie można odczytać pliku XML: {exc}") from exc
+    else:
+        if not resource.link:
+            raise AEDSourceReadError("zasób XML nie ma linku ani pliku")
+        try:
+            response = request_remote_dga(resource.link)
+        except requests.exceptions.RequestException as exc:
+            raise AEDSourceReadError(f"serwer dostawcy nie odpowiada: {exc}") from exc
+        if response.status_code != 200:
+            raise AEDSourceReadError(f"serwer dostawcy zwrócił kod {response.status_code}")
+        content = response.content
+    try:
+        return aed_xml_to_df(content)
+    except AEDXmlInvalid as exc:
+        raise AEDSourceReadError(str(exc)) from exc
+
+
 def get_aed_source_df(resource: "Resource") -> pd.DataFrame:
     """
     Dane zasobu jako tekst; zasoby z CKAN pobierane spod `resource.link`, pozostałe z danych tabelarycznych
     portalu, a gdy ich brak (np. walidacja danych portalu odrzuciła zgadnięte typy), wprost z pliku zasobu.
     """
+    if is_aed_xml_resource(resource):
+        return _get_xml_aed_source_df(resource)
     if resource.is_imported_from_ckan:
         return _get_ckan_aed_source_df(resource)
     tabular_data = resource.tabular_data

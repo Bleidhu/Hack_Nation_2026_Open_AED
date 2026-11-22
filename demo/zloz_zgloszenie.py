@@ -16,7 +16,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "ZGLOSZENIE"
 ORIGINAL_COMMIT = "a1adc22"
-GENERATED = ["INSTRUKCJA_DLA_JURY.md", "ZMIANY_W_PORTALU.md", "prototyp", "wzorcowy_zakres_danych.xlsx", "kod", "dane",
+GENERATED = ["INSTRUKCJA_DLA_JURY.md", "DODATKOWE_INFORMACJE.md", "ZMIANY_W_PORTALU.md", "prototyp", "wzorcowy_zakres_danych.xlsx", "kod", "dane",
              "prezentacja", "logotyp", "ksiega_znaku.pdf", "wideo"]
 LOGOTYPY = ["dane-przezycie_logo_poziome", "dane-przezycie_logo_poziome_haslo", "dane-przezycie_logo_pionowe",
             "dane-przezycie_znak", "dane-przezycie_sygnet"]
@@ -37,7 +37,8 @@ def copy_prototype():
     (target / "wynik").mkdir(parents=True)
     (target / "index.html").write_text(html.replace('href="../', 'href="../../'), encoding="utf-8", newline="\n")
     shutil.copytree(ROOT / "demo" / "zrzuty", target / "zrzuty")
-    for name in ("komenda_create_main_aed_resource.txt", "testy.txt", "zestawienie_aed.csv"):
+    for name in ("komenda_create_main_aed_resource.txt", "komenda_create_main_aed_resource_xml.txt", "testy.txt",
+                 "zestawienie_aed.csv", "wykaz_xml_i_csv.csv", "walidacja_xml.json", "weryfikacja.txt", "weryfikacja.json"):
         shutil.copy2(ROOT / "demo" / "wynik" / name, target / "wynik" / name)
     shutil.copytree(ROOT / "demo" / "integrator", target / "integrator")  # dodatek: wyniki integratora
 
@@ -59,11 +60,14 @@ def main():
         elif path.exists():
             path.unlink()
     copy_markdown("INSTRUKCJA_DLA_JURY.md")
+    copy_markdown("DODATKOWE_INFORMACJE.md")
     copy_markdown("ZMIANY_W_PORTALU.md")
     copy_prototype()
     shutil.copy2(ROOT / "format_danych" / "wzorcowy_zakres_danych.xlsx", OUT / "wzorcowy_zakres_danych.xlsx")
     (OUT / "dane").mkdir()
     shutil.copy2(ROOT / "demo" / "wynik" / "zestawienie_aed.csv", OUT / "dane" / "wykaz_aed_wynik_agregacji.csv")
+    shutil.copytree(ROOT / "format_danych" / "przyklady" / "xml", OUT / "dane" / "xml")  # przykłady XML dostawcy
+    shutil.copy2(ROOT / "format_danych" / "schemat" / "aed_punkty.xsd", OUT / "dane" / "aed_punkty.xsd")
     write_portal_patch()
     (OUT / "prezentacja").mkdir()
     for ext in ("pdf", "pptx"):

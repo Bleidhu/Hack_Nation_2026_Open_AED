@@ -1,0 +1,14 @@
+/usr/src/mcod_backend/mcod/core/registries.py:46: UserWarning: Overriding existing registry serializer `<class 'mcod.users.serializers.UserApiAttrs'>` by `<class 'mcod.users.serializers.AgentApiAttrs'>` for model `<class 'mcod.users.models.User'>`.
+2026-11-22 08:45:26,571 mcod         ERROR    Pomijam zasób źródłowy AED 40251, bo nie da się go odczytać: XML niezgodny z XSD (3 błędów): linia 23: brak wymaganego pola: typ_dostepu
+2026-11-22 08:45:26,615 mcod         WARNING  Pomijam zasób źródłowy AED 40210: brak kolumn: miejscowosc
+2026-11-22 08:45:26,670 mcod         WARNING  Pomijam zasób źródłowy AED 40209: brak kolumn: nazwa_lokalizacji, miejscowosc, szerokosc_geograficzna, dlugosc_geograficzna
+2026-11-22 08:45:26,671 mcod         INFO     Wykaz AED: przyjęte zasoby 3, pominięte 3, wiersze 38, pominięte wiersze 0.
+2026-11-22 08:45:26,682 mcod         INFO     Created main AED file /usr/src/mcod_backend/media/main_aed/Wykaz defibrylatorów AED – wykaz zbiorczy 20261122.csv; stats: {'zasoby_przyjete': 3, 'zasoby_pominiete': [{'resource_id': 40251, 'powod': 'XML niezgodny z XSD (3 błędów): linia 23: brak wymaganego pola: typ_dostepu'}, {'resource_id': 40210, 'powod': 'brak kolumn: miejscowosc'}, {'resource_id': 40209, 'powod': 'brak kolumn: nazwa_lokalizacji, miejscowosc, szerokosc_geograficzna, dlugosc_geograficzna'}], 'wiersze': 38, 'wiersze_pominiete': 0}
+2026-11-22 08:45:26,866 mcod         INFO     Starting clean up process after main AED Resource creation.
+2026-11-22 08:45:26,871 mcod         INFO     File /usr/src/mcod_backend/media/main_aed/Wykaz defibrylatorów AED – wykaz zbiorczy 20261122.csv has been deleted successfully.
+2026-11-22 08:45:26,872 mcod         INFO     Clean up completed.
+2026-11-22 08:45:26,925 mcod         INFO     Running update_dataset_archive signal
+2026-11-22 08:45:26,942 mcod         INFO     Previous Main AED Resource 40247 deleted.
+Zbiór: 4216
+Zasób: 40252
+Wiersze: 38

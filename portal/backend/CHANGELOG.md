@@ -19,6 +19,10 @@ ______________________________________________________________________
 - Dodano zadanie Celery `create_main_aed_resource_task` budujące codziennie zasób zbiorczy Wykazu AED - AED-07
 - Dodano komendę `create_main_aed_resource` (opcje `--eager`, `--dry-run`) do ręcznego budowania Wykazu AED - AED-07
 - Dodano endpoint API `/aed-aggregated` zwracający identyfikatory zbioru i zasobu zbiorczego Wykazu AED wraz z dokumentacją OpenAPI - AED-08
+- Dodano moduł `aed_xml` (walidacja pliku XML schematem XSD wzorca AED i zamiana na ramkę o kolumnach wzorca, bez zewnętrznych encji) oraz schemat `aed_punkty.xsd` - AED-11
+- Dodano źródło XML w Wykazie AED: zasób z linkiem do zewnętrznego serwera dostawcy (format `xml`, typ `api`) jest pobierany przy budowie wykazu, walidowany XSD i scalany z pozostałymi źródłami; plik niezgodny z XSD jest pomijany z powodem w statystykach - AED-12
+- Dodano komendę `import_aed_xml` zaczytującą zewnętrzne dane AED w XML (walidacja XSD, utworzenie zbioru `standard = AED` i zasobu z linkiem, opcja `--dry-run`) - AED-13
+- Dodano testy `test_aed_xml`, `test_aed_xml_source` i `test_aed_import_xml_command` - AED-11, AED-12, AED-13
 
 ### Changes
 

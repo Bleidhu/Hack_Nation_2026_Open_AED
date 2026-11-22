@@ -2,7 +2,7 @@
 
 Tu są pliki do przekazania organizatorowi. To kopie: oryginały zostają w repozytorium. Kopie składa polecenie `python demo/zloz_zgloszenie.py`, uruchamiane po `python demo/build_demo.py`.
 
-**Zacznij od [`INSTRUKCJA_DLA_JURY.md`](INSTRUKCJA_DLA_JURY.md)**, a potem otwórz [`prototyp/index.html`](prototyp/index.html) (działa offline).
+**Zacznij od [`INSTRUKCJA_DLA_JURY.md`](INSTRUKCJA_DLA_JURY.md)** (kilka zdań, 2 minuty), a potem otwórz [`prototyp/index.html`](prototyp/index.html) (działa offline). Pełna wersja instrukcji: [`DODATKOWE_INFORMACJE.md`](DODATKOWE_INFORMACJE.md).
 
 ## Stan wersji
 
@@ -18,9 +18,11 @@ Tu są pliki do przekazania organizatorowi. To kopie: oryginały zostają w repo
 
 | Wymaganie | Gdzie | Stan |
 |---|---|---|
-| Instrukcja dla jury w ponumerowanych krokach | [`INSTRUKCJA_DLA_JURY.md`](INSTRUKCJA_DLA_JURY.md) | jest |
+| Instrukcja dla jury (krótka) i dodatkowe informacje (pełne, ponumerowane kroki) | [`INSTRUKCJA_DLA_JURY.md`](INSTRUKCJA_DLA_JURY.md), [`DODATKOWE_INFORMACJE.md`](DODATKOWE_INFORMACJE.md) | jest |
+| Dane z zewnątrz w XML ze schematem XSD, wczytywane do portalu | [`dane/xml/`](dane/xml/) (poprawny i błędny plik), [`dane/aed_punkty.xsd`](dane/aed_punkty.xsd), [`prototyp/wynik/walidacja_xml.json`](prototyp/wynik/walidacja_xml.json), zrzuty 10–15 w [`prototyp/zrzuty/`](prototyp/zrzuty/README.md) | jest |
+| Sprawdzenie maszynowe (PASS/FAIL per wymaganie) | [`prototyp/wynik/weryfikacja.txt`](prototyp/wynik/weryfikacja.txt), [`.json`](prototyp/wynik/weryfikacja.json); polecenie `python demo/sprawdz.py` w repozytorium | jest |
 | §4 tytuł i szczegółowy opis projektu | [`../README.md`](../README.md), [`ZMIANY_W_PORTALU.md`](ZMIANY_W_PORTALU.md) | jest |
-| §4 prezentacja (min. 5 slajdów ze zrzutami, kroki użytkownika, ograniczenia) | [`prezentacja/dane_przezycie_prezentacja.pdf`](prezentacja/dane_przezycie_prezentacja.pdf), [`.pptx`](prezentacja/dane_przezycie_prezentacja.pptx) | jest (15 slajdów, zrzuty na slajdach 4-10) |
+| §4 prezentacja (min. 5 slajdów ze zrzutami, kroki użytkownika, ograniczenia) | [`prezentacja/dane_przezycie_prezentacja.pdf`](prezentacja/dane_przezycie_prezentacja.pdf), [`.pptx`](prezentacja/dane_przezycie_prezentacja.pptx) | jest (19 slajdów, zrzuty na slajdach 8–14) |
 | §4 prototyp rozwiązania, klikalny | [`prototyp/index.html`](prototyp/index.html) | jest |
 | §4 wzorcowy zakres danych (XLSX) | [`wzorcowy_zakres_danych.xlsx`](wzorcowy_zakres_danych.xlsx) | jest |
 | §4 kod źródłowy | całe repozytorium; zmiany portalu jako łatka względem oryginału (`a1adc22`): [`kod/zmiany_portalu_wzgledem_oryginalu.patch`](kod/zmiany_portalu_wzgledem_oryginalu.patch) | jest |
@@ -30,8 +32,8 @@ Tu są pliki do przekazania organizatorowi. To kopie: oryginały zostają w repo
 | §5 format odczytywalny maszynowo | [`dane/wykaz_aed_wynik_agregacji.csv`](dane/wykaz_aed_wynik_agregacji.csv) (CSV, 51 kolumn); schematy: [`../format_danych/schemat/`](../format_danych/schemat/) | jest |
 | Portal uruchomiony we własnym środowisku | [`prototyp/zrzuty/`](prototyp/zrzuty/README.md), [`prototyp/wynik/testy.txt`](prototyp/wynik/testy.txt), film [`wideo/dane_przezycie_wykaz_aed.mp4`](wideo/dane_przezycie_wykaz_aed.mp4) | jest |
 | §5 WCAG, responsywność, UX | prototyp; podglądy 1440 i 390 px: [`../demo/wynik/`](../demo/wynik/) | jest |
-| Zakres użycia AI (`regulamin_zadania.pdf` §2 ust. 8) | instrukcja, krok 16; prezentacja, slajd 19 | jest |
-| Integrator danych (dodatek, krok 2) | instrukcja, krok 14; wyniki: [`prototyp/integrator/`](prototyp/integrator/README.md); kod: `../integrator/` | jest (dodatek) |
+| Zakres użycia AI (`regulamin_zadania.pdf` §2 ust. 8) | dodatkowe informacje, krok 16; prezentacja, slajd 19 | jest |
+| Integrator danych (dodatek, krok 2) | dodatkowe informacje, krok 14; wyniki: [`prototyp/integrator/`](prototyp/integrator/README.md); kod: `../integrator/` | jest (dodatek) |
 
 ## Weryfikacja z `references/`
 

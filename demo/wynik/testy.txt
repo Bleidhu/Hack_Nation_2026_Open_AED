@@ -1,200 +1,239 @@
-Testy portalu dane.gov.pl: Wykaz AED i regresja DGA (22.11.2026, commit 655a2c3)
+Testy portalu dane.gov.pl: Wykaz AED (w tym źródło XML), regresja DGA (22.11.2026)
 Polecenie (portal/backend):
-docker compose -f docker-compose.local.yml run --rm --no-deps mcod-local-tests -n0 --no-cov -v --disable-warnings -m "feat_dga or feat_main_aed or not depends_on_component" <8 plików test_aed_* i test_main_aed_resource.py> mcod/resources/tests/test_main_dga.py mcod/resources/tests/test_api.py
+docker compose -f docker-compose.local.yml run --rm --no-deps mcod-local-tests -n0 --no-cov -v --disable-warnings -m "feat_dga or feat_main_aed or not depends_on_component" <10 plików test_aed_* i test_main_aed_resource.py> mcod/resources/tests/test_main_dga.py mcod/resources/tests/test_api.py mcod/datasets/tests/test_aed_customfields_help.py
+Jeden test jest pominięty w kontenerze (porównanie XSD z katalogiem format_danych/, którego kontener nie widzi); sprawdza go demo/sprawdz.py.
 
 + python manage.py makemigrations --check --settings mcod.settings.test
 No changes detected
-collecting ... collected 295 items / 103 deselected / 192 selected
-mcod/resources/tests/test_aed_constants.py::test_template_columns_count_and_unique PASSED
-mcod/resources/tests/test_aed_constants.py::test_main_columns_count_order PASSED
-mcod/resources/tests/test_aed_constants.py::test_minimum_subset_of_template PASSED
-mcod/resources/tests/test_aed_constants.py::test_aliases_target_template_columns PASSED
-mcod/resources/tests/test_aed_constants.py::test_alias_keys_are_normalized PASSED
-mcod/resources/tests/test_aed_constants.py::test_alias_keys_do_not_shadow_template PASSED
-mcod/resources/tests/test_aed_constants.py::test_ambiguous_headers_have_no_alias PASSED
-mcod/resources/tests/test_aed_constants.py::test_allowed_licenses_exclude_share_alike PASSED
-mcod/resources/tests/test_aed_aggregation.py::test_normalize_header[D\u0142ugo\u015b\u0107 geograficzna-dlugosc_geograficzna] PASSED
-mcod/resources/tests/test_aed_aggregation.py::test_normalize_header[ Nr_Budynku -nr_budynku] PASSED
-mcod/resources/tests/test_aed_aggregation.py::test_normalize_header[\u0141\xf3d\u017a-lodz] PASSED
-mcod/resources/tests/test_aed_aggregation.py::test_normalize_header[\ufeffnazwa-nazwa] PASSED
-mcod/resources/tests/test_aed_aggregation.py::test_normalize_header[ Numer Id-numer_id] PASSED
-mcod/resources/tests/test_aed_aggregation.py::test_to_text[None-] PASSED
-mcod/resources/tests/test_aed_aggregation.py::test_to_text[True-true] PASSED
-mcod/resources/tests/test_aed_aggregation.py::test_to_text[False-false] PASSED
-mcod/resources/tests/test_aed_aggregation.py::test_to_text[value3-2026-01-02] PASSED
-mcod/resources/tests/test_aed_aggregation.py::test_to_text[nan-] PASSED
-mcod/resources/tests/test_aed_aggregation.py::test_to_text[ x -x] PASSED
-mcod/resources/tests/test_aed_aggregation.py::test_to_text[52.5-52.5] PASSED
-mcod/resources/tests/test_aed_aggregation.py::test_compute_id_aed_deterministic PASSED
-mcod/resources/tests/test_aed_aggregation.py::test_compute_id_aed_fallback_without_source_id PASSED
-mcod/resources/tests/test_aed_aggregation.py::test_compute_id_aed_differs_by_institution PASSED
-mcod/resources/tests/test_aed_aggregation.py::test_needs_inspection[row0-] PASSED
-mcod/resources/tests/test_aed_aggregation.py::test_needs_inspection[row1-true] PASSED
-mcod/resources/tests/test_aed_aggregation.py::test_needs_inspection[row2-true] PASSED
-mcod/resources/tests/test_aed_aggregation.py::test_needs_inspection[row3-false] PASSED
-mcod/resources/tests/test_aed_aggregation.py::test_needs_inspection_ignores_unparseable_dates PASSED
-mcod/resources/tests/test_aed_aggregation.py::test_skip_reason_osm PASSED
-mcod/resources/tests/test_aed_aggregation.py::test_skip_reason_missing_minimum PASSED
-mcod/resources/tests/test_aed_aggregation.py::test_skip_reason_bad_coordinates[52,4] PASSED
-mcod/resources/tests/test_aed_aggregation.py::test_skip_reason_bad_coordinates[abc] PASSED
-mcod/resources/tests/test_aed_aggregation.py::test_skip_reason_bad_coordinates[52.4N] PASSED
-mcod/resources/tests/test_aed_aggregation.py::test_skip_reason_outside_poland PASSED
-mcod/resources/tests/test_aed_aggregation.py::test_skip_reason_valid_row PASSED
-mcod/resources/tests/test_aed_aggregation.py::test_fix_swapped_axes PASSED
-mcod/resources/tests/test_aed_aggregation.py::test_defaults_operator_contacts PASSED
-mcod/resources/tests/test_aed_aggregation.py::test_contacts_kept_without_personal_data PASSED
-mcod/resources/tests/test_aed_aggregation.py::test_unchanged_row_has_empty_processing PASSED
-mcod/resources/tests/test_aed_aggregation.py::test_provenance_columns PASSED
-mcod/resources/tests/test_aed_aggregation.py::test_skipped_rows_are_reported_with_row_number PASSED
-mcod/resources/tests/test_aed_aggregation.py::test_golden_matches_reference PASSED
-mcod/resources/tests/test_aed_aggregation.py::test_to_csv_bytes_format PASSED
-mcod/resources/tests/test_aed_aggregation.py::test_legionowo_aliases PASSED
-mcod/resources/tests/test_aed_aggregation.py::test_krosno_skipped_missing_minimum PASSED
-mcod/resources/tests/test_aed_aggregation.py::test_przemysl_skipped_missing_coordinates PASSED
-mcod/resources/tests/test_aed_aggregation.py::test_marki_single_column_skipped PASSED
-mcod/resources/tests/test_aed_aggregation.py::test_exact_name_wins_over_alias PASSED
-mcod/resources/tests/test_aed_aggregation.py::test_first_alias_from_left_wins PASSED
-mcod/resources/tests/test_aed_aggregation.py::test_read_tabular_bytes_real_csv[legionowo_2625221.csv-shape0-nazwa] PASSED
-mcod/resources/tests/test_aed_aggregation.py::test_read_tabular_bytes_real_csv[krosno_54632.csv-shape1-D\u0142ugo\u015b\u0107 geograficzna] PASSED
-mcod/resources/tests/test_aed_aggregation.py::test_read_tabular_bytes_real_csv[przemysl_62095.csv-shape2-id] PASSED
-mcod/resources/tests/test_aed_aggregation.py::test_read_tabular_bytes_real_csv[marki_68353.csv-shape3-D\u0142ugo\u015b\u0107 geograficzna,Szeroko\u015b\u0107 geograficzna, Nazwa, Lokalizacja, Adres, Numer Id] PASSED
-mcod/resources/tests/test_aed_aggregation.py::test_read_tabular_bytes_keeps_literal_values PASSED
-mcod/resources/tests/test_aed_aggregation.py::test_read_tabular_bytes_cp1250_fallback PASSED
-mcod/resources/tests/test_aed_aggregation.py::test_read_tabular_bytes_xlsx_as_text PASSED
-mcod/resources/tests/test_aed_aggregation.py::test_read_tabular_bytes_rejects_other_formats PASSED
-mcod/resources/tests/test_aed_aggregation.py::test_missing_minimum_columns PASSED
-mcod/resources/tests/test_aed_sources.py::test_is_aed_dataset[customfields0-True] PASSED
-mcod/resources/tests/test_aed_sources.py::test_is_aed_dataset[customfields1-True] PASSED
-mcod/resources/tests/test_aed_sources.py::test_is_aed_dataset[customfields2-True] PASSED
-mcod/resources/tests/test_aed_sources.py::test_is_aed_dataset[{"standard": "AED"}-True] PASSED
-mcod/resources/tests/test_aed_sources.py::test_is_aed_dataset[customfields4-False] PASSED
-mcod/resources/tests/test_aed_sources.py::test_is_aed_dataset[customfields5-False] PASSED
-mcod/resources/tests/test_aed_sources.py::test_is_aed_dataset[None-False] PASSED
-mcod/resources/tests/test_aed_sources.py::test_is_aed_dataset[customfields7-False] PASSED
-mcod/resources/tests/test_aed_sources.py::test_is_aed_dataset[nie-json-False] PASSED
-mcod/resources/tests/test_aed_sources.py::test_is_main_aed_dataset[customfields0-True] PASSED
-mcod/resources/tests/test_aed_sources.py::test_is_main_aed_dataset[customfields1-True] PASSED
-mcod/resources/tests/test_aed_sources.py::test_is_main_aed_dataset[customfields2-False] PASSED
-mcod/resources/tests/test_aed_sources.py::test_is_main_aed_dataset[None-False] PASSED
-mcod/resources/tests/test_aed_sources.py::test_get_aed_source_resources_filters PASSED
-mcod/resources/tests/test_aed_sources.py::test_get_aed_source_resources_ignores_portal_data_validation PASSED
-mcod/resources/tests/test_aed_sources.py::test_get_source_meta_personal_data PASSED
-mcod/resources/tests/test_aed_sources.py::test_create_main_aed_df_with_mocks PASSED
-mcod/resources/tests/test_aed_sources.py::test_missing_tabular_data_is_skipped PASSED
-mcod/resources/tests/test_aed_sources.py::test_ckan_html_link_skipped[html-page] PASSED
-mcod/resources/tests/test_aed_sources.py::test_ckan_html_link_skipped[not-found] PASSED
-mcod/resources/tests/test_aed_sources.py::test_ckan_connection_error_skipped PASSED
-mcod/resources/tests/test_aed_sources.py::test_ckan_csv_read_as_text PASSED
-mcod/resources/tests/test_aed_sources.py::test_template_file_read_without_portal_tabular_data PASSED
-mcod/resources/tests/test_aed_sources.py::test_real_legionowo_csv_read PASSED
-mcod/resources/tests/test_main_aed_resource.py::test_build_aed_tabular_schema PASSED
-mcod/resources/tests/test_main_aed_resource.py::test_create_main_aed_dataset PASSED
-mcod/resources/tests/test_main_aed_resource.py::test_create_main_aed_dataset_without_category PASSED
-mcod/resources/tests/test_main_aed_resource.py::test_get_main_aed_dataset_and_resource PASSED
-mcod/resources/tests/test_main_aed_resource.py::test_get_main_aed_dataset_none_without_aggregate_marker PASSED
-mcod/resources/tests/test_main_aed_resource.py::test_create_main_aed_file PASSED
-mcod/resources/tests/test_main_aed_resource.py::test_create_main_aed_resource_with_dataset PASSED
-mcod/resources/tests/test_main_aed_resource.py::test_create_main_aed_resource_reuses_dataset_and_metadata PASSED
-mcod/resources/tests/test_main_aed_resource.py::test_replace_old_main_aed_resource PASSED
-mcod/resources/tests/test_main_aed_resource.py::test_clean_up_after_main_aed_resource_creation[123-456-False-True] PASSED
-mcod/resources/tests/test_main_aed_resource.py::test_clean_up_after_main_aed_resource_creation[123-456-True-True] PASSED
-mcod/resources/tests/test_main_aed_resource.py::test_clean_up_after_main_aed_resource_creation[123-None-False-True] PASSED
-mcod/resources/tests/test_main_aed_resource.py::test_clean_up_after_main_aed_resource_creation[123-None-True-True] PASSED
-mcod/resources/tests/test_main_aed_resource.py::test_clean_up_after_main_aed_resource_creation[None-None-True-True] PASSED
-mcod/resources/tests/test_main_aed_resource.py::test_clean_up_after_main_aed_resource_creation[None-None-False-True] PASSED
-mcod/resources/tests/test_main_aed_resource.py::test_clean_up_after_main_aed_resource_creation[None-None-False-False] PASSED
-mcod/resources/tests/test_main_aed_resource.py::test_main_aed_resource_has_map_after_processing PASSED
-mcod/resources/tests/test_aed_task.py::TestMainAEDResourceCreationTask::test_main_aed_resource_creation_task PASSED
-mcod/resources/tests/test_aed_task.py::TestMainAEDResourceCreationTask::test_file_creation_exception PASSED
-mcod/resources/tests/test_aed_task.py::TestMainAEDResourceCreationTask::test_resource_creation_exception PASSED
-mcod/resources/tests/test_aed_task.py::TestMainAEDResourceCreationTask::test_validations_exception[Exception] PASSED
-mcod/resources/tests/test_aed_task.py::TestMainAEDResourceCreationTask::test_validations_exception[PendingValidationException] PASSED
-mcod/resources/tests/test_aed_task.py::TestMainAEDResourceCreationTask::test_validations_exception[FailedValidationException] PASSED
-mcod/resources/tests/test_aed_task.py::TestMainAEDResourceCreationTask::test_replace_exception PASSED
-mcod/resources/tests/test_aed_task.py::TestMainAEDResourceCreationTask::test_disabled_does_nothing PASSED
-mcod/resources/tests/test_aed_task.py::test_beat_schedule_has_aed_entry_when_enabled PASSED
-mcod/resources/tests/test_aed_task.py::test_beat_schedule_without_aed_entry_when_disabled PASSED
-mcod/resources/tests/test_aed_task.py::test_task_exported PASSED
-mcod/resources/tests/test_aed_task.py::test_command_delay PASSED
-mcod/resources/tests/test_aed_task.py::test_command_eager PASSED
-mcod/resources/tests/test_aed_task.py::test_command_eager_cleans_up_on_error PASSED
-mcod/resources/tests/test_aed_task.py::test_command_dry_run PASSED
-mcod/resources/tests/test_aed_task.py::test_command_disabled PASSED
-mcod/resources/tests/test_aed_api.py::test_api_aed_aggregated_ok PASSED
-mcod/resources/tests/test_aed_api.py::test_api_aed_aggregated_returns_newest_resource PASSED
-mcod/resources/tests/test_aed_api.py::test_api_aed_aggregated_not_found_without_dataset PASSED
-mcod/resources/tests/test_aed_api.py::test_api_aed_aggregated_not_found_without_resource PASSED
-mcod/resources/tests/test_aed_api.py::test_api_aed_aggregated_draft_or_removed[resource_params0-404 Not Found] PASSED
-mcod/resources/tests/test_aed_api.py::test_api_aed_aggregated_draft_or_removed[resource_params1-200 OK] PASSED
-mcod/resources/tests/test_aed_api.py::test_api_aed_aggregated_draft_or_removed[resource_params2-404 Not Found] PASSED
-mcod/resources/tests/test_aed_api.py::test_api_aed_aggregated_draft_or_removed[resource_params3-200 OK] PASSED
-mcod/resources/tests/test_aed_api.py::test_api_aed_aggregated_disabled PASSED
-mcod/resources/tests/test_aed_api.py::test_openapi_spec_documents_aed_aggregated PASSED
-mcod/resources/tests/test_aed_settings.py::test_aed_settings_defaults PASSED
-mcod/resources/tests/test_aed_settings.py::test_aed_aggregation_enabled_by_default PASSED
-mcod/resources/tests/test_aed_settings.py::test_aed_task_route_registered PASSED
-mcod/datasets/tests/test_aed_customfields_help.py::test_customfields_help_text_mentions_aed PASSED
-mcod/datasets/tests/test_aed_customfields_help.py::test_customfields_field_unchanged PASSED
-mcod/resources/tests/test_main_dga.py::test_get_main_dga_resource PASSED
-mcod/resources/tests/test_main_dga.py::test_get_main_dga_dataset PASSED
-mcod/resources/tests/test_main_dga.py::test_get_dga_resource_for_dga_owner PASSED
-mcod/resources/tests/test_main_dga.py::test_create_main_dga_dataset PASSED
-mcod/resources/tests/test_main_dga.py::test_get_all_dga_resources_sorted_by_organizations PASSED
-mcod/resources/tests/test_main_dga.py::test_get_or_create_main_dga_path[True] PASSED
-mcod/resources/tests/test_main_dga.py::test_get_or_create_main_dga_path[False] PASSED
-mcod/resources/tests/test_main_dga.py::test_create_main_dga_df_with_ckan PASSED
-mcod/resources/tests/test_main_dga.py::test_create_main_dga_df PASSED
-mcod/resources/tests/test_main_dga.py::test_create_empty_main_dga_df PASSED
-mcod/resources/tests/test_main_dga.py::test_create_main_dga_df_validates_and_coerces_required_values[skips-resource-with-none-required-value] PASSED
-mcod/resources/tests/test_main_dga.py::test_create_main_dga_df_validates_and_coerces_required_values[skips-resource-with-empty-required-value-after-strip] PASSED
-mcod/resources/tests/test_main_dga.py::test_create_main_dga_df_validates_and_coerces_required_values[coerces-non-string-required-value-and-strips-whitespace] PASSED
-mcod/resources/tests/test_main_dga.py::test_create_main_dga_df_validates_and_coerces_required_values[skips-resource-with-missing-required-columns] PASSED
-mcod/resources/tests/test_main_dga.py::test_create_main_dga_df_skips_real_csv_with_missing_required_columns PASSED
-mcod/resources/tests/test_main_dga.py::test_normalize_main_dga_source_df_strips_only_columns_with_values[values0-expected0] PASSED
-mcod/resources/tests/test_main_dga.py::test_normalize_main_dga_source_df_strips_only_columns_with_values[values1-expected1] PASSED
-mcod/resources/tests/test_main_dga.py::test_normalize_main_dga_source_df_strips_only_columns_with_values[values2-expected2] PASSED
-mcod/resources/tests/test_main_dga.py::test_check_all_resource_validations_status[SUCCESS-SUCCESS-SUCCESS-None-None] PASSED
-mcod/resources/tests/test_main_dga.py::test_check_all_resource_validations_status[---PendingValidationException-None] PASSED
-mcod/resources/tests/test_main_dga.py::test_check_all_resource_validations_status[SUCCESS---PendingValidationException-None] PASSED
-mcod/resources/tests/test_main_dga.py::test_check_all_resource_validations_status[-SUCCESS--PendingValidationException-None] PASSED
-mcod/resources/tests/test_main_dga.py::test_check_all_resource_validations_status[--SUCCESS-PendingValidationException-None] PASSED
-mcod/resources/tests/test_main_dga.py::test_check_all_resource_validations_status[FAILURE-SUCCESS-SUCCESS-None-data_failure5] PASSED
-mcod/resources/tests/test_main_dga.py::test_check_all_resource_validations_status[FAILURE-SUCCESS--PendingValidationException-data_failure6] PASSED
-mcod/resources/tests/test_main_dga.py::test_check_all_resource_validations_status[FAILURE-SUCCESS-SUCCESS-FailedValidationException-data_failure7] PASSED
-mcod/resources/tests/test_main_dga.py::test_check_all_resource_validations_status[FAILURE-SUCCESS-SUCCESS-FailedValidationException-data_failure8] PASSED
-mcod/resources/tests/test_main_dga.py::test_check_all_resource_validations_status[FAILURE-FAILURE-FAILURE-FailedValidationException-None] PASSED
-mcod/resources/tests/test_main_dga.py::test_check_all_resource_validations_status[SUCCESS-FAILURE-SUCCESS-FailedValidationException-None] PASSED
-mcod/resources/tests/test_main_dga.py::test_check_all_resource_validations_status[SUCCESS-SUCCESS-FAILURE-FailedValidationException-None] PASSED
-mcod/resources/tests/test_main_dga.py::test_check_all_resource_validations_status[-FAILURE--FailedValidationException-None] PASSED
-mcod/resources/tests/test_main_dga.py::test_check_all_resource_validations_status[--FAILURE-FailedValidationException-None] PASSED
-mcod/resources/tests/test_main_dga.py::test_create_main_dga_resource_with_dataset PASSED
-mcod/resources/tests/test_main_dga.py::test_create_main_dga_resource_with_dataset_calls_recovery_when_file_missing PASSED
-mcod/resources/tests/test_main_dga.py::test_create_main_dga_resource_with_dataset_regenerates_missing_file_logic PASSED
-mcod/resources/tests/test_main_dga.py::test_update_aggr_dga_info PASSED
-mcod/resources/tests/test_main_dga.py::test_create_aggr_dga_info PASSED
-mcod/resources/tests/test_main_dga.py::test_clean_up_after_main_dga_resource_creation[123-456-False-True] PASSED
-mcod/resources/tests/test_main_dga.py::test_clean_up_after_main_dga_resource_creation[123-456-True-True] PASSED
-mcod/resources/tests/test_main_dga.py::test_clean_up_after_main_dga_resource_creation[123-None-False-True] PASSED
-mcod/resources/tests/test_main_dga.py::test_clean_up_after_main_dga_resource_creation[123-None-True-True] PASSED
-mcod/resources/tests/test_main_dga.py::test_clean_up_after_main_dga_resource_creation[None-None-True-True] PASSED
-mcod/resources/tests/test_main_dga.py::test_clean_up_after_main_dga_resource_creation[None-None-False-True] PASSED
-mcod/resources/tests/test_main_dga.py::test_clean_up_after_main_dga_resource_creation[None-None-False-False] PASSED
-mcod/resources/tests/test_main_dga.py::test_add_style_to_main_dga_excel_file_smoke PASSED
-mcod/resources/tests/test_main_dga.py::test_create_main_dga_file PASSED
-mcod/resources/tests/test_main_dga.py::TestMainDGAResourceCreationTask::test_main_dga_resource_creation_task PASSED
-mcod/resources/tests/test_main_dga.py::TestMainDGAResourceCreationTask::test_main_dga_file_creation_exception PASSED
-mcod/resources/tests/test_main_dga.py::TestMainDGAResourceCreationTask::test_main_dga_resource_creation_exception PASSED
-mcod/resources/tests/test_main_dga.py::TestMainDGAResourceCreationTask::test_validations_exception[Exception] PASSED
-mcod/resources/tests/test_main_dga.py::TestMainDGAResourceCreationTask::test_validations_exception[PendingValidationException] PASSED
-mcod/resources/tests/test_main_dga.py::TestMainDGAResourceCreationTask::test_validations_exception[FailedValidationException] PASSED
-mcod/resources/tests/test_main_dga.py::TestMainDGAResourceCreationTask::test_update_aggr_dga_info_exception PASSED
-mcod/resources/tests/test_api.py::test_response_dga_flag_in_details[True] PASSED
-mcod/resources/tests/test_api.py::test_response_dga_flag_in_details[False] PASSED
-mcod/resources/tests/test_api.py::test_api_aggregated_dga_info[dga_info_params0-200 OK] PASSED
-mcod/resources/tests/test_api.py::test_api_aggregated_dga_info[dga_info_params1-404 Not Found] PASSED
-mcod/resources/tests/test_api.py::test_api_aggregated_dga_info[None-404 Not Found] PASSED
-mcod/resources/tests/test_api.py::test_api_aggregated_dga_info_resource_removed_draft[resource_params0-404 Not Found] PASSED
-mcod/resources/tests/test_api.py::test_api_aggregated_dga_info_resource_removed_draft[resource_params1-200 OK] PASSED
-mcod/resources/tests/test_api.py::test_api_aggregated_dga_info_resource_removed_draft[resource_params2-404 Not Found] PASSED
-mcod/resources/tests/test_api.py::test_api_aggregated_dga_info_resource_removed_draft[resource_params3-200 OK] PASSED
-============== 192 passed, 103 deselected, 619 warnings in 49.48s ==============
+============================= test session starts ==============================
+platform linux -- Python 3.8.20, pytest-6.2.5, py-1.11.0, pluggy-1.5.0 -- /usr/local/bin/python3
+cachedir: .pytest_cache
+django: settings: mcod.settings.test (from option)
+metadata: {'Python': '3.8.20', 'Platform': 'Linux-6.6.114.1-microsoft-standard-WSL2-x86_64-with-glibc2.2.5', 'Packages': {'pytest': '6.2.5', 'pluggy': '1.5.0'}, 'Plugins': {'requests-mock': '1.12.1', 'html': '3.2.0', 'Faker': '35.2.2', 'ordering': '0.6', 'mock': '3.14.1', 'base-url': '2.0.0', 'django': '4.5.2', 'bdd': '5.0.0', 'xdist': '1.34.0', 'forked': '1.6.0', 'variables': '2.0.0', 'localserver': '0.10.0', 'metadata': '2.0.4', 'factoryboy': '2.7.0', 'cov': '2.12.1', 'django-constance': '4.3.5', 'selenium': '4.0.1', 'anyio': '4.5.2'}, 'Base URL': '', 'Driver': None, 'Capabilities': {}}
+sensitiveurl: .*
+rootdir: /usr/src/mcod_backend, configfile: pytest.ini
+plugins: requests-mock-1.12.1, html-3.2.0, Faker-35.2.2, ordering-0.6, mock-3.14.1, base-url-2.0.0, django-4.5.2, bdd-5.0.0, xdist-1.34.0, forked-1.6.0, variables-2.0.0, localserver-0.10.0, metadata-2.0.4, factoryboy-2.7.0, cov-2.12.1, django-constance-4.3.5, selenium-4.0.1, anyio-4.5.2
+collecting ... collected 323 items / 103 deselected / 220 selected
+
+mcod/resources/tests/test_aed_aggregation.py::test_normalize_header[D\u0142ugo\u015b\u0107 geograficzna-dlugosc_geograficzna] PASSED [  0%]
+mcod/resources/tests/test_aed_aggregation.py::test_normalize_header[ Nr_Budynku -nr_budynku] PASSED [  0%]
+mcod/resources/tests/test_aed_aggregation.py::test_normalize_header[\u0141\xf3d\u017a-lodz] PASSED [  1%]
+mcod/resources/tests/test_aed_aggregation.py::test_normalize_header[\ufeffnazwa-nazwa] PASSED [  1%]
+mcod/resources/tests/test_aed_aggregation.py::test_normalize_header[ Numer Id-numer_id] PASSED [  2%]
+mcod/resources/tests/test_aed_aggregation.py::test_to_text[None-] PASSED [  2%]
+mcod/resources/tests/test_aed_aggregation.py::test_to_text[True-true] PASSED [  3%]
+mcod/resources/tests/test_aed_aggregation.py::test_to_text[False-false] PASSED [  3%]
+mcod/resources/tests/test_aed_aggregation.py::test_to_text[value3-2026-01-02] PASSED [  4%]
+mcod/resources/tests/test_aed_aggregation.py::test_to_text[nan-] PASSED  [  4%]
+mcod/resources/tests/test_aed_aggregation.py::test_to_text[ x -x] PASSED [  5%]
+mcod/resources/tests/test_aed_aggregation.py::test_to_text[52.5-52.5] PASSED [  5%]
+mcod/resources/tests/test_aed_aggregation.py::test_compute_id_aed_deterministic PASSED [  5%]
+mcod/resources/tests/test_aed_aggregation.py::test_compute_id_aed_fallback_without_source_id PASSED [  6%]
+mcod/resources/tests/test_aed_aggregation.py::test_compute_id_aed_differs_by_institution PASSED [  6%]
+mcod/resources/tests/test_aed_aggregation.py::test_needs_inspection[row0-] PASSED [  7%]
+mcod/resources/tests/test_aed_aggregation.py::test_needs_inspection[row1-true] PASSED [  7%]
+mcod/resources/tests/test_aed_aggregation.py::test_needs_inspection[row2-true] PASSED [  8%]
+mcod/resources/tests/test_aed_aggregation.py::test_needs_inspection[row3-false] PASSED [  8%]
+mcod/resources/tests/test_aed_aggregation.py::test_needs_inspection_ignores_unparseable_dates PASSED [  9%]
+mcod/resources/tests/test_aed_aggregation.py::test_skip_reason_osm PASSED [  9%]
+mcod/resources/tests/test_aed_aggregation.py::test_skip_reason_missing_minimum PASSED [ 10%]
+mcod/resources/tests/test_aed_aggregation.py::test_skip_reason_bad_coordinates[52,4] PASSED [ 10%]
+mcod/resources/tests/test_aed_aggregation.py::test_skip_reason_bad_coordinates[abc] PASSED [ 10%]
+mcod/resources/tests/test_aed_aggregation.py::test_skip_reason_bad_coordinates[52.4N] PASSED [ 11%]
+mcod/resources/tests/test_aed_aggregation.py::test_skip_reason_outside_poland PASSED [ 11%]
+mcod/resources/tests/test_aed_aggregation.py::test_skip_reason_valid_row PASSED [ 12%]
+mcod/resources/tests/test_aed_aggregation.py::test_fix_swapped_axes PASSED [ 12%]
+mcod/resources/tests/test_aed_aggregation.py::test_defaults_operator_contacts PASSED [ 13%]
+mcod/resources/tests/test_aed_aggregation.py::test_contacts_kept_without_personal_data PASSED [ 13%]
+mcod/resources/tests/test_aed_aggregation.py::test_unchanged_row_has_empty_processing PASSED [ 14%]
+mcod/resources/tests/test_aed_aggregation.py::test_provenance_columns PASSED [ 14%]
+mcod/resources/tests/test_aed_aggregation.py::test_skipped_rows_are_reported_with_row_number PASSED [ 15%]
+mcod/resources/tests/test_aed_aggregation.py::test_golden_matches_reference PASSED [ 15%]
+mcod/resources/tests/test_aed_aggregation.py::test_to_csv_bytes_format PASSED [ 15%]
+mcod/resources/tests/test_aed_aggregation.py::test_legionowo_aliases PASSED [ 16%]
+mcod/resources/tests/test_aed_aggregation.py::test_krosno_skipped_missing_minimum PASSED [ 16%]
+mcod/resources/tests/test_aed_aggregation.py::test_przemysl_skipped_missing_coordinates PASSED [ 17%]
+mcod/resources/tests/test_aed_aggregation.py::test_marki_single_column_skipped PASSED [ 17%]
+mcod/resources/tests/test_aed_aggregation.py::test_exact_name_wins_over_alias PASSED [ 18%]
+mcod/resources/tests/test_aed_aggregation.py::test_first_alias_from_left_wins PASSED [ 18%]
+mcod/resources/tests/test_aed_aggregation.py::test_read_tabular_bytes_real_csv[legionowo_2625221.csv-shape0-nazwa] PASSED [ 19%]
+mcod/resources/tests/test_aed_aggregation.py::test_read_tabular_bytes_real_csv[krosno_54632.csv-shape1-D\u0142ugo\u015b\u0107 geograficzna] PASSED [ 19%]
+mcod/resources/tests/test_aed_aggregation.py::test_read_tabular_bytes_real_csv[przemysl_62095.csv-shape2-id] PASSED [ 20%]
+mcod/resources/tests/test_aed_aggregation.py::test_read_tabular_bytes_real_csv[marki_68353.csv-shape3-D\u0142ugo\u015b\u0107 geograficzna,Szeroko\u015b\u0107 geograficzna, Nazwa, Lokalizacja, Adres, Numer Id] PASSED [ 20%]
+mcod/resources/tests/test_aed_aggregation.py::test_read_tabular_bytes_keeps_literal_values PASSED [ 20%]
+mcod/resources/tests/test_aed_aggregation.py::test_read_tabular_bytes_cp1250_fallback PASSED [ 21%]
+mcod/resources/tests/test_aed_aggregation.py::test_read_tabular_bytes_xlsx_as_text PASSED [ 21%]
+mcod/resources/tests/test_aed_aggregation.py::test_read_tabular_bytes_rejects_other_formats PASSED [ 22%]
+mcod/resources/tests/test_aed_aggregation.py::test_missing_minimum_columns PASSED [ 22%]
+mcod/resources/tests/test_aed_api.py::test_api_aed_aggregated_ok PASSED  [ 23%]
+mcod/resources/tests/test_aed_api.py::test_api_aed_aggregated_returns_newest_resource PASSED [ 23%]
+mcod/resources/tests/test_aed_api.py::test_api_aed_aggregated_not_found_without_dataset PASSED [ 24%]
+mcod/resources/tests/test_aed_api.py::test_api_aed_aggregated_not_found_without_resource PASSED [ 24%]
+mcod/resources/tests/test_aed_api.py::test_api_aed_aggregated_draft_or_removed[resource_params0-404 Not Found] PASSED [ 25%]
+mcod/resources/tests/test_aed_api.py::test_api_aed_aggregated_draft_or_removed[resource_params1-200 OK] PASSED [ 25%]
+mcod/resources/tests/test_aed_api.py::test_api_aed_aggregated_draft_or_removed[resource_params2-404 Not Found] PASSED [ 25%]
+mcod/resources/tests/test_aed_api.py::test_api_aed_aggregated_draft_or_removed[resource_params3-200 OK] PASSED [ 26%]
+mcod/resources/tests/test_aed_api.py::test_api_aed_aggregated_disabled PASSED [ 26%]
+mcod/resources/tests/test_aed_api.py::test_openapi_spec_documents_aed_aggregated PASSED [ 27%]
+mcod/resources/tests/test_aed_constants.py::test_template_columns_count_and_unique PASSED [ 27%]
+mcod/resources/tests/test_aed_constants.py::test_main_columns_count_order PASSED [ 28%]
+mcod/resources/tests/test_aed_constants.py::test_minimum_subset_of_template PASSED [ 28%]
+mcod/resources/tests/test_aed_constants.py::test_aliases_target_template_columns PASSED [ 29%]
+mcod/resources/tests/test_aed_constants.py::test_alias_keys_are_normalized PASSED [ 29%]
+mcod/resources/tests/test_aed_constants.py::test_alias_keys_do_not_shadow_template PASSED [ 30%]
+mcod/resources/tests/test_aed_constants.py::test_ambiguous_headers_have_no_alias PASSED [ 30%]
+mcod/resources/tests/test_aed_constants.py::test_allowed_licenses_exclude_share_alike PASSED [ 30%]
+mcod/resources/tests/test_aed_import_xml_command.py::test_creates_aed_dataset_and_link_resource PASSED [ 31%]
+mcod/resources/tests/test_aed_import_xml_command.py::test_dry_run_saves_nothing PASSED [ 31%]
+mcod/resources/tests/test_aed_import_xml_command.py::test_invalid_xml_creates_nothing PASSED [ 32%]
+mcod/resources/tests/test_aed_import_xml_command.py::test_command_errors[args0-None-https] PASSED [ 32%]
+mcod/resources/tests/test_aed_import_xml_command.py::test_command_errors[args1-remote1-kod 500] PASSED [ 33%]
+mcod/resources/tests/test_aed_import_xml_command.py::test_command_errors[args2-None---organizacja] PASSED [ 33%]
+mcod/resources/tests/test_aed_import_xml_command.py::test_command_errors[args3-None-Nie ma instytucji] PASSED [ 34%]
+mcod/resources/tests/test_aed_settings.py::test_aed_settings_defaults PASSED [ 34%]
+mcod/resources/tests/test_aed_settings.py::test_aed_aggregation_enabled_by_default PASSED [ 35%]
+mcod/resources/tests/test_aed_settings.py::test_aed_task_route_registered PASSED [ 35%]
+mcod/resources/tests/test_aed_sources.py::test_is_aed_dataset[customfields0-True] PASSED [ 35%]
+mcod/resources/tests/test_aed_sources.py::test_is_aed_dataset[customfields1-True] PASSED [ 36%]
+mcod/resources/tests/test_aed_sources.py::test_is_aed_dataset[customfields2-True] PASSED [ 36%]
+mcod/resources/tests/test_aed_sources.py::test_is_aed_dataset[{"standard": "AED"}-True] PASSED [ 37%]
+mcod/resources/tests/test_aed_sources.py::test_is_aed_dataset[customfields4-False] PASSED [ 37%]
+mcod/resources/tests/test_aed_sources.py::test_is_aed_dataset[customfields5-False] PASSED [ 38%]
+mcod/resources/tests/test_aed_sources.py::test_is_aed_dataset[None-False] PASSED [ 38%]
+mcod/resources/tests/test_aed_sources.py::test_is_aed_dataset[customfields7-False] PASSED [ 39%]
+mcod/resources/tests/test_aed_sources.py::test_is_aed_dataset[nie-json-False] PASSED [ 39%]
+mcod/resources/tests/test_aed_sources.py::test_is_main_aed_dataset[customfields0-True] PASSED [ 40%]
+mcod/resources/tests/test_aed_sources.py::test_is_main_aed_dataset[customfields1-True] PASSED [ 40%]
+mcod/resources/tests/test_aed_sources.py::test_is_main_aed_dataset[customfields2-False] PASSED [ 40%]
+mcod/resources/tests/test_aed_sources.py::test_is_main_aed_dataset[None-False] PASSED [ 41%]
+mcod/resources/tests/test_aed_sources.py::test_get_aed_source_resources_filters PASSED [ 41%]
+mcod/resources/tests/test_aed_sources.py::test_get_aed_source_resources_ignores_portal_data_validation PASSED [ 42%]
+mcod/resources/tests/test_aed_sources.py::test_get_source_meta_personal_data PASSED [ 42%]
+mcod/resources/tests/test_aed_sources.py::test_create_main_aed_df_with_mocks PASSED [ 43%]
+mcod/resources/tests/test_aed_sources.py::test_missing_tabular_data_is_skipped PASSED [ 43%]
+mcod/resources/tests/test_aed_sources.py::test_ckan_html_link_skipped[html-page] PASSED [ 44%]
+mcod/resources/tests/test_aed_sources.py::test_ckan_html_link_skipped[not-found] PASSED [ 44%]
+mcod/resources/tests/test_aed_sources.py::test_ckan_connection_error_skipped PASSED [ 45%]
+mcod/resources/tests/test_aed_sources.py::test_ckan_csv_read_as_text PASSED [ 45%]
+mcod/resources/tests/test_aed_sources.py::test_template_file_read_without_portal_tabular_data PASSED [ 45%]
+mcod/resources/tests/test_aed_sources.py::test_real_legionowo_csv_read PASSED [ 46%]
+mcod/resources/tests/test_aed_task.py::TestMainAEDResourceCreationTask::test_main_aed_resource_creation_task PASSED [ 46%]
+mcod/resources/tests/test_aed_task.py::TestMainAEDResourceCreationTask::test_file_creation_exception PASSED [ 47%]
+mcod/resources/tests/test_aed_task.py::TestMainAEDResourceCreationTask::test_resource_creation_exception PASSED [ 47%]
+mcod/resources/tests/test_aed_task.py::TestMainAEDResourceCreationTask::test_validations_exception[Exception] PASSED [ 48%]
+mcod/resources/tests/test_aed_task.py::TestMainAEDResourceCreationTask::test_validations_exception[PendingValidationException] PASSED [ 48%]
+mcod/resources/tests/test_aed_task.py::TestMainAEDResourceCreationTask::test_validations_exception[FailedValidationException] PASSED [ 49%]
+mcod/resources/tests/test_aed_task.py::TestMainAEDResourceCreationTask::test_replace_exception PASSED [ 49%]
+mcod/resources/tests/test_aed_task.py::TestMainAEDResourceCreationTask::test_disabled_does_nothing PASSED [ 50%]
+mcod/resources/tests/test_aed_task.py::test_beat_schedule_has_aed_entry_when_enabled PASSED [ 50%]
+mcod/resources/tests/test_aed_task.py::test_beat_schedule_without_aed_entry_when_disabled PASSED [ 50%]
+mcod/resources/tests/test_aed_task.py::test_task_exported PASSED         [ 51%]
+mcod/resources/tests/test_aed_task.py::test_command_delay PASSED         [ 51%]
+mcod/resources/tests/test_aed_task.py::test_command_eager PASSED         [ 52%]
+mcod/resources/tests/test_aed_task.py::test_command_eager_cleans_up_on_error PASSED [ 52%]
+mcod/resources/tests/test_aed_task.py::test_command_dry_run PASSED       [ 53%]
+mcod/resources/tests/test_aed_task.py::test_command_disabled PASSED      [ 53%]
+mcod/resources/tests/test_aed_xml.py::test_valid_file PASSED             [ 54%]
+mcod/resources/tests/test_aed_xml.py::test_missing_required_field_names_the_field PASSED [ 54%]
+mcod/resources/tests/test_aed_xml.py::test_value_outside_dictionary_and_wrong_type PASSED [ 55%]
+mcod/resources/tests/test_aed_xml.py::test_coordinates_outside_poland_rejected PASSED [ 55%]
+mcod/resources/tests/test_aed_xml.py::test_duplicate_source_id_rejected PASSED [ 55%]
+mcod/resources/tests/test_aed_xml.py::test_broken_or_empty_input[] PASSED [ 56%]
+mcod/resources/tests/test_aed_xml.py::test_broken_or_empty_input[   ] PASSED [ 56%]
+mcod/resources/tests/test_aed_xml.py::test_broken_or_empty_input[<wykaz><aed>] PASSED [ 57%]
+mcod/resources/tests/test_aed_xml.py::test_broken_or_empty_input[nie xml] PASSED [ 57%]
+mcod/resources/tests/test_aed_xml.py::test_external_entities_are_not_resolved PASSED [ 58%]
+mcod/resources/tests/test_aed_xml.py::test_dataframe_has_template_columns_and_text_values PASSED [ 58%]
+mcod/resources/tests/test_aed_xml.py::test_dataframe_rejects_invalid_xml PASSED [ 59%]
+mcod/resources/tests/test_aed_xml.py::test_xsd_matches_template_columns PASSED [ 59%]
+mcod/resources/tests/test_aed_xml.py::test_portal_xsd_is_copy_of_repo_xsd_and_matches_table_schema SKIPPED [ 60%]
+mcod/resources/tests/test_aed_xml_source.py::test_xml_link_resource_is_selected_without_file_status PASSED [ 60%]
+mcod/resources/tests/test_aed_xml_source.py::test_xml_resource_filters PASSED [ 60%]
+mcod/resources/tests/test_aed_xml_source.py::test_xml_is_read_from_link_and_validated_with_xsd PASSED [ 61%]
+mcod/resources/tests/test_aed_xml_source.py::test_xml_source_errors_become_read_errors[remote_kwargs0-niezgodny z XSD] PASSED [ 61%]
+mcod/resources/tests/test_aed_xml_source.py::test_xml_source_errors_become_read_errors[remote_kwargs1-kod 404] PASSED [ 62%]
+mcod/resources/tests/test_aed_xml_source.py::test_xml_source_errors_become_read_errors[remote_kwargs2-nie odpowiada] PASSED [ 62%]
+mcod/resources/tests/test_aed_xml_source.py::test_aggregation_merges_xml_and_csv_and_skips_invalid_xml PASSED [ 63%]
+mcod/resources/tests/test_main_aed_resource.py::test_build_aed_tabular_schema PASSED [ 63%]
+mcod/resources/tests/test_main_aed_resource.py::test_create_main_aed_dataset PASSED [ 64%]
+mcod/resources/tests/test_main_aed_resource.py::test_create_main_aed_dataset_without_category PASSED [ 64%]
+mcod/resources/tests/test_main_aed_resource.py::test_get_main_aed_dataset_and_resource PASSED [ 65%]
+mcod/resources/tests/test_main_aed_resource.py::test_get_main_aed_dataset_none_without_aggregate_marker PASSED [ 65%]
+mcod/resources/tests/test_main_aed_resource.py::test_create_main_aed_file PASSED [ 65%]
+mcod/resources/tests/test_main_aed_resource.py::test_create_main_aed_resource_with_dataset PASSED [ 66%]
+mcod/resources/tests/test_main_aed_resource.py::test_create_main_aed_resource_reuses_dataset_and_metadata PASSED [ 66%]
+mcod/resources/tests/test_main_aed_resource.py::test_replace_old_main_aed_resource PASSED [ 67%]
+mcod/resources/tests/test_main_aed_resource.py::test_clean_up_after_main_aed_resource_creation[123-456-False-True] PASSED [ 67%]
+mcod/resources/tests/test_main_aed_resource.py::test_clean_up_after_main_aed_resource_creation[123-456-True-True] PASSED [ 68%]
+mcod/resources/tests/test_main_aed_resource.py::test_clean_up_after_main_aed_resource_creation[123-None-False-True] PASSED [ 68%]
+mcod/resources/tests/test_main_aed_resource.py::test_clean_up_after_main_aed_resource_creation[123-None-True-True] PASSED [ 69%]
+mcod/resources/tests/test_main_aed_resource.py::test_clean_up_after_main_aed_resource_creation[None-None-True-True] PASSED [ 69%]
+mcod/resources/tests/test_main_aed_resource.py::test_clean_up_after_main_aed_resource_creation[None-None-False-True] PASSED [ 70%]
+mcod/resources/tests/test_main_aed_resource.py::test_clean_up_after_main_aed_resource_creation[None-None-False-False] PASSED [ 70%]
+mcod/resources/tests/test_main_aed_resource.py::test_main_aed_resource_has_map_after_processing PASSED [ 70%]
+mcod/resources/tests/test_main_dga.py::test_get_main_dga_resource PASSED [ 71%]
+mcod/resources/tests/test_main_dga.py::test_get_main_dga_dataset PASSED  [ 71%]
+mcod/resources/tests/test_main_dga.py::test_get_dga_resource_for_dga_owner PASSED [ 72%]
+mcod/resources/tests/test_main_dga.py::test_create_main_dga_dataset PASSED [ 72%]
+mcod/resources/tests/test_main_dga.py::test_get_all_dga_resources_sorted_by_organizations PASSED [ 73%]
+mcod/resources/tests/test_main_dga.py::test_get_or_create_main_dga_path[True] PASSED [ 73%]
+mcod/resources/tests/test_main_dga.py::test_get_or_create_main_dga_path[False] PASSED [ 74%]
+mcod/resources/tests/test_main_dga.py::test_create_main_dga_df_with_ckan PASSED [ 74%]
+mcod/resources/tests/test_main_dga.py::test_create_main_dga_df PASSED    [ 75%]
+mcod/resources/tests/test_main_dga.py::test_create_empty_main_dga_df PASSED [ 75%]
+mcod/resources/tests/test_main_dga.py::test_create_main_dga_df_validates_and_coerces_required_values[skips-resource-with-none-required-value] PASSED [ 75%]
+mcod/resources/tests/test_main_dga.py::test_create_main_dga_df_validates_and_coerces_required_values[skips-resource-with-empty-required-value-after-strip] PASSED [ 76%]
+mcod/resources/tests/test_main_dga.py::test_create_main_dga_df_validates_and_coerces_required_values[coerces-non-string-required-value-and-strips-whitespace] PASSED [ 76%]
+mcod/resources/tests/test_main_dga.py::test_create_main_dga_df_validates_and_coerces_required_values[skips-resource-with-missing-required-columns] PASSED [ 77%]
+mcod/resources/tests/test_main_dga.py::test_create_main_dga_df_skips_real_csv_with_missing_required_columns PASSED [ 77%]
+mcod/resources/tests/test_main_dga.py::test_normalize_main_dga_source_df_strips_only_columns_with_values[values0-expected0] PASSED [ 78%]
+mcod/resources/tests/test_main_dga.py::test_normalize_main_dga_source_df_strips_only_columns_with_values[values1-expected1] PASSED [ 78%]
+mcod/resources/tests/test_main_dga.py::test_normalize_main_dga_source_df_strips_only_columns_with_values[values2-expected2] PASSED [ 79%]
+mcod/resources/tests/test_main_dga.py::test_check_all_resource_validations_status[SUCCESS-SUCCESS-SUCCESS-None-None] PASSED [ 79%]
+mcod/resources/tests/test_main_dga.py::test_check_all_resource_validations_status[---PendingValidationException-None] PASSED [ 80%]
+mcod/resources/tests/test_main_dga.py::test_check_all_resource_validations_status[SUCCESS---PendingValidationException-None] PASSED [ 80%]
+mcod/resources/tests/test_main_dga.py::test_check_all_resource_validations_status[-SUCCESS--PendingValidationException-None] PASSED [ 80%]
+mcod/resources/tests/test_main_dga.py::test_check_all_resource_validations_status[--SUCCESS-PendingValidationException-None] PASSED [ 81%]
+mcod/resources/tests/test_main_dga.py::test_check_all_resource_validations_status[FAILURE-SUCCESS-SUCCESS-None-data_failure5] PASSED [ 81%]
+mcod/resources/tests/test_main_dga.py::test_check_all_resource_validations_status[FAILURE-SUCCESS--PendingValidationException-data_failure6] PASSED [ 82%]
+mcod/resources/tests/test_main_dga.py::test_check_all_resource_validations_status[FAILURE-SUCCESS-SUCCESS-FailedValidationException-data_failure7] PASSED [ 82%]
+mcod/resources/tests/test_main_dga.py::test_check_all_resource_validations_status[FAILURE-SUCCESS-SUCCESS-FailedValidationException-data_failure8] PASSED [ 83%]
+mcod/resources/tests/test_main_dga.py::test_check_all_resource_validations_status[FAILURE-FAILURE-FAILURE-FailedValidationException-None] PASSED [ 83%]
+mcod/resources/tests/test_main_dga.py::test_check_all_resource_validations_status[SUCCESS-FAILURE-SUCCESS-FailedValidationException-None] PASSED [ 84%]
+mcod/resources/tests/test_main_dga.py::test_check_all_resource_validations_status[SUCCESS-SUCCESS-FAILURE-FailedValidationException-None] PASSED [ 84%]
+mcod/resources/tests/test_main_dga.py::test_check_all_resource_validations_status[-FAILURE--FailedValidationException-None] PASSED [ 85%]
+mcod/resources/tests/test_main_dga.py::test_check_all_resource_validations_status[--FAILURE-FailedValidationException-None] PASSED [ 85%]
+mcod/resources/tests/test_main_dga.py::test_create_main_dga_resource_with_dataset PASSED [ 85%]
+mcod/resources/tests/test_main_dga.py::test_create_main_dga_resource_with_dataset_calls_recovery_when_file_missing PASSED [ 86%]
+mcod/resources/tests/test_main_dga.py::test_create_main_dga_resource_with_dataset_regenerates_missing_file_logic PASSED [ 86%]
+mcod/resources/tests/test_main_dga.py::test_update_aggr_dga_info PASSED  [ 87%]
+mcod/resources/tests/test_main_dga.py::test_create_aggr_dga_info PASSED  [ 87%]
+mcod/resources/tests/test_main_dga.py::test_clean_up_after_main_dga_resource_creation[123-456-False-True] PASSED [ 88%]
+mcod/resources/tests/test_main_dga.py::test_clean_up_after_main_dga_resource_creation[123-456-True-True] PASSED [ 88%]
+mcod/resources/tests/test_main_dga.py::test_clean_up_after_main_dga_resource_creation[123-None-False-True] PASSED [ 89%]
+mcod/resources/tests/test_main_dga.py::test_clean_up_after_main_dga_resource_creation[123-None-True-True] PASSED [ 89%]
+mcod/resources/tests/test_main_dga.py::test_clean_up_after_main_dga_resource_creation[None-None-True-True] PASSED [ 90%]
+mcod/resources/tests/test_main_dga.py::test_clean_up_after_main_dga_resource_creation[None-None-False-True] PASSED [ 90%]
+mcod/resources/tests/test_main_dga.py::test_clean_up_after_main_dga_resource_creation[None-None-False-False] PASSED [ 90%]
+mcod/resources/tests/test_main_dga.py::test_add_style_to_main_dga_excel_file_smoke PASSED [ 91%]
+mcod/resources/tests/test_main_dga.py::test_create_main_dga_file PASSED  [ 91%]
+mcod/resources/tests/test_main_dga.py::TestMainDGAResourceCreationTask::test_main_dga_resource_creation_task PASSED [ 92%]
+mcod/resources/tests/test_main_dga.py::TestMainDGAResourceCreationTask::test_main_dga_file_creation_exception PASSED [ 92%]
+mcod/resources/tests/test_main_dga.py::TestMainDGAResourceCreationTask::test_main_dga_resource_creation_exception PASSED [ 93%]
+mcod/resources/tests/test_main_dga.py::TestMainDGAResourceCreationTask::test_validations_exception[Exception] PASSED [ 93%]
+mcod/resources/tests/test_main_dga.py::TestMainDGAResourceCreationTask::test_validations_exception[PendingValidationException] PASSED [ 94%]
+mcod/resources/tests/test_main_dga.py::TestMainDGAResourceCreationTask::test_validations_exception[FailedValidationException] PASSED [ 94%]
+mcod/resources/tests/test_main_dga.py::TestMainDGAResourceCreationTask::test_update_aggr_dga_info_exception PASSED [ 95%]
+mcod/resources/tests/test_api.py::test_response_dga_flag_in_details[True] PASSED [ 95%]
+mcod/resources/tests/test_api.py::test_response_dga_flag_in_details[False] PASSED [ 95%]
+mcod/resources/tests/test_api.py::test_api_aggregated_dga_info[dga_info_params0-200 OK] PASSED [ 96%]
+mcod/resources/tests/test_api.py::test_api_aggregated_dga_info[dga_info_params1-404 Not Found] PASSED [ 96%]
+mcod/resources/tests/test_api.py::test_api_aggregated_dga_info[None-404 Not Found] PASSED [ 97%]
+mcod/resources/tests/test_api.py::test_api_aggregated_dga_info_resource_removed_draft[resource_params0-404 Not Found] PASSED [ 97%]
+mcod/resources/tests/test_api.py::test_api_aggregated_dga_info_resource_removed_draft[resource_params1-200 OK] PASSED [ 98%]
+mcod/resources/tests/test_api.py::test_api_aggregated_dga_info_resource_removed_draft[resource_params2-404 Not Found] PASSED [ 98%]
+mcod/resources/tests/test_api.py::test_api_aggregated_dga_info_resource_removed_draft[resource_params3-200 OK] PASSED [ 99%]
+mcod/datasets/tests/test_aed_customfields_help.py::test_customfields_help_text_mentions_aed PASSED [ 99%]
+mcod/datasets/tests/test_aed_customfields_help.py::test_customfields_field_unchanged PASSED [100%]
+
+======== 219 passed, 1 skipped, 103 deselected, 628 warnings in 43.49s =========

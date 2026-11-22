@@ -62,6 +62,15 @@ Dodaliśmy do portalu **Wykaz AED**, czyli nocny zasób zbiorczy zbudowany na wz
    - `--eager` buduje wykaz synchronicznie;
    - bez opcji polecenie wysyła zadanie do Celery.
 
+## Dane z zewnątrz w XML ze schematem XSD (AED-11 do AED-13)
+
+Dostawca nie musi być na dane.gov.pl. Może wystawić plik XML pod adresem https na własnym serwerze:
+- **Schemat:** `aed_punkty.xsd` powstaje z Table Schema wzorca (`format_danych/narzedzia/generuj_xsd.py`). Struktura płaska: `<wykaz><aed>…</aed></wykaz>`, jedno pole wzorca to jeden element, pola wymagane mają `minOccurs="1"`, słowniki to `enumeration`, `id_zrodlowe` jest unikalne.
+- **Wejście do portalu:** zasób z linkiem do pliku (w panelu albo `manage.py import_aed_xml <adres> --organizacja <ID>`). Portal klasyfikuje go jako typ `api`, format `xml`, bez kopii pliku, więc wybór źródeł akceptuje taki zasób przy samym poprawnym linku (zadania plikowe go nie dotyczą).
+- **Budowa wykazu:** to samo nocne zadanie pobiera XML spod linku, waliduje go XSD (`aed_xml.validate_aed_xml`), zamienia na kolumny wzorca i scala z CSV i XLSX. Niezgodny plik jest pomijany, a powód (linia, pole, komunikat) trafia do statystyk i logu.
+- **Bezpieczeństwo:** parser nie wczytuje DTD ani zewnętrznych encji, deklaracje `DOCTYPE` i `ENTITY` są odrzucane, rozmiar pliku ograniczony do 20 MB. Zależności: `lxml`, które portal już miał.
+- **Zero migracji, DGA bez zmian:** tylko nowe pliki i dopisek w `aed_utils.py` (wybór źródeł, odczyt).
+
 ## Pliki
 
 ### Nowe pliki: kod
@@ -71,6 +80,8 @@ Dodaliśmy do portalu **Wykaz AED**, czyli nocny zasób zbiorczy zbudowany na wz
 | `mcod/resources/aed_constants.py` | kontrakt kolumn: 41 kolumn wzorca dostawcy, 51 kolumn zasobu zbiorczego, minimum agregacji, aliasy nagłówków, dopuszczone licencje, klucze `customfields`, kody `przetworzenie` |
 | `mcod/resources/aed_aggregation.py` | logika ramek danych bez ORM: odczyt CSV/XLSX, aliasy, kontrola kolumn, normalizacja, `id_aed`, pochodzenie, CSV wynikowy (RFC 4180). Tę samą logikę uruchamia `demo/agreguj.py` poza Django |
 | `mcod/resources/aed_utils.py` | warstwa portalu (wzór: `dga_utils.py`): rozpoznanie zbiorów, wybór i odczyt zasobów, plik CSV, schemat z `geo`, utworzenie zbioru i zasobu zbiorczego, zastąpienie poprzedniego zasobu, sprzątanie |
+| `mcod/resources/aed_xml.py`, `mcod/resources/aed_punkty.xsd` | źródło XML: walidacja XSD i zamiana na ramkę (bez Django); kopia schematu z `format_danych/schemat/` |
+| `mcod/resources/management/commands/import_aed_xml.py` | zaczytanie zewnętrznych danych XML: walidacja, zbiór `standard = AED` i zasób z linkiem |
 | `mcod/resources/tasks/aed.py` | zadanie Celery `create_main_aed_resource_task` (wzór: zadanie DGA) |
 | `mcod/resources/management/commands/create_main_aed_resource.py` | komenda ręcznego uruchomienia (`--dry-run`, `--eager`) |
 | `mcod/templates/docs/resources/aggregated_aed_info_view.yml` | dokumentacja endpointu `/aed-aggregated` w specyfikacji API |
@@ -89,7 +100,7 @@ Dodaliśmy do portalu **Wykaz AED**, czyli nocny zasób zbiorczy zbudowany na wz
 | `mcod/core/api/utils/views.py` | rejestracja schematu i ścieżki w specyfikacji OpenAPI |
 | `mcod/datasets/forms.py` | `help_text` pola „Pola niestandardowe” z instrukcją dla dostawcy |
 | `mcod/core/tests/fixtures/__init__.py` | rejestracja fikstur AED |
-| `CHANGELOG.md` | wpisy AED-01 do AED-10 w sekcji „Unreleased” |
+| `CHANGELOG.md` | wpisy AED-01 do AED-13 w sekcji „Unreleased” |
 
 ### Nowe pliki: testy i dane testowe
 
@@ -100,6 +111,7 @@ Dodaliśmy do portalu **Wykaz AED**, czyli nocny zasób zbiorczy zbudowany na wz
 | `mcod/resources/tests/test_aed_sources.py` | wybór źródeł (oznaczenie, licencje, formaty, statusy), odczyt plików lokalnych i z CKAN, pominięcia z powodem |
 | `mcod/resources/tests/test_main_aed_resource.py` | tworzenie zbioru i zasobu zbiorczego, schemat z `geo`, zastąpienie poprzedniego zasobu, sprzątanie po błędzie |
 | `mcod/resources/tests/test_aed_task.py` | zadanie Celery, harmonogram i komendę `create_main_aed_resource` |
+| `mcod/resources/tests/test_aed_xml.py`, `test_aed_xml_source.py`, `test_aed_import_xml_command.py` | walidacja XSD (poprawny, błędny, zepsuty, XXE, zgodność z Table Schema), wybór i odczyt zasobu XML z linku, scalenie XML z CSV, komenda importu |
 | `mcod/resources/tests/test_aed_api.py` | endpoint `/aed-aggregated`: najnowszy zasób, 404 bez zbioru lub zasobu, wersja robocza i usunięta, wyłączony dodatek, specyfikacja |
 | `mcod/resources/tests/test_aed_settings.py` | ustawienia domyślne, wyłącznik i routing zadania do kolejki |
 | `mcod/datasets/tests/test_aed_customfields_help.py` | podpowiedź w formularzu zbioru |
@@ -108,7 +120,7 @@ Dodaliśmy do portalu **Wykaz AED**, czyli nocny zasób zbiorczy zbudowany na wz
 
 ## Weryfikacja
 
-- **Testy:** w kontenerze testowym portalu przechodzą 192 testy, w tym wszystkie testy AED oraz regresja DGA (`test_main_dga.py`, testy DGA w `test_api.py`). Log: [`demo/wynik/testy.txt`](../demo/wynik/testy.txt).
+- **Testy:** w kontenerze testowym portalu przechodzą 219 testów (1 pominięty w kontenerze, sprawdza go `demo/sprawdz.py`), w tym wszystkie testy AED oraz regresja DGA (`test_main_dga.py`, testy DGA w `test_api.py`). Log: [`demo/wynik/testy.txt`](../demo/wynik/testy.txt).
 - **Migracje:** `makemigrations --check` zwraca „No changes detected” (ten sam log).
 - **Portal uruchomiony lokalnie:** zrzuty i log komendy są w [`demo/zrzuty/`](../demo/zrzuty/README.md) i [`demo/wynik/`](../demo/wynik/).
 - **Bez bazy:** [`demo/agreguj.py`](../demo/agreguj.py) uruchamia logikę agregacji na realnych plikach z dane.gov.pl ([`demo/wynik/raport_agregacji.txt`](../demo/wynik/raport_agregacji.txt)).

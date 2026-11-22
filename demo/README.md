@@ -1,8 +1,18 @@
 # Demo Wykazu AED
 
+## Weryfikacja maszynowa: `sprawdz.py`
+
+```bash
+python demo/sprawdz.py
+```
+
+Jedno polecenie, bez Dockera i bazy (brakujące biblioteki dociąga `uv`). Wykonuje 15 kontroli wymagań (schemat XSD, walidacja XML poprawnego i błędnego, scalenie XML i CSV, 51 kolumn wykazu, licencje, brak migracji i usunięć w diffie, testy, XLSX, prototyp offline, `proces.json`, pliki do zgłoszenia) i zapisuje `wynik/weryfikacja.txt` i `weryfikacja.json` (PASS/FAIL z plikiem dowodowym). Kod wyjścia 0 oznacza komplet PASS.
+
+Dane z zewnątrz: `serwer_zewnetrzny.py` (serwer dostawcy z XML i XSD, `--https` dla portalu), `NGROK.md` (wystawienie przez ngrok, ostrożnie), `scenariusz/przygotuj_dane_xml.py` i `zrzuty_xml.py` (scenariusz w portalu i zrzuty 10–15). `proces.json` opisuje kroki prototypu w postaci do odczytu maszynowego.
+
 ## Klikalny prototyp offline: `index.html`
 
-Otwórz `demo/index.html` w przeglądarce, bez instalacji i bez sieci. Siedem kroków prowadzi przez cały proces:
+Otwórz `demo/index.html` w przeglądarce, bez instalacji i bez sieci. Dziewięć kroków prowadzi przez cały proces (krok 4: dane z zewnątrz w XML z walidacją XSD):
 
 1. problem;
 2. dostawca oznacza zbiór wpisem `standard = AED`;

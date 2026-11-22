@@ -127,6 +127,11 @@ def main():
         "przyklad": sample_rows(),
         "zmiany": portal_changes(),
         "integrator": integrator_summary(),
+        "xml": {
+            "poprawny": read_text("format_danych/przyklady/xml/aed_poprawny.xml"),
+            "bledny": read_text("format_danych/przyklady/xml/aed_bledny.xml"),
+            "raport": json.loads(read_text("demo/wynik/walidacja_xml.json")),
+        },
     }
     data_json = json.dumps(data, ensure_ascii=False, separators=(",", ":")).replace("<", "\\u003c")
     logo = read_text("branding/logo/dane-przezycie_logo_poziome.svg").strip()
@@ -139,6 +144,7 @@ def main():
         "{{FONT_BOLD}}": font_data_uri("AtkinsonHyperlegible-Bold.ttf"),
         "{{LOGO_SVG}}": logo,
         "{{DANE_JSON}}": data_json,
+        "{{PROCES_JSON}}": json.dumps(json.loads(read_text("demo/proces.json")), ensure_ascii=False, separators=(",", ":")).replace("<", "\u003c"),
     }.items():
         if key not in html:
             raise SystemExit(f"brak {key} w demo/szablon.html")

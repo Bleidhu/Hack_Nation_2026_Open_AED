@@ -1,0 +1,39 @@
+# Publikuje na GitHub Pages wyłącznie statyczny prototyp i pliki, do których on odsyła.
+# Bez portalu, bez backendu, bez sekretów. Uruchamiany ręcznie (Actions → Prototyp na GitHub Pages → Run workflow).
+# Wymaga włączenia Pages: Settings → Pages → Source: GitHub Actions. Link jest dodatkiem, nic w ocenie od niego nie zależy.
+name: Prototyp na GitHub Pages
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Złożenie strony (układ katalogów jak w repozytorium, żeby linki względne działały)
+        run: |
+          mkdir -p _site/portal/backend
+          cp -r demo format_danych branding prezentacja _site/
+          rm -rf _site/demo/wideo _site/demo/.cert _site/branding/archiwum
+          cp README.md INSTRUKCJA_DLA_JURY.md DODATKOWE_INFORMACJE.md ZMIANY_W_PORTALU.md _site/ 2>/dev/null || true
+          cp portal/backend/CHANGELOG.md _site/portal/backend/
+          echo '<!doctype html><meta charset="utf-8"><meta http-equiv="refresh" content="0; url=demo/index.html"><a href="demo/index.html">Prototyp Wykazu AED</a>' > _site/index.html
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+      - id: deployment
+        uses: actions/deploy-pages@v4

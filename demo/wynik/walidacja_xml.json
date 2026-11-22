@@ -1,0 +1,28 @@
+{
+  "aed_poprawny.xml": {
+    "valid": true,
+    "records": 6,
+    "errors": []
+  },
+  "aed_bledny.xml": {
+    "valid": false,
+    "records": 6,
+    "errors": [
+      {
+        "line": 23,
+        "field": "typ_dostepu",
+        "message": "brak wymaganego pola: typ_dostepu"
+      },
+      {
+        "line": 55,
+        "field": "status_urzadzenia",
+        "message": "Element 'status_urzadzenia': [facet 'enumeration'] The value 'dziala' is not an element of the set {'sprawny', 'niesprawny', 'w_serwisie', 'wycofany', 'nieznany'}."
+      },
+      {
+        "line": 69,
+        "field": "szerokosc_geograficzna",
+        "message": "Element 'szerokosc_geograficzna': 'pięćdziesiąt cztery' is not a valid value of the local atomic type."
+      }
+    ]
+  }
+}

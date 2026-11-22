@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wykaz>
+  <aed>
+    <id_zrodlowe>OL-001</id_zrodlowe>
+    <nazwa_lokalizacji>Urząd Miasta – hol główny</nazwa_lokalizacji>
+    <miejscowosc>Olsztyn</miejscowosc>
+    <nazwa_ulicy>Plac Jana Pawła II</nazwa_ulicy>
+    <numer_budynku>1</numer_budynku>
+    <kod_pocztowy>10-101</kod_pocztowy>
+    <szerokosc_geograficzna>53.778420</szerokosc_geograficzna>
+    <dlugosc_geograficzna>20.480120</dlugosc_geograficzna>
+    <opis_lokalizacji>Parter, hol główny, na lewo od portierni</opis_lokalizacji>
+    <wewnatrz_budynku>true</wewnatrz_budynku>
+    <typ_dostepu>publiczny</typ_dostepu>
+    <dostepny_24_7>false</dostepny_24_7>
+    <status_urzadzenia>sprawny</status_urzadzenia>
+    <dysponent_nazwa>Miejski Zakład Przykład (PRZYKŁAD)</dysponent_nazwa>
+    <dysponent_regon>123456785</dysponent_regon>
+    <zrodlo_danych>dysponent</zrodlo_danych>
+    <zrodlo_url>https://dostawca.example.pl/aed</zrodlo_url>
+    <data_aktualizacji>2026-11-20T08:00:00</data_aktualizacji>
+  </aed>
+  <aed>
+    <id_zrodlowe>OL-002</id_zrodlowe>
+    <nazwa_lokalizacji>Dworzec – hala odpraw</nazwa_lokalizacji>
+    <miejscowosc>Olsztyn</miejscowosc>
+    <nazwa_ulicy>Partyzantów</nazwa_ulicy>
+    <numer_budynku>6</numer_budynku>
+    <kod_pocztowy>10-402</kod_pocztowy>
+    <szerokosc_geograficzna>53.783060</szerokosc_geograficzna>
+    <dlugosc_geograficzna>20.493770</dlugosc_geograficzna>
+    <opis_lokalizacji>Hala odpraw, przy kasach biletowych</opis_lokalizacji>
+    <wewnatrz_budynku>true</wewnatrz_budynku>
+    <typ_dostepu>publiczny</typ_dostepu>
+    <dostepny_24_7>true</dostepny_24_7>
+    <status_urzadzenia>sprawny</status_urzadzenia>
+    <dysponent_nazwa>Miejski Zakład Przykład (PRZYKŁAD)</dysponent_nazwa>
+    <dysponent_regon>123456785</dysponent_regon>
+    <zrodlo_danych>dysponent</zrodlo_danych>
+    <zrodlo_url>https://dostawca.example.pl/aed</zrodlo_url>
+    <data_aktualizacji>2026-11-20T08:00:00</data_aktualizacji>
+  </aed>
+  <aed>
+    <id_zrodlowe>OL-003</id_zrodlowe>
+    <nazwa_lokalizacji>Szkoła Podstawowa nr 7 – sala gimnastyczna</nazwa_lokalizacji>
+    <miejscowosc>Olsztyn</miejscowosc>
+    <nazwa_ulicy>Szkolna</nazwa_ulicy>
+    <numer_budynku>5A</numer_budynku>
+    <kod_pocztowy>10-502</kod_pocztowy>
+    <szerokosc_geograficzna>53.790110</szerokosc_geograficzna>
+    <dlugosc_geograficzna>20.470950</dlugosc_geograficzna>
+    <opis_lokalizacji>Korytarz przy wejściu do sali gimnastycznej</opis_lokalizacji>
+    <wewnatrz_budynku>true</wewnatrz_budynku>
+    <typ_dostepu>ograniczony</typ_dostepu>
+    <dostepny_24_7>false</dostepny_24_7>
+    <status_urzadzenia>sprawny</status_urzadzenia>
+    <dysponent_nazwa>Miejski Zakład Przykład (PRZYKŁAD)</dysponent_nazwa>
+    <dysponent_regon>123456785</dysponent_regon>
+    <zrodlo_danych>dysponent</zrodlo_danych>
+    <zrodlo_url>https://dostawca.example.pl/aed</zrodlo_url>
+    <data_aktualizacji>2026-11-20T08:00:00</data_aktualizacji>
+  </aed>
+  <aed>
+    <id_zrodlowe>EL-001</id_zrodlowe>
+    <nazwa_lokalizacji>Hala sportowa – wejście główne</nazwa_lokalizacji>
+    <miejscowosc>Elbląg</miejscowosc>
+    <nazwa_ulicy>Moniuszki</nazwa_ulicy>
+    <numer_budynku>2</numer_budynku>
+    <kod_pocztowy>82-300</kod_pocztowy>
+    <szerokosc_geograficzna>54.156610</szerokosc_geograficzna>
+    <dlugosc_geograficzna>19.404270</dlugosc_geograficzna>
+    <opis_lokalizacji>Na zewnątrz, szafka przy wejściu głównym</opis_lokalizacji>
+    <wewnatrz_budynku>false</wewnatrz_budynku>
+    <typ_dostepu>publiczny</typ_dostepu>
+    <dostepny_24_7>true</dostepny_24_7>
+    <status_urzadzenia>w_serwisie</status_urzadzenia>
+    <dysponent_nazwa>Miejski Zakład Przykład (PRZYKŁAD)</dysponent_nazwa>
+    <dysponent_regon>123456785</dysponent_regon>
+    <zrodlo_danych>dysponent</zrodlo_danych>
+    <zrodlo_url>https://dostawca.example.pl/aed</zrodlo_url>
+    <data_aktualizacji>2026-11-20T08:00:00</data_aktualizacji>
+  </aed>
+  <aed>
+    <id_zrodlowe>EL-002</id_zrodlowe>
+    <nazwa_lokalizacji>Biblioteka Miejska – recepcja</nazwa_lokalizacji>
+    <miejscowosc>Elbląg</miejscowosc>
+    <nazwa_ulicy>Rynek Staromiejski</nazwa_ulicy>
+    <numer_budynku>1</numer_budynku>
+    <kod_pocztowy>82-300</kod_pocztowy>
+    <szerokosc_geograficzna>54.159800</szerokosc_geograficzna>
+    <dlugosc_geograficzna>19.402500</dlugosc_geograficzna>
+    <opis_lokalizacji>Parter, recepcja</opis_lokalizacji>
+    <wewnatrz_budynku>true</wewnatrz_budynku>
+    <typ_dostepu>ograniczony</typ_dostepu>
+    <dostepny_24_7>false</dostepny_24_7>
+    <status_urzadzenia>nieznany</status_urzadzenia>
+    <dysponent_nazwa>Miejski Zakład Przykład (PRZYKŁAD)</dysponent_nazwa>
+    <dysponent_regon>123456785</dysponent_regon>
+    <zrodlo_danych>dysponent</zrodlo_danych>
+    <zrodlo_url>https://dostawca.example.pl/aed</zrodlo_url>
+    <data_aktualizacji>2026-11-20T08:00:00</data_aktualizacji>
+  </aed>
+  <aed>
+    <id_zrodlowe>EL-003</id_zrodlowe>
+    <nazwa_lokalizacji>Basen miejski – kasa</nazwa_lokalizacji>
+    <miejscowosc>Elbląg</miejscowosc>
+    <nazwa_ulicy>Agrykola</nazwa_ulicy>
+    <numer_budynku>9</numer_budynku>
+    <kod_pocztowy>82-300</kod_pocztowy>
+    <szerokosc_geograficzna>54.171230</szerokosc_geograficzna>
+    <dlugosc_geograficzna>19.407880</dlugosc_geograficzna>
+    <opis_lokalizacji>Przy kasie, w szafce z alarmem</opis_lokalizacji>
+    <wewnatrz_budynku>true</wewnatrz_budynku>
+    <typ_dostepu>ograniczony</typ_dostepu>
+    <dostepny_24_7>false</dostepny_24_7>
+    <status_urzadzenia>sprawny</status_urzadzenia>
+    <dysponent_nazwa>Miejski Zakład Przykład (PRZYKŁAD)</dysponent_nazwa>
+    <dysponent_regon>123456785</dysponent_regon>
+    <zrodlo_danych>dysponent</zrodlo_danych>
+    <zrodlo_url>https://dostawca.example.pl/aed</zrodlo_url>
+    <data_aktualizacji>2026-11-20T08:00:00</data_aktualizacji>
+  </aed>
+</wykaz>

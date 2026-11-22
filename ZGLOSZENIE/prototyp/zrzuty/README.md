@@ -22,7 +22,15 @@
 | `05_wykaz_mapa.png` | Frontend: zakładka Mapa: punkty wzorca w Bydgoszczy i klaster 24 punktów z Legionowa. | Schemat zasobu zbiorczego z `geo` (b, l, label) włącza mapę portalu. |
 | `06_api_aed_aggregated.png` | `GET /1.4/aed-aggregated`: identyfikatory i slugi zbioru i zasobu zbiorczego. | Stały punkt API, odpowiednik `/dga-aggregated` (zadanie 08). |
 | `07_api_dane_zasobu.png` | `GET /1.4/resources/40247/data`: `meta.count = 32`, mapowanie geo i pierwszy wiersz z kolumnami pochodzenia (`wydawca_zasobu`, `licencja_zasobu`, `id_zasobu_zrodlowego`, `url_zasobu_zrodlowego`, `data_agregacji`). | Dane wykazu w API portalu, z atrybucją dostawcy wymaganą przez CC BY 4.0. |
-| `09_testy.png` | Wynik pytest w kontenerze: testy AED i regresja DGA, 192 passed, `makemigrations --check`: No changes detected (pełna lista: `demo/wynik/testy.txt`). | Zmiany mają testy, mechanizm DGA działa bez zmian, migracji brak. |
+| `09_testy.png` | Wynik pytest w kontenerze: testy AED i regresja DGA, 219 passed, `makemigrations --check`: No changes detected (pełna lista: `demo/wynik/testy.txt`). | Zmiany mają testy, mechanizm DGA działa bez zmian, migracji brak. |
+| `10_zewnetrzny_xml.png` | Początek pliku XML z zewnętrznego serwera dostawcy (`demo/serwer_zewnetrzny.py`, dane fikcyjne): `<wykaz><aed>…`. | Źródło danych jest poza dane.gov.pl, w XML (krok 17 instrukcji dodatkowej). |
+| `11_walidacja_xsd.png` | Raport walidacji XSD funkcją portalu `validate_aed_xml`: plik poprawny (6 rekordów, 0 błędów) i błędny (3 błędy z numerem linii i polem). Wyświetlony jako tekst z `demo/wynik/walidacja_xml.json`. | Schemat XSD wzorca wykrywa brak pola wymaganego, wartość spoza słownika i zły typ. |
+| `12_zasob_xml_w_panelu.png` | Panel, formularz zasobu „Wykaz AED (XML, link do serwera dostawcy)”: link https do serwera, format XML, typ API. | Dostawca dodaje do portalu zasób z linkiem do zewnętrznego XML; portal nie kopiuje pliku. |
+| `13_komenda_wykaz_z_xml.png` | Terminal: `create_main_aed_resource --eager` z zasobami XML: zasób niezgodny z XSD pominięty z powodem (linia 23, brak `typ_dostepu`), przyjęte zasoby 3, 38 wierszy. Wybrane linie logu (pełny: `demo/wynik/komenda_create_main_aed_resource_xml.txt`). | Nocne zadanie pobiera XML spod linku, waliduje XSD i scala z CSV; niezgodny plik nie psuje wykazu. |
+| `14_wykaz_z_xml_tabela.png` | Frontend: tabela Wykazu AED, pierwsze wiersze to rekordy z XML (Olsztyn, Elbląg: OL-001…EL-003). | Rekordy z zewnętrznego XML są w standardowej tabeli portalu. |
+| `15_wykaz_z_xml_mapa.png` | Frontend: mapa Wykazu AED z punktami z Olsztyna i Elbląga obok Bydgoszczy i klastra Legionowa. | Dane z XML działają w mapie portalu. |
+
+Zrzuty 10–15 pochodzą z uruchomienia z 22.11.2026 (skrypty `demo/scenariusz/przygotuj_dane_xml.py` i `zrzuty_xml.py`); zasoby źródłowe 40250 (XML poprawny) i 40251 (XML z błędami), Wykaz: zasób 40252.
 
 Zrzutu `08_strona_wykazu.png` nie ma, bo zadanie 12 (strona Wykazu we froncie) jest opcjonalne i go nie zrobiliśmy.
 

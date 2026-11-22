@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+  <!-- Wzorcowy zakres danych o defibrylatorach AED – plik dostawcy, wersja 2.0.0. Plik generowany z aed_punkty.tableschema.json przez format_danych/narzedzia/generuj_xsd.py. -->
+  <xs:element name="wykaz">
+    <xs:complexType><xs:sequence>
+      <xs:element name="aed" minOccurs="1" maxOccurs="unbounded">
+        <xs:complexType><xs:all>
+          <xs:element name="id_zrodlowe" minOccurs="1"><xs:simpleType><xs:restriction base="xs:string"></xs:restriction></xs:simpleType></xs:element>
+          <xs:element name="nazwa_lokalizacji" minOccurs="1"><xs:simpleType><xs:restriction base="xs:string"></xs:restriction></xs:simpleType></xs:element>
+          <xs:element name="wojewodztwo" minOccurs="0"><xs:simpleType><xs:restriction base="xs:string"></xs:restriction></xs:simpleType></xs:element>
+          <xs:element name="powiat" minOccurs="0"><xs:simpleType><xs:restriction base="xs:string"></xs:restriction></xs:simpleType></xs:element>
+          <xs:element name="gmina" minOccurs="0"><xs:simpleType><xs:restriction base="xs:string"></xs:restriction></xs:simpleType></xs:element>
+          <xs:element name="kod_terc" minOccurs="0"><xs:simpleType><xs:restriction base="xs:string"><xs:pattern value="\d{7}"/></xs:restriction></xs:simpleType></xs:element>
+          <xs:element name="miejscowosc" minOccurs="1"><xs:simpleType><xs:restriction base="xs:string"></xs:restriction></xs:simpleType></xs:element>
+          <xs:element name="kod_simc" minOccurs="0"><xs:simpleType><xs:restriction base="xs:string"><xs:pattern value="\d{7}"/></xs:restriction></xs:simpleType></xs:element>
+          <xs:element name="kod_pocztowy" minOccurs="0"><xs:simpleType><xs:restriction base="xs:string"><xs:pattern value="\d{2}-\d{3}"/></xs:restriction></xs:simpleType></xs:element>
+          <xs:element name="cecha_ulicy" minOccurs="0"><xs:simpleType><xs:restriction base="xs:string"><xs:enumeration value="ul."/><xs:enumeration value="al."/><xs:enumeration value="pl."/><xs:enumeration value="skwer"/><xs:enumeration value="bulw."/><xs:enumeration value="rondo"/><xs:enumeration value="park"/><xs:enumeration value="rynek"/><xs:enumeration value="szosa"/><xs:enumeration value="droga"/><xs:enumeration value="os."/><xs:enumeration value="ogród"/><xs:enumeration value="wyspa"/><xs:enumeration value="wyb."/><xs:enumeration value="inne"/></xs:restriction></xs:simpleType></xs:element>
+          <xs:element name="nazwa_ulicy" minOccurs="0"><xs:simpleType><xs:restriction base="xs:string"></xs:restriction></xs:simpleType></xs:element>
+          <xs:element name="kod_ulic" minOccurs="0"><xs:simpleType><xs:restriction base="xs:string"><xs:pattern value="\d{5}"/></xs:restriction></xs:simpleType></xs:element>
+          <xs:element name="numer_budynku" minOccurs="0"><xs:simpleType><xs:restriction base="xs:string"></xs:restriction></xs:simpleType></xs:element>
+          <xs:element name="numer_lokalu" minOccurs="0"><xs:simpleType><xs:restriction base="xs:string"></xs:restriction></xs:simpleType></xs:element>
+          <xs:element name="adres_uniwersalny" minOccurs="0"><xs:simpleType><xs:restriction base="xs:string"></xs:restriction></xs:simpleType></xs:element>
+          <xs:element name="szerokosc_geograficzna" minOccurs="1"><xs:simpleType><xs:restriction base="xs:decimal"><xs:minInclusive value="49.0"/><xs:maxInclusive value="54.9"/></xs:restriction></xs:simpleType></xs:element>
+          <xs:element name="dlugosc_geograficzna" minOccurs="1"><xs:simpleType><xs:restriction base="xs:decimal"><xs:minInclusive value="14.1"/><xs:maxInclusive value="24.2"/></xs:restriction></xs:simpleType></xs:element>
+          <xs:element name="opis_lokalizacji" minOccurs="1"><xs:simpleType><xs:restriction base="xs:string"></xs:restriction></xs:simpleType></xs:element>
+          <xs:element name="wewnatrz_budynku" minOccurs="0"><xs:simpleType><xs:restriction base="xs:boolean"/></xs:simpleType></xs:element>
+          <xs:element name="kondygnacja" minOccurs="0"><xs:simpleType><xs:restriction base="xs:integer"></xs:restriction></xs:simpleType></xs:element>
+          <xs:element name="typ_dostepu" minOccurs="1"><xs:simpleType><xs:restriction base="xs:string"><xs:enumeration value="publiczny"/><xs:enumeration value="ograniczony"/><xs:enumeration value="prywatny"/></xs:restriction></xs:simpleType></xs:element>
+          <xs:element name="dostepny_24_7" minOccurs="1"><xs:simpleType><xs:restriction base="xs:boolean"/></xs:simpleType></xs:element>
+          <xs:element name="godziny_dostepnosci" minOccurs="0"><xs:simpleType><xs:restriction base="xs:string"></xs:restriction></xs:simpleType></xs:element>
+          <xs:element name="zabezpieczenie" minOccurs="0"><xs:simpleType><xs:restriction base="xs:string"><xs:enumeration value="brak"/><xs:enumeration value="szafka_otwarta"/><xs:enumeration value="szafka_z_alarmem"/><xs:enumeration value="szafka_na_kod"/><xs:enumeration value="zamkniety_na_klucz"/></xs:restriction></xs:simpleType></xs:element>
+          <xs:element name="instrukcja_dostepu" minOccurs="0"><xs:simpleType><xs:restriction base="xs:string"></xs:restriction></xs:simpleType></xs:element>
+          <xs:element name="status_urzadzenia" minOccurs="0"><xs:simpleType><xs:restriction base="xs:string"><xs:enumeration value="sprawny"/><xs:enumeration value="niesprawny"/><xs:enumeration value="w_serwisie"/><xs:enumeration value="wycofany"/><xs:enumeration value="nieznany"/></xs:restriction></xs:simpleType></xs:element>
+          <xs:element name="producent" minOccurs="0"><xs:simpleType><xs:restriction base="xs:string"></xs:restriction></xs:simpleType></xs:element>
+          <xs:element name="model" minOccurs="0"><xs:simpleType><xs:restriction base="xs:string"></xs:restriction></xs:simpleType></xs:element>
+          <xs:element name="elektrody_pediatryczne" minOccurs="0"><xs:simpleType><xs:restriction base="xs:boolean"/></xs:simpleType></xs:element>
+          <xs:element name="data_waznosci_elektrod" minOccurs="0"><xs:simpleType><xs:restriction base="xs:date"/></xs:simpleType></xs:element>
+          <xs:element name="data_waznosci_baterii" minOccurs="0"><xs:simpleType><xs:restriction base="xs:date"/></xs:simpleType></xs:element>
+          <xs:element name="data_ostatniego_przegladu" minOccurs="0"><xs:simpleType><xs:restriction base="xs:date"/></xs:simpleType></xs:element>
+          <xs:element name="poziom_weryfikacji" minOccurs="0"><xs:simpleType><xs:restriction base="xs:string"><xs:enumeration value="zweryfikowany_w_terenie"/><xs:enumeration value="zweryfikowany_przez_dysponenta"/><xs:enumeration value="niezweryfikowany"/></xs:restriction></xs:simpleType></xs:element>
+          <xs:element name="data_weryfikacji" minOccurs="0"><xs:simpleType><xs:restriction base="xs:date"/></xs:simpleType></xs:element>
+          <xs:element name="dysponent_nazwa" minOccurs="0"><xs:simpleType><xs:restriction base="xs:string"></xs:restriction></xs:simpleType></xs:element>
+          <xs:element name="dysponent_regon" minOccurs="0"><xs:simpleType><xs:restriction base="xs:string"><xs:pattern value="(\d{9}|\d{14})"/></xs:restriction></xs:simpleType></xs:element>
+          <xs:element name="telefon_kontaktowy" minOccurs="0"><xs:simpleType><xs:restriction base="xs:string"><xs:pattern value="(\+\d{2})?\d{9}"/></xs:restriction></xs:simpleType></xs:element>
+          <xs:element name="email_kontaktowy" minOccurs="0"><xs:simpleType><xs:restriction base="xs:string"></xs:restriction></xs:simpleType></xs:element>
+          <xs:element name="zrodlo_danych" minOccurs="0"><xs:simpleType><xs:restriction base="xs:string"><xs:enumeration value="dysponent"/><xs:enumeration value="rejestr_publiczny"/><xs:enumeration value="baza_zewnetrzna"/><xs:enumeration value="openstreetmap"/><xs:enumeration value="zgloszenie_obywatelskie"/></xs:restriction></xs:simpleType></xs:element>
+          <xs:element name="zrodlo_url" minOccurs="0"><xs:simpleType><xs:restriction base="xs:string"></xs:restriction></xs:simpleType></xs:element>
+          <xs:element name="data_aktualizacji" minOccurs="1"><xs:simpleType><xs:restriction base="xs:string"><xs:pattern value="\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}"/></xs:restriction></xs:simpleType></xs:element>
+        </xs:all></xs:complexType>
+      </xs:element>
+    </xs:sequence></xs:complexType>
+    <xs:unique name="unikalny_id_zrodlowe"><xs:selector xpath="aed"/><xs:field xpath="id_zrodlowe"/></xs:unique>
+  </xs:element>
+</xs:schema>

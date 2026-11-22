@@ -134,6 +134,15 @@ summary { cursor: pointer; font-weight: 700; color: var(--granat); min-height: 3
 footer { background: var(--granat); color: #fff; padding: 1.25rem 0; font-size: .9rem; }
 footer a { color: #fff; }
 footer p { margin: .3rem 0; }
+
+.wybor-xml { border: 1px solid var(--ramka); padding: .75rem 1rem; margin: 1rem 0; max-width: 60rem; }
+.wybor-xml label { display: block; padding: .3rem 0; min-height: 32px; }
+.werdykt { font-weight: 700; padding: .5rem .75rem; border-left: 6px solid var(--zielen); background: var(--zielen-jasna); }
+.werdykt.zly { border-color: var(--czerwien); background: #fbe9e7; color: #8c1d18; }
+pre.xml { background: #f5f7fa; border: 1px solid var(--ramka); padding: .75rem; overflow: auto; max-height: 22rem; font-size: .85rem; }
+pre.xml .l { display: block; white-space: pre; }
+pre.xml .l.blad { background: #fbe9e7; color: #8c1d18; font-weight: 700; }
+pre.xml .n { display: inline-block; width: 3rem; color: var(--szary); user-select: none; }
 </style>
 </head>
 <body>
@@ -151,11 +160,12 @@ footer p { margin: .3rem 0; }
     <li><button type="button" data-krok="1">1. Problem</button></li>
     <li><button type="button" data-krok="2">2. Dostawca oznacza zbiór</button></li>
     <li><button type="button" data-krok="3">3. Dostawca publikuje zasób</button></li>
-    <li><button type="button" data-krok="4">4. Portal buduje wykaz</button></li>
-    <li><button type="button" data-krok="5">5. Odbiorca przegląda</button></li>
-    <li><button type="button" data-krok="6">6. Pobieranie i API</button></li>
-    <li><button type="button" data-krok="7">7. Co zmieniliśmy</button></li>
-<li><button type="button" data-krok="8">8. Dodatek: integrator</button></li>
+    <li><button type="button" data-krok="4">4. Dane z zewnątrz (XML)</button></li>
+    <li><button type="button" data-krok="5">5. Portal buduje wykaz</button></li>
+    <li><button type="button" data-krok="6">6. Odbiorca przegląda</button></li>
+    <li><button type="button" data-krok="7">7. Pobieranie i API</button></li>
+    <li><button type="button" data-krok="8">8. Co zmieniliśmy</button></li>
+<li><button type="button" data-krok="9">9. Dodatek: integrator</button></li>
   </ol>
 </nav>
 
@@ -189,7 +199,7 @@ footer p { margin: .3rem 0; }
   <ul>
     <li>Używamy istniejącej metadanej <code>Dataset.customfields</code>, więc nie ma nowego pola, tabeli ani migracji.</li>
     <li>Nie używamy tagu ani checkboxa.</li>
-    <li>Deklaracja dotyczy zbioru. Każdy zasób zbioru jest dodatkowo sprawdzany w kroku 4.</li>
+    <li>Deklaracja dotyczy zbioru. Każdy zasób zbioru jest dodatkowo sprawdzany w kroku 5.</li>
   </ul>
   <figure>
     <img src="zrzuty/01_formularz_zbioru_standard_aed.png" width="1440" height="900" alt="Panel administracyjny portalu, formularz zbioru „Defibrylatory AED w Legionowie”. W sekcji Pola niestandardowe jest wpis: nazwa standard, wartość AED. Pod polem tekst podpowiedzi: aby zasoby trafiły do krajowego Wykazu AED, dodaj pole standard o wartości AED; zasoby muszą być plikami CSV lub XLSX z kolumnami wzorca; licencja CC0 1.0 lub CC BY 4.0; tylko kontakty instytucjonalne.">
@@ -218,7 +228,49 @@ footer p { margin: .3rem 0; }
 </section>
 
 <section class="krok" id="etap-4" aria-labelledby="h-4" hidden>
-  <h2 id="h-4" tabindex="-1"><span class="nr">4</span>Portal sprawdza zasoby i co noc buduje Wykaz AED</h2>
+  <h2 id="h-4" tabindex="-1"><span class="nr">4</span>Dane z zewnątrz: XML z serwera dostawcy i walidacja XSD</h2>
+  <p>Dostawca nie musi być na dane.gov.pl. Wystawia plik <strong>XML</strong> pod adresem https na własnym serwerze, a w portalu dodaje zasób z <strong>linkiem</strong> do tego pliku (w panelu albo komendą <code>manage.py import_aed_xml &lt;adres&gt;</code>, która najpierw sprawdza plik schematem <strong>XSD</strong>). Co noc zadanie Wykazu AED pobiera plik spod linku, waliduje go XSD, zamienia na te same kolumny wzorca co CSV i XLSX i scala z pozostałymi źródłami. Plik niezgodny z XSD jest pomijany, a powód trafia do logu.</p>
+  <fieldset class="wybor-xml">
+    <legend>Którego pliku dostawcy użyć? (wynik walidacji pochodzi z prawdziwego uruchomienia kodu portalu)</legend>
+    <label><input type="radio" name="xml-plik" value="poprawny" checked> <code>aed_poprawny.xml</code>: 6 rekordów</label>
+    <label><input type="radio" name="xml-plik" value="bledny"> <code>aed_bledny.xml</code>: ten sam plik z 3 błędami</label>
+  </fieldset>
+  <div id="xml-wynik" aria-live="polite">
+    <p id="xml-werdykt" class="werdykt"></p>
+    <div class="tabela-wrap" role="region" aria-labelledby="cap-xml-bledy" tabindex="0" id="xml-bledy-wrap" hidden>
+      <table><caption id="cap-xml-bledy">Błędy walidacji XSD (funkcja <code>validate_aed_xml</code>)</caption>
+        <thead><tr><th scope="col">Linia</th><th scope="col">Pole</th><th scope="col">Komunikat</th></tr></thead><tbody id="xml-bledy"></tbody></table>
+    </div>
+    <details open><summary>Zawartość pliku (numery linii; błędne linie wyróżnione)</summary><pre id="xml-tresc" class="xml"></pre></details>
+  </div>
+  <p class="przyciski">
+    <a class="btn" href="../format_danych/przyklady/xml/aed_poprawny.xml">Poprawny XML</a>
+    <a class="btn drugi" href="../format_danych/przyklady/xml/aed_bledny.xml">Błędny XML</a>
+    <a class="btn drugi" href="../format_danych/schemat/aed_punkty.xsd">Schemat XSD</a>
+    <a class="btn drugi" href="wynik/weryfikacja.txt">Weryfikacja maszynowa</a>
+  </p>
+  <h3>Ten sam proces w zmodyfikowanym portalu</h3>
+  <p>Zrzuty z portalu uruchomionego lokalnie (22.11.2026): serwer dostawcy to <code>demo/serwer_zewnetrzny.py</code> (dane fikcyjne), a zasób w portalu ma link do niego.</p>
+  <figure>
+    <img src="zrzuty/10_zewnetrzny_xml.png" width="1440" height="740" loading="lazy" alt="Zawartość pliku XML z serwera dostawcy: element wykaz, rekord aed z polami id_zrodlowe OL-001, nazwa_lokalizacji Urząd Miasta – hol główny, miejscowosc Olsztyn, współrzędne, typ_dostepu publiczny i innymi.">
+    <figcaption>Plik XML na zewnętrznym serwerze dostawcy (początek). <a href="zrzuty/10_zewnetrzny_xml.png">Pełny rozmiar</a></figcaption>
+  </figure>
+  <figure>
+    <img src="zrzuty/12_zasob_xml_w_panelu.png" width="1440" height="2287" loading="lazy" alt="Panel portalu, formularz zasobu „Wykaz AED (XML, link do serwera dostawcy)”: link do zasobu https://host.docker.internal:8099/aed.xml, format XML, typ API, status opublikowany.">
+    <figcaption>Zasób w panelu: link do serwera dostawcy, format XML, typ API (portal nie kopiuje pliku). <a href="zrzuty/12_zasob_xml_w_panelu.png">Pełny rozmiar</a></figcaption>
+  </figure>
+  <figure>
+    <img src="zrzuty/13_komenda_wykaz_z_xml.png" width="1440" height="420" loading="lazy" alt="Terminal: wynik komendy create_main_aed_resource z zasobem XML. Zasób 40251 pominięty z powodem XML niezgodny z XSD, 3 błędy, linia 23 brak wymaganego pola typ_dostepu. Przyjęte zasoby 3, wiersze 38.">
+    <figcaption>Nocne zadanie: plik niezgodny z XSD jest pominięty z powodem, poprawny trafia do wykazu (38 wierszy: 32 dotychczasowe i 6 z XML). <a href="zrzuty/13_komenda_wykaz_z_xml.png">Pełny rozmiar</a></figcaption>
+  </figure>
+  <figure>
+    <img src="zrzuty/14_wykaz_z_xml_tabela.png" width="1440" height="2070" loading="lazy" alt="Frontend portalu, tabela zasobu Wykaz defibrylatorów AED: pierwsze wiersze to rekordy z XML (Olsztyn, Elbląg) z identyfikatorami id_aed, id_zrodlowe OL-001 do EL-003.">
+    <figcaption>Wykaz AED w portalu zawiera rekordy z zewnętrznego XML (Olsztyn, Elbląg). <a href="zrzuty/14_wykaz_z_xml_tabela.png">Pełny rozmiar</a></figcaption>
+  </figure>
+</section>
+
+<section class="krok" id="etap-5" aria-labelledby="h-5" hidden>
+  <h2 id="h-5" tabindex="-1"><span class="nr">5</span>Portal sprawdza zasoby i co noc buduje Wykaz AED</h2>
   <svg class="proces" viewBox="0 0 1000 250" role="img" aria-labelledby="proces-t proces-d">
     <title id="proces-t">Schemat budowy Wykazu AED</title>
     <desc id="proces-d">Pięć etapów od lewej do prawej. Pierwszy: zbiory z wpisem standard = AED. Drugi: kontrola zasobu, czyli format CSV lub XLSX, licencja CC0 lub CC BY i kolumny minimum. Trzeci: normalizacja, czyli aliasy nagłówków, identyfikator id_aed, wartości jawne i pochodzenie. Czwarty: zasób zbiorczy CSV z 51 kolumnami w zbiorze Wykaz AED. Piąty: tabela, mapa i API portalu. Pod schematem: zasoby odrzucone trafiają do logu z powodem.</desc>
@@ -254,9 +306,9 @@ footer p { margin: .3rem 0; }
   </details>
 </section>
 
-<section class="krok" id="etap-5" aria-labelledby="h-5" hidden>
-  <h2 id="h-5" tabindex="-1"><span class="nr">5</span>Odbiorca przegląda Wykaz AED</h2>
-  <p>W portalu Wykaz AED to zwykły zasób z tabelą, mapą i wyszukiwaniem (zrzuty w kroku 6). Poniżej możesz przejrzeć te same dane offline: to dokładnie plik <a href="wynik/zestawienie_aed.csv"><code>demo/wynik/zestawienie_aed.csv</code></a> wyprodukowany przez <code>demo/agreguj.py</code> z realnego zasobu Legionowa (CC0) i przykładu wzorca (dane fikcyjne).</p>
+<section class="krok" id="etap-6" aria-labelledby="h-6" hidden>
+  <h2 id="h-6" tabindex="-1"><span class="nr">6</span>Odbiorca przegląda Wykaz AED</h2>
+  <p>W portalu Wykaz AED to zwykły zasób z tabelą, mapą i wyszukiwaniem (zrzuty w kroku 7). Poniżej możesz przejrzeć te same dane offline: to dokładnie plik <a href="wynik/zestawienie_aed.csv"><code>demo/wynik/zestawienie_aed.csv</code></a> wyprodukowany przez <code>demo/agreguj.py</code> z realnego zasobu Legionowa (CC0) i przykładu wzorca (dane fikcyjne).</p>
   <form class="filtry" id="filtry" role="search" aria-label="Filtry wykazu" onsubmit="return false">
     <div><label for="f-szukaj">Szukaj</label><input id="f-szukaj" type="search" placeholder="nazwa, ulica, dysponent…" autocomplete="off"></div>
     <div><label for="f-miasto">Miejscowość</label><select id="f-miasto"><option value="*">wszystkie</option></select></div>
@@ -287,8 +339,8 @@ footer p { margin: .3rem 0; }
   <section id="szczegoly" aria-labelledby="szczegoly-h" hidden></section>
 </section>
 
-<section class="krok" id="etap-6" aria-labelledby="h-6" hidden>
-  <h2 id="h-6" tabindex="-1"><span class="nr">6</span>Pobieranie i API</h2>
+<section class="krok" id="etap-7" aria-labelledby="h-7" hidden>
+  <h2 id="h-7" tabindex="-1"><span class="nr">7</span>Pobieranie i API</h2>
   <p>Wykaz AED pobiera się jak każdy zasób portalu (CSV, JSON-LD), a API portalu udostępnia jego dane, punkty mapy i stały adres, pod którym zawsze jest aktualny zasób zbiorczy.</p>
   <p class="przyciski"><button type="button" class="btn" id="pobierz-csv">Pobierz CSV (zestawienie_aed.csv)</button><span class="maly">Plik powstaje w przeglądarce z wbudowanych danych, bez sieci.</span></p>
   <h3>Stały adres zasobu zbiorczego: <code>GET /1.4/aed-aggregated</code></h3>
@@ -316,8 +368,8 @@ footer p { margin: .3rem 0; }
   </div>
 </section>
 
-<section class="krok" id="etap-7" aria-labelledby="h-7" hidden>
-  <h2 id="h-7" tabindex="-1"><span class="nr">7</span>Co zmieniliśmy w portalu</h2>
+<section class="krok" id="etap-8" aria-labelledby="h-8" hidden>
+  <h2 id="h-8" tabindex="-1"><span class="nr">8</span>Co zmieniliśmy w portalu</h2>
   <ul>
     <li><strong>Rozszerzamy, niczego nie usuwamy.</strong> Kod Wykazu AED jest w nowych plikach obok DGA. Funkcje DGA importujemy, a nie kopiujemy.</li>
     <li>W istniejących plikach są tylko dopisane punkty zaczepienia: harmonogram, trasa API, ustawienia, eksport zadania i podpowiedź formularza.</li>
@@ -346,8 +398,8 @@ footer p { margin: .3rem 0; }
   </ul>
 </section>
 
-<section class="krok" id="etap-8" aria-labelledby="h-8" hidden>
-  <h2 id="h-8" tabindex="-1"><span class="nr">8</span>Dodatek: integrator dla dostawców bez wzorcowego formatu</h2>
+<section class="krok" id="etap-9" aria-labelledby="h-9" hidden>
+  <h2 id="h-9" tabindex="-1"><span class="nr">9</span>Dodatek: integrator dla dostawców bez wzorcowego formatu</h2>
   <p><strong>To osobny dodatek, nie część zmian w portalu.</strong> Dwóch największych dostawców
      na dane.gov.pl (Warszawa, Gdańsk) nie da się dziś odczytać jako tabeli. Integrator bierze ich
      pliki, mapuje kolumny na wzorzec v2 (41 pól), normalizuje wartości, waliduje i wystawia CSV,
@@ -383,7 +435,7 @@ footer p { margin: .3rem 0; }
 
 <div class="nawigacja">
   <button type="button" class="btn drugi" id="wstecz">← Wstecz</button>
-  <span id="licznik">Krok 1 z 7</span>
+  <span id="licznik">Krok 1 z 9</span>
   <button type="button" class="btn" id="dalej">Dalej →</button>
 </div>
 </div>
@@ -397,6 +449,7 @@ footer p { margin: .3rem 0; }
 </footer>
 
 <script type="application/json" id="dane">{{DANE_JSON}}</script>
+<script type="application/json" id="proces">{{PROCES_JSON}}</script>
 <script>
 (function () {
   "use strict";
@@ -457,7 +510,7 @@ footer p { margin: .3rem 0; }
     current = n;
     var bar = navButtons[0].closest("ol");
     bar.scrollLeft += navButtons[n - 1].getBoundingClientRect().left - bar.getBoundingClientRect().left - 16;
-    if (n === 5) render();
+    if (n === 6) render();
     if (moveFocus) {
       document.querySelector("nav.etapy").scrollIntoView();
       steps[n - 1].querySelector("h2").focus({ preventScroll: true });
@@ -469,6 +522,40 @@ footer p { margin: .3rem 0; }
   $("#dalej").addEventListener("click", function () { show(current + 1, true); });
   function stepFromHash() { var m = /^#krok-(\d)$/.exec(location.hash); return m ? +m[1] : 1; }
   window.addEventListener("hashchange", function () { if (stepFromHash() !== current) show(stepFromHash(), true); });
+
+
+  /* Krok 4: zewnętrzny XML i walidacja XSD (wynik z kodu portalu, zapisany w danych strony) */
+  function renderXml() {
+    var kind = document.querySelector('input[name="xml-plik"]:checked').value;
+    var text = D.xml[kind], report = D.xml.raport[kind === "poprawny" ? "aed_poprawny.xml" : "aed_bledny.xml"];
+    var bad = {};
+    report.errors.forEach(function (e) { bad[e.line] = true; });
+    var verdict = $("#xml-werdykt");
+    verdict.className = "werdykt" + (report.valid ? "" : " zly");
+    verdict.textContent = report.valid
+      ? "Zgodny z XSD: " + report.records + " rekordów trafi do wykazu."
+      : "Niezgodny z XSD (" + report.errors.length + " błędy): plik zostanie pominięty, a powód trafi do logu.";
+    $("#xml-bledy-wrap").hidden = report.valid;
+    var tbody = $("#xml-bledy");
+    tbody.textContent = "";
+    report.errors.forEach(function (e) {
+      var tr = el("tr");
+      tr.appendChild(el("td", { text: String(e.line) }));
+      tr.appendChild(el("td", { text: e.field }));
+      tr.appendChild(el("td", { text: e.message }));
+      tbody.appendChild(tr);
+    });
+    var pre = $("#xml-tresc");
+    pre.textContent = "";
+    text.split("\n").forEach(function (line, i) {
+      var row = el("span", { "class": "l" + (bad[i + 1] ? " blad" : "") });
+      row.appendChild(el("span", { "class": "n", text: String(i + 1) }));
+      row.appendChild(document.createTextNode(line));
+      pre.appendChild(row);
+    });
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('input[name="xml-plik"]'), function (r) { r.addEventListener("change", renderXml); });
+  renderXml();
 
   /* Krok 3: przykład pliku dostawcy */
   (function () {

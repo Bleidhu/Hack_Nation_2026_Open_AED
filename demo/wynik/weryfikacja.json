@@ -1,0 +1,110 @@
+{
+  "wynik": "PASS",
+  "kontrole": [
+    {
+      "id": "xsd-zgodny-ze-wzorcem",
+      "wymaganie": "Schemat XSD odpowiada wzorcowi (41 kolumn, pola wymagane)",
+      "status": "PASS",
+      "szczegoly": "41 pól, wymaganych 9, kopia w portalu identyczna: True",
+      "dowod": "format_danych/schemat/aed_punkty.xsd, aed_punkty.tableschema.json"
+    },
+    {
+      "id": "xml-poprawny",
+      "wymaganie": "Poprawny plik XML od zewnętrznego dostawcy przechodzi walidację XSD",
+      "status": "PASS",
+      "szczegoly": "rekordów: 6, błędów: 0",
+      "dowod": "format_danych/przyklady/xml/aed_poprawny.xml"
+    },
+    {
+      "id": "xml-bledny",
+      "wymaganie": "Niepoprawny XML jest odrzucany z wskazaniem linii i pola",
+      "status": "PASS",
+      "szczegoly": "linia 23 typ_dostepu; linia 55 status_urzadzenia; linia 69 szerokosc_geograficzna",
+      "dowod": "demo/wynik/walidacja_xml.json"
+    },
+    {
+      "id": "xml-bezpieczenstwo",
+      "wymaganie": "Plik z zewnątrz nie może wczytywać zewnętrznych encji (XXE)",
+      "status": "PASS",
+      "szczegoly": "deklaracje DOCTYPE i ENTITY są niedozwolone",
+      "dowod": "portal/backend/mcod/resources/aed_xml.py"
+    },
+    {
+      "id": "agregacja-dwoch-dostawcow",
+      "wymaganie": "Dane dwóch dostawców i dwóch formatów (XML i CSV) scalone w jeden wykaz",
+      "status": "PASS",
+      "szczegoly": "XML: 6, CSV: 8, w wykazie: 14, pominiętych wierszy: 0",
+      "dowod": "demo/wynik/wykaz_xml_i_csv.csv"
+    },
+    {
+      "id": "kolumny-wykazu",
+      "wymaganie": "Wykaz ma 51 kolumn zgodnych z Table Schema, unikalne id_aed i pochodzenie każdego wiersza",
+      "status": "PASS",
+      "szczegoly": "kolumn: 51, unikalnych id_aed: 14/14",
+      "dowod": "format_danych/schemat/aed_zestawienie.tableschema.json"
+    },
+    {
+      "id": "licencje",
+      "wymaganie": "Do wykazu trafiają tylko CC0 i CC BY 4.0; ODbL (OpenStreetMap) jest wykluczona",
+      "status": "PASS",
+      "szczegoly": "dozwolone: ['CC BY 4.0', 'CC0 1.0']; w wykazie: ['CC BY 4.0', 'CC0 1.0']",
+      "dowod": "portal/backend/mcod/resources/aed_constants.py"
+    },
+    {
+      "id": "nic-nie-usunieto",
+      "wymaganie": "Portal rozszerzono, a nie przepisano: w diffie względem oryginału nic nie usunięto",
+      "status": "PASS",
+      "szczegoly": "dodane pliki: 22, zmienione istniejące: 11, usunięte: 0",
+      "dowod": "git diff --name-status a1adc22 -- portal/backend"
+    },
+    {
+      "id": "zero-migracji",
+      "wymaganie": "Zero migracji: żaden plik migracji nie został dodany ani zmieniony",
+      "status": "PASS",
+      "szczegoly": "zmienionych plików migracji: 0 (wszystkich zmienionych plików: 33)",
+      "dowod": "git diff a1adc22 -- '*/migrations/*'"
+    },
+    {
+      "id": "testy-portalu",
+      "wymaganie": "Testy portalu (nowe i DGA) przechodzą, makemigrations --check: brak zmian",
+      "status": "PASS",
+      "szczegoly": "219 passed; makemigrations: No changes detected",
+      "dowod": "demo/wynik/testy.txt"
+    },
+    {
+      "id": "odpornosc-na-realne-dane",
+      "wymaganie": "Realne wadliwe dane z dane.gov.pl nie psują wykazu: pominięcia mają powód",
+      "status": "PASS",
+      "szczegoly": "10 zasobów pominiętych z powodem",
+      "dowod": "demo/wynik/raport_agregacji.txt"
+    },
+    {
+      "id": "xlsx-wzorcowy-zakres",
+      "wymaganie": "Wzorcowy zakres danych w XLSX (5 arkuszy)",
+      "status": "PASS",
+      "szczegoly": "1_Zakres_wzorca, 2_Szablon_z_przykladami, 3_Slowniki, 4_Zasob_zbiorczy, 5_Zasady",
+      "dowod": "format_danych/wzorcowy_zakres_danych.xlsx"
+    },
+    {
+      "id": "prototyp-offline",
+      "wymaganie": "Prototyp działa offline: strona nie ładuje nic z innych domen",
+      "status": "PASS",
+      "szczegoly": "rozmiar 274 kB; zewnętrzne zasoby: brak",
+      "dowod": "demo/index.html"
+    },
+    {
+      "id": "proces-maszynowy",
+      "wymaganie": "Prototyp ma opis procesu w JSON: każdy krok wskazuje istniejące pliki dowodowe i zrzuty",
+      "status": "PASS",
+      "szczegoly": "kroków: 9 (sekcji na stronie: 9), plików: 33, brakuje: nic",
+      "dowod": "demo/proces.json"
+    },
+    {
+      "id": "pliki-do-zgloszenia",
+      "wymaganie": "Obecne są wszystkie pliki z §4: opis, prezentacja, logotypy, księga znaku, instrukcja",
+      "status": "PASS",
+      "szczegoly": "9 plików jest",
+      "dowod": "patrz szczegóły"
+    }
+  ]
+}
