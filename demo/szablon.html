@@ -1,0 +1,687 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wykaz AED na dane.gov.pl – klikalny prototyp (Otwórz AED)</title>
+<!-- Plik generowany przez demo/build_demo.py z demo/szablon.html. Nie edytuj index.html ręcznie. -->
+<style>
+@font-face { font-family: "Atkinson Hyperlegible"; src: url({{FONT_REGULAR}}) format("truetype"); font-weight: 400; font-display: swap; }
+@font-face { font-family: "Atkinson Hyperlegible"; src: url({{FONT_BOLD}}) format("truetype"); font-weight: 700; font-display: swap; }
+:root {
+  --granat: #0E2A47; --zielen: #007A45; --zielen-ciemna: #00552f; --zielen-jasna: #e6f2ec;
+  --tekst: #1b2430; --szary: #4f5a68; --ramka: #c3ccd6; --tlo: #f4f6f8; --czerwien: #b3261e; --bursztyn: #8a5a00;
+  --focus: #ffbf47;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; font-family: "Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", sans-serif; font-size: 1.0625rem; line-height: 1.55; color: var(--tekst); background: #fff; overflow-x: hidden; }
+a { color: #0b4f8a; }
+a:hover { text-decoration-thickness: 2px; }
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; box-shadow: 0 0 0 5px var(--granat); }
+.skip { position: absolute; left: .5rem; top: -4rem; background: #fff; color: var(--granat); padding: .5rem 1rem; z-index: 10; font-weight: 700; }
+.skip:focus { top: .5rem; }
+code, pre, kbd { font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; font-size: .9em; }
+code { background: var(--tlo); padding: .05em .3em; border-radius: 3px; overflow-wrap: anywhere; }
+pre { background: #0f1b2a; color: #e8eef5; padding: 1rem; border-radius: 6px; overflow-x: auto; font-size: .82rem; line-height: 1.45; max-width: 100%; }
+.wrap { max-width: 72rem; margin: 0 auto; padding: 0 1rem; }
+
+header.top { border-bottom: 4px solid var(--zielen); }
+header.top .wrap { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem 1.5rem; padding-top: .75rem; padding-bottom: .75rem; }
+header.top svg { width: 13rem; height: auto; max-width: 100%; }
+.haslo { margin: 0; font-weight: 700; color: var(--granat); font-size: 1.1rem; }
+.podtytul { margin: 0; color: var(--szary); font-size: .95rem; flex-basis: 100%; }
+
+nav.etapy { background: var(--tlo); border-bottom: 1px solid var(--ramka); }
+.kroki { list-style: none; margin: 0 auto; padding: .5rem 1rem; display: flex; gap: .35rem; max-width: 72rem; overflow-x: auto; }
+.kroki li { flex: none; }
+.kroki button { font: inherit; font-size: .88rem; border: 2px solid var(--ramka); background: #fff; color: var(--granat); border-radius: 999px; padding: .3rem .7rem; cursor: pointer; min-height: 44px; white-space: nowrap; }
+.kroki button:hover { border-color: var(--granat); }
+.kroki button.zrobiony { border-color: var(--zielen); color: var(--zielen-ciemna); }
+.kroki button[aria-current="step"] { background: var(--granat); border-color: var(--granat); color: #fff; font-weight: 700; }
+
+main { padding: 1.5rem 0 2rem; }
+main:focus { outline: none; }
+h1 { font-size: 1.6rem; line-height: 1.25; color: var(--granat); margin: 0 0 .25rem; }
+h2 { font-size: 1.45rem; line-height: 1.25; color: var(--granat); margin: 0 0 .75rem; }
+h2:focus { outline: none; }
+h2 .nr { display: inline-block; background: var(--zielen); color: #fff; border-radius: 6px; padding: 0 .45rem; margin-right: .4rem; }
+h3 { font-size: 1.15rem; color: var(--granat); margin: 1.5rem 0 .5rem; }
+.krok > p, .krok > ul, .krok > ol { max-width: 50rem; }
+.lead { font-size: 1.15rem; }
+.uwaga { border-left: 5px solid var(--zielen); background: var(--zielen-jasna); padding: .75rem 1rem; border-radius: 0 6px 6px 0; max-width: 50rem; }
+.uwaga.ilustracja { border-color: var(--bursztyn); background: #fff6e0; }
+.zrodlo { color: var(--szary); font-size: .9rem; }
+
+figure { margin: 1rem 0; max-width: 60rem; }
+figure img { display: block; width: 100%; height: auto; border: 1px solid var(--ramka); border-radius: 6px; }
+figcaption { color: var(--szary); font-size: .92rem; margin-top: .4rem; }
+.galeria { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 22rem), 1fr)); gap: 1rem 1.5rem; }
+.galeria figure { margin: 0; }
+.galeria img { max-height: 28rem; object-fit: cover; object-position: top; }
+
+.tabela-wrap { overflow-x: auto; max-width: 100%; border: 1px solid var(--ramka); border-radius: 6px; margin: .75rem 0; }
+table { border-collapse: collapse; width: 100%; font-size: .93rem; }
+caption { text-align: left; padding: .5rem .75rem; color: var(--szary); font-size: .9rem; caption-side: top; }
+th, td { padding: .45rem .6rem; text-align: left; vertical-align: top; border-top: 1px solid var(--ramka); }
+thead th { background: var(--granat); color: #fff; border-top: 0; white-space: nowrap; }
+tbody th { font-weight: 700; }
+tbody tr:nth-child(even) { background: #f8fafb; }
+tbody tr.wybrany { background: #fff3c4; }
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+
+.karty { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr)); gap: .75rem; margin: 1rem 0; }
+.karta { border: 1px solid var(--ramka); border-radius: 8px; padding: .75rem 1rem; background: #fff; }
+.karta h3 { margin: 0 0 .25rem; font-size: 1.05rem; }
+.karta p { margin: .25rem 0 0; font-size: .95rem; }
+.liczba { font-size: 2.2rem; font-weight: 700; color: var(--granat); line-height: 1.1; }
+.etykieta-zla { color: var(--czerwien); font-weight: 700; }
+.etykieta-dobra { color: var(--zielen-ciemna); font-weight: 700; }
+
+.przyciski { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; }
+.btn { font: inherit; font-weight: 700; border: 2px solid var(--granat); background: var(--granat); color: #fff; border-radius: 6px; padding: .5rem 1rem; cursor: pointer; min-height: 44px; text-decoration: none; display: inline-flex; align-items: center; }
+.btn:hover { background: #163c63; }
+.btn.drugi { background: #fff; color: var(--granat); }
+.btn.drugi:hover { background: var(--tlo); }
+.btn[aria-pressed="true"] { background: var(--zielen); border-color: var(--zielen); color: #fff; }
+.btn:disabled { opacity: .45; cursor: not-allowed; }
+
+.filtry { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr)); gap: .75rem; background: var(--tlo); border: 1px solid var(--ramka); border-radius: 8px; padding: .75rem 1rem; margin: 1rem 0 .5rem; }
+.filtry label { display: block; font-weight: 700; font-size: .92rem; margin-bottom: .2rem; }
+.filtry input, .filtry select { width: 100%; font: inherit; padding: .4rem .5rem; border: 2px solid var(--szary); border-radius: 4px; background: #fff; min-height: 44px; }
+#licznik-wynikow { font-weight: 700; margin: .5rem 0; }
+
+.wykaz { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1rem; }
+.mapa-box { border: 1px solid var(--ramka); border-radius: 8px; padding: .5rem; background: #fff; }
+#mapa { display: block; width: 100%; height: 22rem; margin: .5rem 0 0; background: #eaf1f7; border-radius: 4px; }
+#mapa .kraj { fill: #fbfcf7; stroke: var(--granat); stroke-width: 1.5; vector-effect: non-scaling-stroke; }
+#mapa .punkt { stroke: #fff; stroke-width: 1.5; vector-effect: non-scaling-stroke; cursor: pointer; }
+#mapa .punkt:focus { outline: none; stroke: var(--focus); stroke-width: 4; }
+#mapa .punkt.wybrany { stroke: #000; stroke-width: 3.5; }
+#mapa .miasto { fill: var(--granat); font-weight: 700; paint-order: stroke; stroke: #fff; stroke-width: 3px; stroke-linejoin: round; }
+.legenda { list-style: none; display: flex; flex-wrap: wrap; gap: .25rem 1rem; padding: 0; margin: .5rem 0 0; font-size: .9rem; }
+.legenda span { display: inline-block; width: .9rem; height: .9rem; border-radius: 50%; vertical-align: -.1rem; margin-right: .3rem; border: 1px solid #fff; box-shadow: 0 0 0 1px var(--szary); }
+.s-sprawny { fill: var(--zielen); background: var(--zielen); }
+.s-niesprawny { fill: var(--czerwien); background: var(--czerwien); }
+.s-w_serwisie { fill: #b26a00; background: #b26a00; }
+.s-wycofany { fill: #000; background: #000; }
+.s-nieznany { fill: #5a6472; background: #5a6472; }
+.status { display: inline-block; padding: .05rem .45rem; border-radius: 4px; font-size: .85rem; font-weight: 700; white-space: nowrap; }
+.status.sprawny { background: var(--zielen-jasna); color: var(--zielen-ciemna); }
+.status.niesprawny { background: #fbe9e7; color: #8c1d18; }
+.status.w_serwisie { background: #fff4d6; color: #6b4a00; }
+.status.nieznany, .status.wycofany { background: #eceff3; color: #3d4652; }
+.maly { font-size: .85rem; color: var(--szary); }
+button.link { font: inherit; background: none; border: 0; color: #0b4f8a; text-decoration: underline; cursor: pointer; padding: .2rem 0; min-height: 32px; text-align: left; }
+
+#szczegoly { border: 2px solid var(--granat); border-radius: 8px; padding: 1rem; margin-top: 1rem; }
+#szczegoly h3 { margin-top: 0; }
+#szczegoly h3:focus { outline: none; }
+#szczegoly h4 { margin: 1rem 0 .4rem; color: var(--granat); }
+dl.pola { display: grid; grid-template-columns: minmax(0, 14rem) minmax(0, 1fr); gap: .25rem 1rem; margin: 0; font-size: .93rem; }
+dl.pola dt { font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; font-size: .85rem; color: var(--szary); overflow-wrap: anywhere; }
+dl.pola dd { margin: 0; overflow-wrap: anywhere; }
+@media (max-width: 30rem) { dl.pola { grid-template-columns: minmax(0, 1fr); } dl.pola dd { margin-bottom: .4rem; } }
+
+.proces { width: 100%; height: auto; max-width: 60rem; display: block; margin: 1rem 0; }
+details { margin: 1rem 0; max-width: 60rem; }
+summary { cursor: pointer; font-weight: 700; color: var(--granat); min-height: 32px; }
+
+.nawigacja { display: flex; justify-content: space-between; align-items: center; gap: .5rem; border-top: 1px solid var(--ramka); margin-top: 2rem; padding-top: 1rem; }
+footer { background: var(--granat); color: #fff; padding: 1.25rem 0; font-size: .9rem; }
+footer a { color: #fff; }
+footer p { margin: .3rem 0; }
+</style>
+</head>
+<body>
+<a class="skip" href="#tresc">Przejdź do treści</a>
+<header class="top">
+  <div class="wrap">
+    {{LOGO_SVG}}
+    <p class="haslo">Pokaż, gdzie jest. Powiedz, czy działa.</p>
+    <p class="podtytul">Klikalny prototyp offline: <strong>Wykaz AED</strong> jako dodatek do portalu dane.gov.pl, zbudowany na wzór mechanizmu DGA (HackNation 2026, zadanie „Misja AED – Dane na ratunek”).</p>
+  </div>
+</header>
+
+<nav class="etapy" aria-label="Kroki procesu">
+  <ol class="kroki">
+    <li><button type="button" data-krok="1">1. Problem</button></li>
+    <li><button type="button" data-krok="2">2. Dostawca oznacza zbiór</button></li>
+    <li><button type="button" data-krok="3">3. Dostawca publikuje zasób</button></li>
+    <li><button type="button" data-krok="4">4. Portal buduje wykaz</button></li>
+    <li><button type="button" data-krok="5">5. Odbiorca przegląda</button></li>
+    <li><button type="button" data-krok="6">6. Pobieranie i API</button></li>
+    <li><button type="button" data-krok="7">7. Co zmieniliśmy</button></li>
+  </ol>
+</nav>
+
+<main id="tresc" tabindex="-1">
+<div class="wrap">
+
+<section class="krok" id="etap-1" aria-labelledby="h-1">
+  <h2 id="h-1" tabindex="-1"><span class="nr">1</span>Dane o AED są rozproszone i każdy publikuje je inaczej</h2>
+  <p class="lead">Na dane.gov.pl jest kilka zbiorów o defibrylatorach AED. Każdy ma inny układ kolumn, format i drogę do portalu, a ogólnopolskiego zestawienia nie ma.</p>
+  <div class="tabela-wrap" role="region" aria-labelledby="cap-zrodla" tabindex="0">
+    <table>
+      <caption id="cap-zrodla">Realne źródła AED na dane.gov.pl (migawka z 21.11.2026, <code>references/dane_gov_pl_aed/</code>)</caption>
+      <thead><tr><th scope="col">Zbiór</th><th scope="col">Jak trafia do portalu</th><th scope="col">Co to znaczy dla wykazu</th></tr></thead>
+      <tbody>
+        <tr><th scope="row">Krosno</th><td>plik CSV w portalu, CC0 1.0</td><td>czyta się wprost, ale brakuje kolumny miejscowości</td></tr>
+        <tr><th scope="row">Przemyśl</th><td>link do systemu miasta, 5 dystrybucji (CSV, GeoJSON, JSON, 2×GML)</td><td>tylko CSV daje tabelę; bez wyboru jednego zasobu powstałyby duplikaty</td></tr>
+        <tr><th scope="row">Marki</th><td>plik CSV i XLSX, CC BY 4.0</td><td>oba wadliwe: cały wiersz w jednym polu, zamienione osie współrzędnych</td></tr>
+        <tr><th scope="row">Legionowo</th><td>plik CSV w zbiorze mieszanym „Zdrowie”, CC0 1.0</td><td>oznaczenie zbioru obejmie też zasoby, które nie dotyczą AED, więc potrzebna jest kontrola kolumn każdego zasobu</td></tr>
+        <tr><th scope="row">Warszawa</th><td>harvester CKAN; zasób to link do strony WWW</td><td>dane są w API miasta z obowiązkowym tokenem, więc portal nie ma tabeli</td></tr>
+        <tr><th scope="row">Gdańsk</th><td>harvester CKAN; baza pojazdów ZTM w JSON</td><td>278 pojazdów z AED: dane flotowe, a nie punkty</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p><strong>Cel:</strong> jeden ogólnopolski zasób <strong>Wykaz AED</strong>, który portal co noc składa z zasobów zadeklarowanych przez dostawców. Działa tak jak istniejący mechanizm DGA (nocny zasób zbiorczy z zasobów wielu instytucji), bez nowych tabel w bazie i bez migracji.</p>
+  <p class="uwaga">Kolejne kroki pokazują ścieżkę dostawcy i odbiorcy. Zrzuty pochodzą ze <strong>zmodyfikowanego portalu uruchomionego lokalnie</strong> (22.11.2026), a tabela i mapa w kroku 5 korzystają z prawdziwego wyniku naszej funkcji agregacji.</p>
+</section>
+
+<section class="krok" id="etap-2" aria-labelledby="h-2" hidden>
+  <h2 id="h-2" tabindex="-1"><span class="nr">2</span>Dostawca oznacza zbiór: <code>standard = AED</code></h2>
+  <p>W panelu portalu dostawca otwiera swój zbiór i w <strong>„Polach niestandardowych”</strong> dodaje pole <code>standard</code> z wartością <code>AED</code>. Wielkość liter nie ma znaczenia, a wersja po spacji jest dopuszczalna, np. <code>AED 1.1</code>. Pod polem portal wyświetla podpowiedź z warunkami przyjęcia do wykazu.</p>
+  <ul>
+    <li>Używamy istniejącej metadanej <code>Dataset.customfields</code>, więc nie ma nowego pola, tabeli ani migracji.</li>
+    <li>Nie używamy tagu ani checkboxa.</li>
+    <li>Deklaracja dotyczy zbioru. Każdy zasób zbioru jest dodatkowo sprawdzany w kroku 4.</li>
+  </ul>
+  <figure>
+    <img src="zrzuty/01_formularz_zbioru_standard_aed.png" width="1440" height="900" alt="Panel administracyjny portalu, formularz zbioru „Defibrylatory AED w Legionowie”. W sekcji Pola niestandardowe jest wpis: nazwa standard, wartość AED. Pod polem tekst podpowiedzi: aby zasoby trafiły do krajowego Wykazu AED, dodaj pole standard o wartości AED; zasoby muszą być plikami CSV lub XLSX z kolumnami wzorca; licencja CC0 1.0 lub CC BY 4.0; tylko kontakty instytucjonalne.">
+    <figcaption>Zrzut z panelu zmodyfikowanego portalu: formularz zbioru z polem <code>standard = AED</code> i podpowiedzią dodaną w <code>mcod/datasets/forms.py</code>. <a href="zrzuty/01_formularz_zbioru_standard_aed.png">Pełny rozmiar</a></figcaption>
+  </figure>
+</section>
+
+<section class="krok" id="etap-3" aria-labelledby="h-3" hidden>
+  <h2 id="h-3" tabindex="-1"><span class="nr">3</span>Dostawca publikuje zasób we wzorcowym formacie</h2>
+  <p>Zasób to plik CSV lub XLSX z kolumnami <strong>wzorcowego zakresu danych</strong> (41 kolumn). Do wykazu wystarczy minimum: <code>nazwa_lokalizacji</code>, <code>miejscowosc</code>, <code>szerokosc_geograficzna</code>, <code>dlugosc_geograficzna</code>. Dostawca może wgrać plik albo podać link, który portal odświeża cyklicznie. Licencja: CC0 1.0 lub CC BY 4.0.</p>
+  <div class="tabela-wrap" role="region" aria-labelledby="cap-przyklad" tabindex="0">
+    <table id="tab-przyklad">
+      <caption id="cap-przyklad"></caption>
+      <thead></thead><tbody></tbody>
+    </table>
+  </div>
+  <p class="przyciski">
+    <a class="btn" href="../format_danych/wzorcowy_zakres_danych.xlsx">Wzorcowy zakres danych (XLSX)</a>
+    <a class="btn drugi" href="../format_danych/README.md">Opis formatu i schematy</a>
+    <a class="btn drugi" href="../format_danych/przyklady/aed_punkty_przyklad.csv">Przykładowy plik CSV</a>
+  </p>
+  <figure>
+    <img src="zrzuty/02_zasoby_dostawcow.png" width="1440" height="1234" loading="lazy" alt="Panel portalu, lista zasobów po wyszukaniu AED: sześć opublikowanych zasobów. Pięć zasobów dostawców (Legionowo, Marki, Krosno, wzorzec v2, punkty bez deklaracji standardu) i zasób zbiorczy Wykaz defibrylatorów AED. Dwa zasoby oparte na wzorcu mają czerwony znak w kolumnie widoku tabelarycznego.">
+    <figcaption>Zasoby dostawców po zwykłej walidacji portalu. Czerwony znak przy plikach wzorca oznacza, że walidator typów zgadywanych przez portal odrzucił np. wartość „5A” w <code>numer_budynku</code>. Wykaz i tak je przyjmuje, bo czyta plik wprost. <a href="zrzuty/02_zasoby_dostawcow.png">Pełny rozmiar</a></figcaption>
+  </figure>
+</section>
+
+<section class="krok" id="etap-4" aria-labelledby="h-4" hidden>
+  <h2 id="h-4" tabindex="-1"><span class="nr">4</span>Portal sprawdza zasoby i co noc buduje Wykaz AED</h2>
+  <svg class="proces" viewBox="0 0 1000 250" role="img" aria-labelledby="proces-t proces-d">
+    <title id="proces-t">Schemat budowy Wykazu AED</title>
+    <desc id="proces-d">Pięć etapów od lewej do prawej. Pierwszy: zbiory z wpisem standard = AED. Drugi: kontrola zasobu, czyli format CSV lub XLSX, licencja CC0 lub CC BY i kolumny minimum. Trzeci: normalizacja, czyli aliasy nagłówków, identyfikator id_aed, wartości jawne i pochodzenie. Czwarty: zasób zbiorczy CSV z 51 kolumnami w zbiorze Wykaz AED. Piąty: tabela, mapa i API portalu. Pod schematem: zasoby odrzucone trafiają do logu z powodem.</desc>
+    <defs><marker id="strz" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#0E2A47"/></marker></defs>
+    <g font-size="17" text-anchor="middle" fill="#1b2430">
+      <rect x="5" y="20" width="170" height="120" rx="10" fill="#e6f2ec" stroke="#007A45" stroke-width="2"/>
+      <text x="90" y="55" font-weight="700" fill="#0E2A47">Zbiory</text><text x="90" y="80">customfields</text><text x="90" y="104">standard = AED</text>
+      <rect x="210" y="20" width="170" height="120" rx="10" fill="#fff" stroke="#0E2A47" stroke-width="2"/>
+      <text x="295" y="55" font-weight="700" fill="#0E2A47">Kontrola zasobu</text><text x="295" y="80">CSV / XLSX</text><text x="295" y="104">CC0 lub CC BY</text><text x="295" y="128">kolumny minimum</text>
+      <rect x="415" y="20" width="170" height="120" rx="10" fill="#fff" stroke="#0E2A47" stroke-width="2"/>
+      <text x="500" y="55" font-weight="700" fill="#0E2A47">Normalizacja</text><text x="500" y="80">aliasy nagłówków</text><text x="500" y="104">id_aed, wartości</text><text x="500" y="128">jawne, pochodzenie</text>
+      <rect x="620" y="20" width="170" height="120" rx="10" fill="#0E2A47"/>
+      <text x="705" y="55" font-weight="700" fill="#fff">Zasób zbiorczy</text><text x="705" y="80" fill="#fff">CSV, 51 kolumn</text><text x="705" y="104" fill="#fff">zbiór Wykaz AED</text><text x="705" y="128" fill="#fff">CC BY 4.0</text>
+      <rect x="825" y="20" width="170" height="120" rx="10" fill="#e6f2ec" stroke="#007A45" stroke-width="2"/>
+      <text x="910" y="55" font-weight="700" fill="#0E2A47">Portal</text><text x="910" y="80">tabela</text><text x="910" y="104">mapa</text><text x="910" y="128">API</text>
+    </g>
+    <g stroke="#0E2A47" stroke-width="3" marker-end="url(#strz)"><line x1="177" y1="80" x2="206" y2="80"/><line x1="382" y1="80" x2="411" y2="80"/><line x1="587" y1="80" x2="616" y2="80"/><line x1="792" y1="80" x2="821" y2="80"/></g>
+    <path d="M295 142V200H560" fill="none" stroke="#b3261e" stroke-width="3" stroke-dasharray="7 5" marker-end="url(#strz)"/>
+    <text x="570" y="206" font-size="17" fill="#8c1d18">zasoby odrzucone → log z powodem</text>
+  </svg>
+  <p>Zadanie Celery uruchamia się codziennie o 4:15, po harvesterze (3:00) i DGA (3:30). Ten sam proces można wywołać ręcznie komendą <code>manage.py create_main_aed_resource</code>. Cały dodatek wyłącza ustawienie <code>AED_AGGREGATION_ENABLED</code>; wtedy portal działa jak oryginał.</p>
+  <h3>Wynik uruchomienia w portalu lokalnym</h3>
+  <div class="karty" id="karty-statystyk"></div>
+  <ul id="lista-pominietych"></ul>
+  <figure>
+    <img src="zrzuty/03_komenda_wykaz_statystyki.png" width="1440" height="900" loading="lazy" alt="Terminal z wynikiem komendy create_main_aed_resource z opcjami dry-run i eager: pominięty zasób 40210 z powodem brak kolumn miejscowosc, pominięty zasób 40209 z powodem brak kolumn minimum, przyjęte zasoby 2, wiersze 32, utworzony zasób 40247 i usunięty poprzedni zasób 40246.">
+    <figcaption>Wyjście komendy w kontenerze portalu (z pominięciem linii diagnostycznych; pełny log: <a href="wynik/komenda_create_main_aed_resource.txt">komenda_create_main_aed_resource.txt</a>).</figcaption>
+  </figure>
+  <details>
+    <summary>Ta sama logika na migawce realnych zasobów z dane.gov.pl (demo/agreguj.py, bez bazy)</summary>
+    <p>Skrypt <code>demo/agreguj.py</code> wywołuje funkcje agregacji z <code>portal/backend/mcod/resources/aed_aggregation.py</code> poza Django. Wszystkie zbiory z migawki traktuje tak, jakby miały <code>standard = AED</code>.</p>
+    <pre id="raport"></pre>
+  </details>
+</section>
+
+<section class="krok" id="etap-5" aria-labelledby="h-5" hidden>
+  <h2 id="h-5" tabindex="-1"><span class="nr">5</span>Odbiorca przegląda Wykaz AED</h2>
+  <p>W portalu Wykaz AED to zwykły zasób z tabelą, mapą i wyszukiwaniem (zrzuty w kroku 6). Poniżej możesz przejrzeć te same dane offline: to dokładnie plik <a href="wynik/zestawienie_aed.csv"><code>demo/wynik/zestawienie_aed.csv</code></a> wyprodukowany przez <code>demo/agreguj.py</code> z realnego zasobu Legionowa (CC0) i przykładu wzorca (dane fikcyjne).</p>
+  <form class="filtry" id="filtry" role="search" aria-label="Filtry wykazu" onsubmit="return false">
+    <div><label for="f-szukaj">Szukaj</label><input id="f-szukaj" type="search" placeholder="nazwa, ulica, dysponent…" autocomplete="off"></div>
+    <div><label for="f-miasto">Miejscowość</label><select id="f-miasto"><option value="*">wszystkie</option></select></div>
+    <div><label for="f-dostep">Typ dostępu</label><select id="f-dostep"><option value="*">wszystkie</option></select></div>
+    <div><label for="f-status">Status urządzenia</label><select id="f-status"><option value="*">wszystkie</option></select></div>
+  </form>
+  <p id="licznik-wynikow" role="status" aria-live="polite"></p>
+  <div class="wykaz">
+    <div class="mapa-box">
+      <div class="przyciski" role="group" aria-label="Widok mapy">
+        <button type="button" class="btn drugi" id="widok-kraj" aria-pressed="false">Cała Polska</button>
+        <button type="button" class="btn drugi" id="widok-punkty" aria-pressed="true">Przybliż do punktów</button>
+      </div>
+      <svg id="mapa" viewBox="0 0 640 620" role="group" aria-label="Mapa punktów AED na konturze Polski. Każdy punkt to przycisk otwierający szczegóły rekordu."></svg>
+      <ul class="legenda" id="legenda"></ul>
+      <p class="maly">Wybierz miejscowość w filtrze, aby przybliżyć mapę do jej punktów. Kontur Polski: Natural Earth (domena publiczna), projekcja równoodległościowa. Mapa nie pobiera kafelków z sieci.</p>
+    </div>
+    <div>
+      <div class="tabela-wrap" role="region" aria-labelledby="cap-wykaz" tabindex="0">
+        <table id="tab-wykaz">
+          <caption id="cap-wykaz">Wykaz AED: wybrane kolumny (wszystkie 51 kolumn w szczegółach rekordu)</caption>
+          <thead><tr><th scope="col">Lokalizacja</th><th scope="col">Miejscowość i adres</th><th scope="col">Dostęp</th><th scope="col">Status</th><th scope="col">Źródło</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <section id="szczegoly" aria-labelledby="szczegoly-h" hidden></section>
+</section>
+
+<section class="krok" id="etap-6" aria-labelledby="h-6" hidden>
+  <h2 id="h-6" tabindex="-1"><span class="nr">6</span>Pobieranie i API</h2>
+  <p>Wykaz AED pobiera się jak każdy zasób portalu (CSV, JSON-LD), a API portalu udostępnia jego dane, punkty mapy i stały adres, pod którym zawsze jest aktualny zasób zbiorczy.</p>
+  <p class="przyciski"><button type="button" class="btn" id="pobierz-csv">Pobierz CSV (zestawienie_aed.csv)</button><span class="maly">Plik powstaje w przeglądarce z wbudowanych danych, bez sieci.</span></p>
+  <h3>Stały adres zasobu zbiorczego: <code>GET /1.4/aed-aggregated</code></h3>
+  <p>Nowy endpoint, odpowiednik istniejącego <code>/dga-aggregated</code>. Odpowiedź z portalu lokalnego:</p>
+  <pre id="api"></pre>
+  <p>Dane i punkty mapy udostępniają istniejące endpointy portalu: <code>/1.4/resources/{resource_id}/data</code> i <code>/1.4/resources/{resource_id}/geo</code>.</p>
+  <h3>Zrzuty z portalu</h3>
+  <div class="galeria">
+    <figure>
+      <img src="zrzuty/04_wykaz_tabela.png" width="1440" height="2071" loading="lazy" alt="Strona zasobu Wykaz defibrylatorów AED w portalu Otwarte Dane: przyciski pobierania CSV i JSON-LD, zakładka Tabela z kolumnami id_aed, id_zrodlowe, nazwa_lokalizacji, wojewodztwo, powiat, gmina i dalszymi; 32 wiersze na dwóch stronach.">
+      <figcaption>Zasób zbiorczy w portalu: widok tabeli. <a href="zrzuty/04_wykaz_tabela.png">Pełny rozmiar</a></figcaption>
+    </figure>
+    <figure>
+      <img src="zrzuty/05_wykaz_mapa.png" width="1440" height="900" loading="lazy" alt="Zakładka Mapa zasobu Wykaz defibrylatorów AED: mapa z pinezkami w Bydgoszczy i klastrem 24 punktów w okolicy Legionowa.">
+      <figcaption>Mapa portalu włącza się sama dzięki mapowaniu <code>geo</code> w schemacie zasobu zbiorczego. <a href="zrzuty/05_wykaz_mapa.png">Pełny rozmiar</a></figcaption>
+    </figure>
+    <figure>
+      <img src="zrzuty/06_api_aed_aggregated.png" width="1440" height="900" loading="lazy" alt="Odpowiedź GET /1.4/aed-aggregated: dataset_id 4216, slug zbioru, resource_id 40247 i slug zasobu.">
+      <figcaption>Odpowiedź <code>/1.4/aed-aggregated</code> (sformatowana). <a href="zrzuty/06_api_aed_aggregated.png">Pełny rozmiar</a></figcaption>
+    </figure>
+    <figure>
+      <img src="zrzuty/07_api_dane_zasobu.png" width="1440" height="1497" loading="lazy" alt="Wybrane pola odpowiedzi GET /1.4/resources/40247/data: liczba wierszy 32, mapowanie geo na kolumny szerokosc_geograficzna, dlugosc_geograficzna i nazwa_lokalizacji oraz pierwszy wiersz z kolumnami pochodzenia: wydawca, licencja CC BY 4.0, identyfikator i adres zasobu źródłowego, data agregacji.">
+      <figcaption>Dane wykazu w API portalu z atrybucją dostawcy (wybrane pola, sformatowane). <a href="zrzuty/07_api_dane_zasobu.png">Pełny rozmiar</a></figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="krok" id="etap-7" aria-labelledby="h-7" hidden>
+  <h2 id="h-7" tabindex="-1"><span class="nr">7</span>Co zmieniliśmy w portalu</h2>
+  <ul>
+    <li><strong>Rozszerzamy, niczego nie usuwamy.</strong> Kod Wykazu AED jest w nowych plikach obok DGA. Funkcje DGA importujemy, a nie kopiujemy.</li>
+    <li>W istniejących plikach są tylko dopisane punkty zaczepienia: harmonogram, trasa API, ustawienia, eksport zadania i podpowiedź formularza.</li>
+    <li><strong>Zero migracji:</strong> <code>makemigrations --check</code> zwraca „No changes detected”. Testy DGA przechodzą bez zmian.</li>
+  </ul>
+  <div class="karty" id="karty-zmian"></div>
+  <div class="tabela-wrap" role="region" aria-labelledby="cap-zmiany" tabindex="0">
+    <table id="tab-zmiany">
+      <caption id="cap-zmiany">Pliki portalu zmienione względem oryginału (<code>git diff a119b1b -- portal/</code>)</caption>
+      <thead><tr><th scope="col">Plik</th><th scope="col">Zmiana</th><th scope="col" class="num">Linie +/−</th><th scope="col">Po co</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+  <figure>
+    <img src="zrzuty/09_testy.png" width="1440" height="900" loading="lazy" alt="Wynik testów pytest w kontenerze portalu: liczby zaliczonych testów w plikach test_aed oraz test_main_dga, makemigrations No changes detected, łącznie 192 passed.">
+    <figcaption>Testy Wykazu AED i regresja DGA w kontenerze portalu (pełny log: <a href="wynik/testy.txt">testy.txt</a>).</figcaption>
+  </figure>
+  <h3>Do pobrania i dalszej lektury</h3>
+  <ul>
+    <li><a href="../INSTRUKCJA_DLA_JURY.md">Instrukcja dla jury</a>: jak sprawdzić zmiany w kodzie</li>
+    <li><a href="../portal/backend/CHANGELOG.md">CHANGELOG portalu</a> z wpisami AED</li>
+    <li><a href="zrzuty/README.md">Podpisy zrzutów</a> (co dowodzi każdy zrzut)</li>
+    <li><a href="../format_danych/wzorcowy_zakres_danych.xlsx">Wzorcowy zakres danych (XLSX)</a></li>
+    <li><a href="../branding/logo/">Logotyp akcji „Otwórz AED”</a> i <a href="../branding/ksiega_znaku.pdf">księga znaku (PDF)</a></li>
+  </ul>
+</section>
+
+<div class="nawigacja">
+  <button type="button" class="btn drugi" id="wstecz">← Wstecz</button>
+  <span id="licznik">Krok 1 z 7</span>
+  <button type="button" class="btn" id="dalej">Dalej →</button>
+</div>
+</div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p><strong>Otwórz AED</strong>: HackNation 2026, zadanie „Misja AED – Dane na ratunek”. Prototyp działa offline z pliku, bez zasobów z innych domen.</p>
+    <p>Dane wykazu: Urząd Miasta Legionowo (CC0 1.0) i przykład wzorca (dane fikcyjne). Kontur Polski: Natural Earth (domena publiczna). Krój pisma: Atkinson Hyperlegible (SIL OFL).</p>
+  </div>
+</footer>
+
+<script type="application/json" id="dane">{{DANE_JSON}}</script>
+<script>
+(function () {
+  "use strict";
+  var D = JSON.parse(document.getElementById("dane").textContent);
+  var H = D.naglowki;
+  var rows = D.wiersze.map(function (r, i) {
+    var o = { _i: i };
+    H.forEach(function (h, j) { o[h] = r[j]; });
+    return o;
+  });
+  var AGG_COLUMNS = ["id_aed", "wymaga_przegladu", "dysponent_z_wydawcy", "przetworzenie", "wydawca_zasobu", "licencja_zasobu",
+    "id_zasobu_zrodlowego", "url_zasobu_zrodlowego", "data_danych_zasobu", "data_agregacji"];
+  var $ = function (s) { return document.querySelector(s); };
+
+  function el(tag, attrs) {
+    var e = document.createElement(tag);
+    if (attrs) Object.keys(attrs).forEach(function (k) {
+      if (k === "text") e.textContent = attrs[k];
+      else if (k === "class") e.className = attrs[k];
+      else e.setAttribute(k, attrs[k]);
+    });
+    for (var i = 2; i < arguments.length; i++) {
+      var c = arguments[i];
+      if (c == null) continue;
+      e.appendChild(typeof c === "string" ? document.createTextNode(c) : c);
+    }
+    return e;
+  }
+  function svgEl(tag, attrs) {
+    var e = document.createElementNS("http://www.w3.org/2000/svg", tag);
+    Object.keys(attrs || {}).forEach(function (k) { e.setAttribute(k, attrs[k]); });
+    return e;
+  }
+  function dictLabel(column, value, short) {
+    var dict = D.slowniki[column];
+    var found = dict && dict.wartosci.filter(function (w) { return w.kod === value; })[0];
+    var label = found && found.etykieta ? found.etykieta : value;
+    return short ? label.split(/ – | \(/)[0] : label;
+  }
+  var plNumber = function (n) { return n.toLocaleString("pl-PL"); };
+
+  /* Kroki */
+  var steps = Array.prototype.slice.call(document.querySelectorAll(".krok"));
+  var navButtons = Array.prototype.slice.call(document.querySelectorAll(".kroki button"));
+  function show(n, moveFocus) {
+    n = Math.max(1, Math.min(steps.length, n || 1));
+    steps.forEach(function (s, i) { s.hidden = i !== n - 1; });
+    navButtons.forEach(function (b, i) {
+      if (i === n - 1) b.setAttribute("aria-current", "step"); else b.removeAttribute("aria-current");
+      b.classList.toggle("zrobiony", i < n - 1);
+    });
+    $("#wstecz").disabled = n === 1;
+    $("#dalej").disabled = n === steps.length;
+    $("#licznik").textContent = "Krok " + n + " z " + steps.length;
+    if (location.hash !== "#krok-" + n) {
+      try { history.replaceState(null, "", "#krok-" + n); } catch (e) { /* file:// w niektórych przeglądarkach */ }
+    }
+    current = n;
+    var bar = navButtons[0].closest("ol");
+    bar.scrollLeft += navButtons[n - 1].getBoundingClientRect().left - bar.getBoundingClientRect().left - 16;
+    if (n === 5) render();
+    if (moveFocus) {
+      document.querySelector("nav.etapy").scrollIntoView();
+      steps[n - 1].querySelector("h2").focus({ preventScroll: true });
+    }
+  }
+  var current = 1;
+  navButtons.forEach(function (b) { b.addEventListener("click", function () { show(+b.dataset.krok, true); }); });
+  $("#wstecz").addEventListener("click", function () { show(current - 1, true); });
+  $("#dalej").addEventListener("click", function () { show(current + 1, true); });
+  function stepFromHash() { var m = /^#krok-(\d)$/.exec(location.hash); return m ? +m[1] : 1; }
+  window.addEventListener("hashchange", function () { if (stepFromHash() !== current) show(stepFromHash(), true); });
+
+  /* Krok 3: przykład pliku dostawcy */
+  (function () {
+    var p = D.przyklad;
+    $("#cap-przyklad").textContent = "Fragment pliku format_danych/przyklady/aed_punkty_przyklad.csv: " + p.wiersze.length +
+      " z " + p.liczba + " wierszy, " + p.naglowki.length + " z 41 kolumn (dane fikcyjne)";
+    var head = el("tr");
+    p.naglowki.forEach(function (h) { head.appendChild(el("th", { scope: "col", text: h })); });
+    $("#tab-przyklad thead").appendChild(head);
+    p.wiersze.forEach(function (r) {
+      var tr = el("tr");
+      r.forEach(function (v, i) { tr.appendChild(el(i === 0 ? "th" : "td", i === 0 ? { scope: "row", text: v } : { text: v })); });
+      $("#tab-przyklad tbody").appendChild(tr);
+    });
+  })();
+
+  /* Krok 4: statystyki z portalu lokalnego */
+  (function () {
+    var s = D.statystyki;
+    function card(number, title, text) {
+      return el("div", { class: "karta" }, el("div", { class: "liczba", text: plNumber(number) }), el("h3", { text: title }), text ? el("p", { text: text }) : null);
+    }
+    var cards = $("#karty-statystyk");
+    cards.appendChild(card(s.zasoby_przyjete, "zasoby przyjęte", "Legionowo (CC0) i plik wzorca (CC BY 4.0)"));
+    cards.appendChild(card(s.zasoby_pominiete.length, "zasoby pominięte", "z powodem w logu"));
+    cards.appendChild(card(s.wiersze, "wierszy w wykazie", "zbiór " + s.zbior_zbiorczy_id + ", zasób " + s.zasob_zbiorczy_id));
+    s.zasoby_pominiete.forEach(function (p) {
+      $("#lista-pominietych").appendChild(el("li", null, el("span", { class: "etykieta-zla", text: "Pominięty: " }),
+        (p.nazwa || "zasób") + " (id " + p.resource_id + "): " + p.powod));
+    });
+    $("#lista-pominietych").appendChild(el("li", null, el("span", { class: "etykieta-dobra", text: "Niebrany pod uwagę: " }),
+      "zbiór bez wpisu standard = AED, choć ma te same kolumny co wzorzec."));
+    $("#raport").textContent = D.raport;
+  })();
+
+  /* Krok 5: wykaz */
+  var filters = { q: $("#f-szukaj"), miasto: $("#f-miasto"), dostep: $("#f-dostep"), status: $("#f-status") };
+  function fillSelect(select, column) {
+    var values = rows.map(function (r) { return r[column]; }).filter(function (v, i, a) { return a.indexOf(v) === i; });
+    values.sort(function (a, b) { return a.localeCompare(b, "pl"); });
+    values.forEach(function (v) {
+      var count = rows.filter(function (r) { return r[column] === v; }).length;
+      select.appendChild(el("option", { value: v, text: (v === "" ? "(brak danych)" : dictLabel(column, v, true)) + " (" + count + ")" }));
+    });
+  }
+  fillSelect(filters.miasto, "miejscowosc");
+  fillSelect(filters.dostep, "typ_dostepu");
+  fillSelect(filters.status, "status_urzadzenia");
+
+  function filtered() {
+    var q = filters.q.value.trim().toLocaleLowerCase("pl");
+    return rows.filter(function (r) {
+      if (filters.miasto.value !== "*" && r.miejscowosc !== filters.miasto.value) return false;
+      if (filters.dostep.value !== "*" && r.typ_dostepu !== filters.dostep.value) return false;
+      if (filters.status.value !== "*" && r.status_urzadzenia !== filters.status.value) return false;
+      if (!q) return true;
+      return ["id_aed", "nazwa_lokalizacji", "miejscowosc", "nazwa_ulicy", "opis_lokalizacji", "dysponent_nazwa", "wydawca_zasobu"]
+        .some(function (c) { return r[c].toLocaleLowerCase("pl").indexOf(q) !== -1; });
+    });
+  }
+  function address(r) {
+    var street = [r.cecha_ulicy === "ulica" ? "ul." : r.cecha_ulicy, r.nazwa_ulicy, r.numer_budynku].filter(Boolean).join(" ");
+    return [r.kod_pocztowy, r.miejscowosc].filter(Boolean).join(" ") + (street ? ", " + street : "");
+  }
+  function statusBadge(r) {
+    var v = r.status_urzadzenia || "nieznany";
+    return el("span", { class: "status " + v, text: dictLabel("status_urzadzenia", v, true) });
+  }
+
+  var selected = null;
+  var mapMode = "punkty";
+  var K = Math.cos(52 * Math.PI / 180);
+  function project(lon, lat) { return [(lon - 14) * K * 100, (55.1 - lat) * 100]; }
+  var svg = $("#mapa");
+  var outline = D.kontur.kontury.map(function (ring) {
+    return "M" + ring.map(function (p) { return project(p[0], p[1]).map(function (n) { return n.toFixed(1); }).join(" "); }).join("L") + "Z";
+  }).join("");
+  svg.appendChild(svgEl("path", { class: "kraj", d: outline, "aria-hidden": "true" }));
+  var labelsLayer = svgEl("g", { "aria-hidden": "true" });
+  var pointsLayer = svgEl("g", {});
+  svg.appendChild(labelsLayer);
+  svg.appendChild(pointsLayer);
+
+  ["sprawny", "niesprawny", "w_serwisie", "nieznany"].forEach(function (s) {
+    if (!rows.some(function (r) { return r.status_urzadzenia === s; })) return;
+    $("#legenda").appendChild(el("li", null, el("span", { class: "s-" + s, "aria-hidden": "true" }), dictLabel("status_urzadzenia", s, true)));
+  });
+
+  function renderMap(list) {
+    var pts = list.map(function (r) {
+      return { r: r, xy: project(parseFloat(r.dlugosc_geograficzna), parseFloat(r.szerokosc_geograficzna)) };
+    }).filter(function (p) { return isFinite(p.xy[0]) && isFinite(p.xy[1]); });
+    var widthPx = svg.clientWidth || 600;
+    var heightPx = Math.min(Math.max(widthPx * 0.7, 280), 520);
+    svg.style.height = heightPx + "px";
+    var ratio = widthPx / heightPx;
+    var box = [-10, 10, 640, 610];
+    if (mapMode === "punkty" && pts.length) {
+      var xs = pts.map(function (p) { return p.xy[0]; }), ys = pts.map(function (p) { return p.xy[1]; });
+      var minX = Math.min.apply(null, xs), maxX = Math.max.apply(null, xs), minY = Math.min.apply(null, ys), maxY = Math.max.apply(null, ys);
+      var spanX = Math.max(maxX - minX, 8), spanY = Math.max(maxY - minY, 8);
+      var padX = 80 / (widthPx - 160), padY = 50 / (heightPx - 100);
+      box = [minX - spanX * padX, minY - spanY * padY, spanX * (1 + 2 * padX), spanY * (1 + 2 * padY)];
+    }
+    var w = box[2], h = box[3];
+    if (w / h < ratio) w = h * ratio; else h = w / ratio;
+    var vb = [box[0] + (box[2] - w) / 2, box[1] + (box[3] - h) / 2, w, h];
+    svg.setAttribute("viewBox", vb.map(function (n) { return n.toFixed(2); }).join(" "));
+    var unit = vb[2] / widthPx;
+    var radius = 7 * unit;
+    while (pointsLayer.firstChild) pointsLayer.removeChild(pointsLayer.firstChild);
+    while (labelsLayer.firstChild) labelsLayer.removeChild(labelsLayer.firstChild);
+
+    var cities = {};
+    pts.forEach(function (p) {
+      var c = cities[p.r.miejscowosc] = cities[p.r.miejscowosc] || { x: 0, y: 0, n: 0, maxY: -Infinity };
+      c.x += p.xy[0]; c.n += 1; c.maxY = Math.max(c.maxY, p.xy[1]);
+    });
+    Object.keys(cities).forEach(function (name) {
+      var c = cities[name];
+      var t = svgEl("text", { class: "miasto", x: (c.x / c.n).toFixed(2), y: (c.maxY + 24 * unit).toFixed(2), "text-anchor": "middle", "font-size": (15 * unit).toFixed(2) });
+      t.textContent = name + " (" + c.n + ")";
+      labelsLayer.appendChild(t);
+    });
+
+    pts.forEach(function (p) {
+      var r = p.r;
+      var circle = svgEl("circle", {
+        class: "punkt s-" + (r.status_urzadzenia || "nieznany") + (selected === r._i ? " wybrany" : ""),
+        cx: p.xy[0].toFixed(2), cy: p.xy[1].toFixed(2), r: radius.toFixed(2),
+        tabindex: "0", role: "button", "aria-label": r.nazwa_lokalizacji + ", " + r.miejscowosc + ", status: " + dictLabel("status_urzadzenia", r.status_urzadzenia, true)
+      });
+      var title = svgEl("title", {});
+      title.textContent = r.nazwa_lokalizacji + " (" + r.miejscowosc + ")";
+      circle.appendChild(title);
+      circle.addEventListener("click", function () { select(r._i, true); });
+      circle.addEventListener("keydown", function (ev) {
+        if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); select(r._i, true); }
+      });
+      pointsLayer.appendChild(circle);
+    });
+    $("#widok-kraj").setAttribute("aria-pressed", String(mapMode === "kraj"));
+    $("#widok-punkty").setAttribute("aria-pressed", String(mapMode === "punkty"));
+  }
+
+  function renderTable(list) {
+    var body = $("#tab-wykaz tbody");
+    while (body.firstChild) body.removeChild(body.firstChild);
+    list.forEach(function (r) {
+      var button = el("button", { type: "button", class: "link", text: r.nazwa_lokalizacji, "aria-label": "Szczegóły: " + r.nazwa_lokalizacji + ", " + r.miejscowosc });
+      button.addEventListener("click", function () { select(r._i, true); });
+      var access = r.typ_dostepu ? dictLabel("typ_dostepu", r.typ_dostepu, true) : "brak danych";
+      if (r.dostepny_24_7 === "true") access += ", 24/7";
+      var tr = el("tr", { class: selected === r._i ? "wybrany" : "" },
+        el("th", { scope: "row" }, button, el("div", { class: "maly", text: r.id_aed })),
+        el("td", { text: address(r) }),
+        el("td", { text: access }),
+        el("td", null, statusBadge(r)),
+        el("td", null, r.wydawca_zasobu, el("div", { class: "maly", text: r.licencja_zasobu })));
+      body.appendChild(tr);
+    });
+    if (!list.length) body.appendChild(el("tr", null, el("td", { colspan: "5", text: "Brak rekordów spełniających filtry." })));
+  }
+
+  function render() {
+    var list = filtered();
+    $("#licznik-wynikow").textContent = "Wyświetlono " + list.length + " z " + rows.length + " rekordów wykazu.";
+    renderMap(list);
+    renderTable(list);
+  }
+
+  function select(i, moveFocus) {
+    selected = i;
+    var r = rows[i];
+    var box = $("#szczegoly");
+    while (box.firstChild) box.removeChild(box.firstChild);
+    box.appendChild(el("h3", { id: "szczegoly-h", tabindex: "-1", text: "Szczegóły rekordu: " + r.nazwa_lokalizacji }));
+    box.appendChild(el("h4", { text: "Pochodzenie i przetworzenie (kolumny dodane przez portal)" }));
+    var dl = el("dl", { class: "pola" });
+    AGG_COLUMNS.forEach(function (c) {
+      var value = r[c];
+      var dd;
+      if (c === "przetworzenie" && value) {
+        dd = el("dd", null, el("ul", null));
+        value.split(";").forEach(function (code) { dd.firstChild.appendChild(el("li", null, el("code", { text: code }), ": " + dictLabel("przetworzenie", code))); });
+      } else if (c === "url_zasobu_zrodlowego" && value) {
+        dd = el("dd", null, el("a", { href: value, text: value }));
+      } else {
+        dd = el("dd", { text: value || "—" });
+      }
+      dl.appendChild(el("dt", { text: c }));
+      dl.appendChild(dd);
+    });
+    box.appendChild(dl);
+    var filled = H.filter(function (c) { return AGG_COLUMNS.indexOf(c) === -1 && r[c]; });
+    var empty = H.filter(function (c) { return AGG_COLUMNS.indexOf(c) === -1 && !r[c]; });
+    box.appendChild(el("h4", { text: "Dane z pliku dostawcy (kolumny wzorca: wypełnione " + filled.length + " z " + (filled.length + empty.length) + ")" }));
+    var dl2 = el("dl", { class: "pola" });
+    filled.forEach(function (c) {
+      var label = D.slowniki[c] ? dictLabel(c, r[c], false) : r[c];
+      var value = label.toLocaleLowerCase("pl") === r[c].toLocaleLowerCase("pl") ? r[c] : r[c] + " (" + label + ")";
+      dl2.appendChild(el("dt", { text: c }));
+      dl2.appendChild(el("dd", { text: value }));
+    });
+    box.appendChild(dl2);
+    if (empty.length) box.appendChild(el("p", { class: "maly", text: "Puste kolumny wzorca: " + empty.join(", ") + "." }));
+    var close = el("button", { type: "button", class: "btn drugi", text: "Zamknij szczegóły" });
+    close.addEventListener("click", function () { selected = null; box.hidden = true; render(); });
+    box.appendChild(el("p", null, close));
+    box.hidden = false;
+    render();
+    if (moveFocus) { box.scrollIntoView({ block: "start" }); $("#szczegoly-h").focus({ preventScroll: true }); }
+  }
+
+  Object.keys(filters).forEach(function (k) { filters[k].addEventListener("input", render); });
+  $("#widok-kraj").addEventListener("click", function () { mapMode = "kraj"; render(); });
+  $("#widok-punkty").addEventListener("click", function () { mapMode = "punkty"; render(); });
+  window.addEventListener("resize", function () { if (current === 5) renderMap(filtered()); });
+
+  /* Krok 6: pobieranie i API */
+  $("#api").textContent = "GET /1.4/aed-aggregated\n\n" + JSON.stringify(D.api, null, 2);
+  $("#pobierz-csv").addEventListener("click", function () {
+    var blob = new Blob([D.csv], { type: "text/csv;charset=utf-8" });
+    var a = el("a", { href: URL.createObjectURL(blob), download: "zestawienie_aed.csv" });
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 0);
+  });
+
+  /* Krok 7: zmiany w portalu */
+  (function () {
+    var changes = D.zmiany;
+    var added = changes.filter(function (c) { return c.status === "A"; });
+    var modified = changes.filter(function (c) { return c.status !== "A"; });
+    var sum = function (list, key) { return list.reduce(function (a, c) { return a + c[key]; }, 0); };
+    var cards = $("#karty-zmian");
+    [[added.length, "nowe pliki", "kod AED, testy, próbki danych"],
+     [modified.length, "istniejące pliki z dopiskami", "+" + plNumber(sum(modified, "dodane")) + " / −" + plNumber(sum(modified, "usuniete")) + " linii"],
+     [0, "migracji", "bez nowych pól i tabel"]].forEach(function (c) {
+      cards.appendChild(el("div", { class: "karta" }, el("div", { class: "liczba", text: plNumber(c[0]) }), el("h3", { text: c[1] }), el("p", { text: c[2] })));
+    });
+    modified.concat(added).forEach(function (c) {
+      $("#tab-zmiany tbody").appendChild(el("tr", null,
+        el("th", { scope: "row" }, el("code", { text: c.sciezka.replace("portal/backend/", "") })),
+        el("td", { text: c.status === "A" ? "nowy" : "dopisek" }),
+        el("td", { class: "num", text: "+" + c.dodane + " / −" + c.usuniete }),
+        el("td", { text: c.opis })));
+    });
+  })();
+
+  render();
+  show(stepFromHash(), false);
+})();
+</script>
+</body>
+</html>
