@@ -16,7 +16,10 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "ZGLOSZENIE"
 ORIGINAL_COMMIT = "a119b1b"
-GENERATED = ["INSTRUKCJA_DLA_JURY.md", "ZMIANY_W_PORTALU.md", "prototyp", "wzorcowy_zakres_danych.xlsx", "kod", "dane"]
+GENERATED = ["INSTRUKCJA_DLA_JURY.md", "ZMIANY_W_PORTALU.md", "prototyp", "wzorcowy_zakres_danych.xlsx", "kod", "dane",
+             "prezentacja", "logotyp", "ksiega_znaku.pdf"]
+LOGOTYPY = ["dane-przezycie_logo_poziome", "dane-przezycie_logo_poziome_haslo", "dane-przezycie_logo_pionowe",
+            "dane-przezycie_znak", "dane-przezycie_sygnet"]
 
 
 def relink_markdown(text, prefix):
@@ -61,6 +64,14 @@ def main():
     (OUT / "dane").mkdir()
     shutil.copy2(ROOT / "demo" / "wynik" / "zestawienie_aed.csv", OUT / "dane" / "wykaz_aed_wynik_agregacji.csv")
     write_portal_patch()
+    (OUT / "prezentacja").mkdir()
+    for ext in ("pdf", "pptx"):
+        shutil.copy2(ROOT / "prezentacja" / f"dane_przezycie_prezentacja.{ext}", OUT / "prezentacja")
+    (OUT / "logotyp").mkdir()
+    for name in LOGOTYPY:
+        for ext in ("jpg", "png", "pdf", "svg"):
+            shutil.copy2(ROOT / "branding" / "logo" / f"{name}.{ext}", OUT / "logotyp")
+    shutil.copy2(ROOT / "branding" / "ksiega_znaku.pdf", OUT / "ksiega_znaku.pdf")
     files = sorted(p.relative_to(OUT).as_posix() for p in OUT.rglob("*") if p.is_file())
     print(f"ZGLOSZENIE/: {len(files)} plików")
 

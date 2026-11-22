@@ -1,5 +1,13 @@
 # Wydania
 
+## Niewydane (gałąź `ksiega-znaku-dane-przezycie`): materiały do zgłoszenia
+
+- **Akcja „Dane (prze)życie”** zamiast roboczej „Otwórz AED” (archiwum: `branding/archiwum/otworz_aed/`). Hasło: „Twoje dane – czyjeś życie.”
+- **Znak finalny:** migotanie komór i rytm zatokowy spotykają się na środku znaku, w środku nałożonego folderu z danymi.
+- **Logotyp** w JPG, PNG, PDF i SVG oraz **księga znaku** (12 stron): `branding/`.
+- **Prezentacja** (14 slajdów, PPTX i PDF): `prezentacja/`.
+- **README** z tytułem i szczegółowym opisem; instrukcja dla jury, prototyp i `ZGLOSZENIE/` zaktualizowane.
+
 ## v1.0.0 (22.11.2026): działająca integracja danych AED w portalu
 
 Tag `v1.0.0` (commit `22dd379`). To podstawowa wersja rozwiązania. Zawiera działający mechanizm integracji danych AED w kodzie portalu dane.gov.pl, czyli **Wykaz AED**. Nie zawiera materiałów do finalnego zgłoszenia.

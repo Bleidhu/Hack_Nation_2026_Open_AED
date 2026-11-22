@@ -121,6 +121,7 @@ Dodaliśmy do portalu **Wykaz AED**, czyli nocny zasób zbiorczy zbudowany na wz
   - [`demo/zrzuty/`](../demo/zrzuty/README.md): zrzuty z portalu;
   - [`demo/wynik/`](../demo/wynik/): wyniki i logi.
 - **Wzorcowy zakres danych:** [`format_danych/`](../format_danych/README.md).
-- **Akcja „Otwórz AED”:** [`branding/`](../branding/AKCJA_OTWORZ_AED.md).
+- **Akcja „Dane (prze)życie”:** [`branding/`](../branding/README.md): logotyp, księga znaku, opis akcji.
+- **Prezentacja:** [`prezentacja/`](../prezentacja/README.md).
 - **Integrator** dla dostawców bez wzorcowego formatu (dodatek): [`integrator/`](../integrator/README.md).
 - **Instrukcja dla jury:** [`INSTRUKCJA_DLA_JURY.md`](../INSTRUKCJA_DLA_JURY.md).
