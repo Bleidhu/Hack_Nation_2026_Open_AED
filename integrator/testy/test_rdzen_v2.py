@@ -41,7 +41,7 @@ class TestWzorzec(unittest.TestCase):
 class TestPrzyklad(unittest.TestCase):
     def test_plik_wzorca_bez_bledow_i_bez_zmian_wartosci(self):
         data = PRZYKLAD.read_bytes()
-        res = importer.run(data, PRZYKLAD.name, preset="wzorzec")
+        res = importer.run(data, PRZYKLAD.name, preset="wzorzec", cel="lokalny")
         self.assertEqual(res["raport"]["odrzucone"], 0, res["raport"]["bledy"])
         out = list(csv.DictReader(io.StringIO(importer.to_csv(res["rekordy"]), newline="")))
         src = list(csv.DictReader(io.StringIO(data.decode("utf-8"), newline="")))
@@ -52,7 +52,7 @@ class TestPrzyklad(unittest.TestCase):
                     self.assertEqual(a[k], v, k)
 
     def test_csv_crlf_i_naglowek(self):
-        res = importer.run(PRZYKLAD.read_bytes(), PRZYKLAD.name, preset="wzorzec")
+        res = importer.run(PRZYKLAD.read_bytes(), PRZYKLAD.name, preset="wzorzec", cel="lokalny")
         text = importer.to_csv(res["rekordy"])
         self.assertTrue(text.startswith(",".join(wzorzec.FIELDS) + "\r\n"))
         self.assertNotIn("\n", text.replace("\r\n", ""))
@@ -72,7 +72,7 @@ class TestMapowanie(unittest.TestCase):
         self.assertEqual(cols["dostepny_24_7"]["z"], "Całodobowo")
 
     def test_normalizacja_domyslne_i_raport(self):
-        res = importer.run(self.CSV, "x.csv")
+        res = importer.run(self.CSV, "x.csv", cel="lokalny")
         r1, r2, r3 = res["rekordy"]
         self.assertEqual((r1["szerokosc_geograficzna"], r1["dostepny_24_7"]), ("53.4285", "true"))
         self.assertEqual(r1["status_urzadzenia"], "nieznany")
@@ -82,8 +82,8 @@ class TestMapowanie(unittest.TestCase):
         self.assertTrue(any(e["wiersz"] == 3 for e in res["raport"]["bledy"]))
 
     def test_brak_id_nadaje_stabilny_identyfikator(self):
-        a = importer.run(b"nazwa,miasto,lat,lon\nX,Y,52.1,21.0\n", "a.csv")["rekordy"][0]
-        b = importer.run(b"nazwa,miasto,lat,lon\nX,Y,52.1,21.0\n", "a.csv")["rekordy"][0]
+        a = importer.run(b"nazwa,miasto,lat,lon\nX,Y,52.1,21.0\n", "a.csv", cel="lokalny")["rekordy"][0]
+        b = importer.run(b"nazwa,miasto,lat,lon\nX,Y,52.1,21.0\n", "a.csv", cel="lokalny")["rekordy"][0]
         self.assertTrue(a["id_zrodlowe"].startswith("auto-"))
         self.assertEqual(a["id_zrodlowe"], b["id_zrodlowe"])
 

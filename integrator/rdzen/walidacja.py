@@ -40,8 +40,13 @@ def validate_value(field: dict, v: str):
     return None
 
 
-def validate(recs: list, *, today: str = None) -> dict:
-    """Błąd (odrzucenie wiersza): naruszenie schematu lub zduplikowane id_zrodlowe. Ostrzeżenie: reguły dodatkowe."""
+WSPOLRZEDNE = ("szerokosc_geograficzna", "dlugosc_geograficzna")
+
+
+def validate(recs: list, *, today: str = None, luzna: bool = False) -> dict:
+    """Błąd (odrzucenie wiersza): naruszenie schematu lub zduplikowane id_zrodlowe. Ostrzeżenie: reguły dodatkowe.
+
+    luzna=True (tylko tryb lokalny, np. OSM bez adresu): puste pola wymagane (poza współrzędnymi) są ostrzeżeniem."""
     today = today or date.today().isoformat()
     seen: set = set()
     rep = {"liczba_wierszy": len(recs), "poprawne": 0, "z_ostrzezeniami": 0, "odrzucone": 0,
@@ -52,7 +57,10 @@ def validate(recs: list, *, today: str = None) -> dict:
         for f in SCHEMA["fields"]:
             msg = validate_value(f, r.get(f["name"], ""))
             if msg:
-                errs.append({"pole": f["name"], "komunikat": msg})
+                if luzna and msg == "pole wymagane" and f["name"] not in WSPOLRZEDNE:
+                    warns.append({"pole": f["name"], "komunikat": "brak wartości w źródle (wymagane we wzorcu)"})
+                else:
+                    errs.append({"pole": f["name"], "komunikat": msg})
         for f, label in (("data_waznosci_elektrod", "elektrody"), ("data_waznosci_baterii", "bateria")):
             v = r.get(f, "")
             if re.fullmatch(r"\d{4}-\d{2}-\d{2}", v) and v < today:

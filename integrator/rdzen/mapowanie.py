@@ -2,8 +2,10 @@
 from __future__ import annotations
 
 import hashlib
+import json
 import re
 from datetime import datetime, timezone
+from pathlib import Path
 
 from .normalizacja import norm_value
 from .wzorzec import FIELDS, HEADER_ALIASES, PL_LAT, PL_LON, normalize_header
@@ -38,34 +40,7 @@ SYNONYMS = {
 
 PRESETS = {
     "wzorzec": {"opis": "Plik już we wzorcu v2 (nagłówki = nazwy kolumn)", "kolumny": {f: {"z": f} for f in FIELDS}},
-    "osm": {
-        "opis": "OpenStreetMap (emergency=defibrillator). Licencja ODbL: tylko tryb lokalny i porównania.",
-        "licencja_zrodla": "ODbL-1.0",
-        "kolumny": {
-            "id_zrodlowe": {"z": "@id"},
-            "nazwa_lokalizacji": {"z": ["name", "description", "operator"]},
-            "opis_lokalizacji": {"z": ["defibrillator:location:pl", "defibrillator:location", "description"]},
-            "szerokosc_geograficzna": {"z": "__lat"},
-            "dlugosc_geograficzna": {"z": "__lon"},
-            "miejscowosc": {"z": "addr:city"},
-            "kod_pocztowy": {"z": "addr:postcode"},
-            "nazwa_ulicy": {"z": "addr:street"},
-            "numer_budynku": {"z": "addr:housenumber"},
-            "wewnatrz_budynku": {"z": "indoor", "mapa": {"yes": "true", "no": "false"}},
-            "kondygnacja": {"z": "level"},
-            "typ_dostepu": {"z": "access", "mapa": {"yes": "publiczny", "permissive": "publiczny", "customers": "ograniczony",
-                                                    "permit": "ograniczony", "private": "prywatny", "no": "prywatny"}},
-            "godziny_dostepnosci": {"z": "opening_hours"},
-            "dostepny_24_7": {"z": "opening_hours", "mapa": {"24/7": "true", "*": "false"}},
-            "dysponent_nazwa": {"z": "operator"},
-            "telefon_kontaktowy": {"z": ["phone", "emergency:phone"]},
-            "producent": {"z": "manufacturer"},
-            "model": {"z": "model"},
-            "data_weryfikacji": {"z": "check_date"},
-            "zrodlo_danych": {"stala": "openstreetmap"},
-            "poziom_weryfikacji": {"stala": "niezweryfikowany"},
-        },
-    },
+    "osm": json.loads((Path(__file__).resolve().parent.parent / "adaptery" / "osm_mapowanie.json").read_text("utf-8")),
 }
 
 
