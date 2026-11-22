@@ -7,7 +7,7 @@ git diff --stat a119b1b -- portal/backend
 git diff a119b1b -- portal/backend
 ```
 
-## W jednym akapicie
+## W skrócie
 
 Dodaliśmy do portalu **Wykaz AED**, czyli nocny zasób zbiorczy zbudowany na wzór istniejącego wykazu DGA:
 - Dostawca oznacza swój zbiór w istniejących „Polach niestandardowych” wpisem `standard = AED`.
@@ -51,7 +51,7 @@ Dodaliśmy do portalu **Wykaz AED**, czyli nocny zasób zbiorczy zbudowany na wz
 5. **Publikacja** (`create_main_aed_resource_with_dataset`, zadanie `create_main_aed_resource_task`):
    - zadanie tworzy nowy zasób z plikiem CSV, a gdy trzeba, także zbiór zbiorczy (licencja CC BY 4.0, kategoria „Zdrowie”, tagi);
    - ustawia schemat z mapowaniem `geo`, który włącza mapę portalu;
-   - czeka na walidację, ponawiając zadanie w trakcie walidacji;
+   - czeka na wynik walidacji i do tego czasu ponawia zadanie;
    - po sukcesie usuwa poprzedni zasób zbiorczy, a po błędzie sprząta wszystko, co utworzyło;
    - przebieg jest taki sam jak w zadaniu DGA.
 6. **Dostęp:**
@@ -108,7 +108,7 @@ Dodaliśmy do portalu **Wykaz AED**, czyli nocny zasób zbiorczy zbudowany na wz
 
 ## Weryfikacja
 
-- **Testy:** w kontenerze testowym portalu przechodzi 192 testów, w tym wszystkie testy AED oraz regresja DGA (`test_main_dga.py`, testy DGA w `test_api.py`). Log: [`demo/wynik/testy.txt`](../demo/wynik/testy.txt).
+- **Testy:** w kontenerze testowym portalu przechodzą 192 testy, w tym wszystkie testy AED oraz regresja DGA (`test_main_dga.py`, testy DGA w `test_api.py`). Log: [`demo/wynik/testy.txt`](../demo/wynik/testy.txt).
 - **Migracje:** `makemigrations --check` zwraca „No changes detected” (ten sam log).
 - **Portal uruchomiony lokalnie:** zrzuty i log komendy są w [`demo/zrzuty/`](../demo/zrzuty/README.md) i [`demo/wynik/`](../demo/wynik/).
 - **Bez bazy:** [`demo/agreguj.py`](../demo/agreguj.py) uruchamia logikę agregacji na realnych plikach z dane.gov.pl ([`demo/wynik/raport_agregacji.txt`](../demo/wynik/raport_agregacji.txt)).

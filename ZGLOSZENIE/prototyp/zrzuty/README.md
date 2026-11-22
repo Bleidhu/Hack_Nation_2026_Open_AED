@@ -9,7 +9,7 @@
   - Marki i Krosno: pliki z dane.gov.pl.
   - Jeden zbiór bez oznaczenia.
 - **Wykaz:** zbudowała go komenda `create_main_aed_resource --eager`. Powstał zbiór 4216 z zasobem 40247.
-- **Makiet nie ma:** zrzuty 01, 02, 04 i 05 to widoki portalu. Zrzuty 03, 06, 07 i 09 pokazują prawdziwe wyjście komendy, API i testów, wyświetlone jako tekst. Ich tytuł mówi, czy wyjście jest sformatowane albo wybrane.
+- **Makiet nie ma:** zrzuty 01, 02, 04 i 05 to widoki portalu. Zrzuty 03, 06, 07 i 09 pokazują prawdziwe wyjście komendy, API i testów, wyświetlone jako tekst. Tytuł każdego z nich mówi, czy wyjście jest sformatowane i czy pokazuje tylko wybrane pola.
 
 ## Zrzuty
 
@@ -24,7 +24,7 @@
 | `07_api_dane_zasobu.png` | `GET /1.4/resources/40247/data`: `meta.count = 32`, mapowanie geo i pierwszy wiersz z kolumnami pochodzenia (`wydawca_zasobu`, `licencja_zasobu`, `id_zasobu_zrodlowego`, `url_zasobu_zrodlowego`, `data_agregacji`). | Dane wykazu w API portalu, z atrybucją dostawcy wymaganą przez CC BY 4.0. |
 | `09_testy.png` | Wynik pytest w kontenerze: testy AED i regresja DGA, 192 passed, `makemigrations --check`: No changes detected (pełna lista: `demo/wynik/testy.txt`). | Zmiany mają testy, mechanizm DGA działa bez zmian, migracji brak. |
 
-Zrzutu `08_strona_wykazu.png` nie ma, bo zadanie 12 (strona Wykazu we froncie) jest opcjonalne i niezrobione.
+Zrzutu `08_strona_wykazu.png` nie ma, bo zadanie 12 (strona Wykazu we froncie) jest opcjonalne i go nie zrobiliśmy.
 
 ## Uwagi o środowisku
 

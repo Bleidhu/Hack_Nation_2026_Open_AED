@@ -48,7 +48,7 @@ Reguły agregacji mają implementację referencyjną (z samokontrolą) w `zrodla
 
 | Ścieżka | Zawartość |
 |---|---|
-| `wzorcowy_zakres_danych.xlsx` | dokumentacja zakresu (deliverable konkursowy) w 5 arkuszach: zakres, szablon z przykładami, słowniki, zasób zbiorczy, zasady. **Nie jest plikiem do publikacji.** |
+| `wzorcowy_zakres_danych.xlsx` | dokumentacja zakresu (plik wymagany w zadaniu konkursowym) w 5 arkuszach: zakres, szablon z przykładami, słowniki, zasób zbiorczy, zasady. **Nie jest plikiem do publikacji.** |
 | `szablony/aed_punkty_szablon.csv`, `.xlsx` | pusty szablon dla dostawcy; XLSX ma jeden arkusz, zgodnie z POD |
 | `schemat/aed_punkty.tableschema.json` | Table Schema wzorca dostawcy (walidator) |
 | `schemat/aed_zestawienie.tableschema.json` | Table Schema zasobu zbiorczego z mapowaniem `geo` dla mapy portalu |

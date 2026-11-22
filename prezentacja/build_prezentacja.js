@@ -106,7 +106,7 @@ const slajd = (master = "TRESC") => pres.addSlide({ masterName: master });
     h: hPNG(P("branding", "logo", "dane-przezycie_logo_poziome_negatyw.png"), 8.4),
     altText: "Logo akcji Dane (prze)życie: migotanie komór i rytm serca spotykają się w środku folderu z danymi" });
   tx(s, "Wykaz AED w portalu dane.gov.pl", { x: M, y: 3.35, w: 11, h: 0.8, fontSize: 40, bold: true, color: K.bialy });
-  tx(s, "Ogólnopolski, otwarty wykaz defibrylatorów z danych wielu dysponentów. Zbudowany przez przeróbkę mechanizmu DGA w kodzie portalu, bez migracji bazy.",
+  tx(s, "Ogólnopolski, otwarty wykaz defibrylatorów z danych wielu dysponentów. Powstał z przerobionego mechanizmu DGA w kodzie portalu, bez migracji bazy.",
     { x: M, y: 4.25, w: 10.5, h: 1.0, fontSize: 18, color: K.mieta });
   tx(s, "Zadanie „Misja AED – Dane na ratunek” · HackNation 2026 · Ministerstwo Cyfryzacji",
     { x: M, y: 6.6, w: 11, h: 0.4, fontSize: 13, color: K.mieta });
@@ -191,7 +191,7 @@ dowod("Dostawca, krok 2: publikuje zasób według wzorca", "02_zasoby_dostawcow.
       ["Legionowo i wzorzec: ", "przyjęte"]], null, false);
   liczba(s, 8.75, 3.85, 1.9, "2 + 2", "zasoby przyjęte i pominięte z powodem");
   liczba(s, 10.85, 3.85, 1.9, "32", "wiersze w wykazie", K.zielen);
-  tx(s, "Poprzedni zasób zbiorczy jest wycofywany, tak jak w DGA. Zasoby niezgodne nie są przyjmowane po cichu: log podaje powód.",
+  tx(s, "Nowy wykaz zastępuje poprzedni zasób zbiorczy, tak jak w DGA. Przy każdym pominiętym zasobie log podaje powód.",
     { x: 8.75, y: 5.4, w: 4.0, h: 1.1, fontSize: 13 });
 }
 

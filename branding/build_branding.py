@@ -566,7 +566,7 @@ th{{font-weight:700}}
   <h2><small>01 · Koncepcja</small>Z chaosu w rytm: w sercu i w danych</h2>
   <div class="grid2" style="grid-template-columns:1.15fr 1fr;align-items:start">
     <div>
-      <p class="koncepcja">Nazwa „{NAZWA}” czyta się na dwa sposoby: „dane przeżycie” i „dane życie”, a „dane” to także dane.gov.pl. W znaku czerwona linia migotania komór, czyli rytmu, który przerywa defibrylator AED, spotyka się na środku z zielonym, miarowym rytmem serca. Miejsce spotkania przykrywa folder z danymi, bo to rozproszone dane, zebrane w jeden wykaz, pozwalają szybko znaleźć najbliższy AED. Chaos zamienia się w porządek dwa razy: w sercu po defibrylacji i w danych po publikacji według jednego wzorca. Zieleń nawiązuje do oznakowania AED, czerwień do zagrożenia życia, a granat do rzetelności danych publicznych.</p>
+      <p class="koncepcja">Nazwa „{NAZWA}” czyta się na dwa sposoby: „dane przeżycie” i „dane życie”, a „dane” to także dane.gov.pl. W znaku czerwona linia migotania komór, czyli rytmu, który przerywa defibrylator AED, spotyka się na środku z zielonym, miarowym rytmem serca. Miejsce spotkania przykrywa folder z danymi, bo najbliższy AED da się szybko znaleźć dopiero wtedy, gdy rozproszone dane trafią do jednego wykazu. Chaos zamienia się w porządek dwa razy: w sercu po defibrylacji i w danych po publikacji według jednego wzorca. Zieleń nawiązuje do oznakowania AED, czerwień do zagrożenia życia, a granat do rzetelności danych publicznych.</p>
     </div>
     <div>
       <h3 style="margin-top:0">Komunikacja</h3>
@@ -590,11 +590,11 @@ th{{font-weight:700}}
     <ul class="legenda">
       <li><b class="n">1</b><strong>Migotanie komór</strong> (czerwień). Nieregularne fale o zmiennej wysokości i odstępach. To rytm, który AED rozpoznaje i przerywa wyładowaniem. Fale słabną ku środkowi.</li>
       <li><b class="n">2</b><strong>Folder z danymi</strong> (granat), nałożony na linię. Kontur folderu ma prześwit, więc widać, że leży na sygnale. To zbiór danych w portalu i Wykaz AED.</li>
-      <li><b class="n">3</b><strong>Punkt spotkania</strong> na przecięciu osi symetrii i linii izoelektrycznej: w środku folderu i w środku znaku. Tu migotanie przechodzi w rytm.</li>
+      <li><b class="n">3</b><strong>Punkt spotkania</strong> na przecięciu pionowej osi znaku i linii izoelektrycznej: w środku folderu i w środku znaku. Tu migotanie przechodzi w rytm.</li>
       <li><b class="n">4</b><strong>Rytm zatokowy</strong> (zieleń). Pełne pobudzenie (załamek P, zespół QRS, załamek T) w folderze i zespół QRS następnego pobudzenia za folderem: rytm się powtarza.</li>
     </ul>
   </div>
-  <p style="font-size:9.5pt;max-width:none">Grubość linii znaku jest jedna dla wszystkich elementów (1/25 szerokości znaku). Linia izoelektryczna przechodzi przez środek korpusu folderu. Pierwsze pobudzenie powstaje jeszcze w folderze: rytm wraca dzięki danym.</p>
+  <p style="font-size:9.5pt;max-width:none">Wszystkie elementy znaku mają tę samą grubość linii: 1/25 szerokości znaku. Linia izoelektryczna przechodzi przez środek korpusu folderu. Pierwsze pobudzenie powstaje jeszcze w folderze: rytm wraca dzięki danym.</p>
   {stopka(3)}
 </section>
 
@@ -606,7 +606,7 @@ th{{font-weight:700}}
     <figure><div class="pole">{inline(W["logo_pionowe"], h=150)}</div><figcaption><strong>Pionowa (z hasłem).</strong> Naklejki, plakaty, roll-upy, awatary: gdy miejsce jest zbliżone do kwadratu.</figcaption></figure>
     <figure><div class="pole">{inline(W["znak"], w=220)}</div><figcaption><strong>Znak.</strong> Element graficzny bez nazwy, gdy nazwa akcji jest obok w tekście.</figcaption></figure>
     <figure><div class="pole">{inline(W["sygnet"], h=110)}</div><figcaption><strong>Sygnet.</strong> Małe rozmiary: favicon, ikona aplikacji, znacznik na mapie. Całe przejście mieści się w folderze.</figcaption></figure>
-    <figure><div class="pole" style="background:{GRANAT}">{inline(W["logo_poziome_negatyw"], w=270)}</div><figcaption><strong>Negatyw na granacie.</strong> Jaśniejsze odpowiedniki czerwieni i zieleni zapewniają kontrast.</figcaption></figure>
+    <figure><div class="pole" style="background:{GRANAT}">{inline(W["logo_poziome_negatyw"], w=270)}</div><figcaption><strong>Negatyw na granacie.</strong> Czerwień i zieleń zastępujemy jaśniejszymi odpowiednikami, żeby zachować kontrast.</figcaption></figure>
   </div>
   {stopka(4)}
 </section>
@@ -652,7 +652,7 @@ th{{font-weight:700}}
   <h2><small>07 · Minimalna wielkość</small>Poniżej tych rozmiarów znak traci czytelność</h2>
   <table><tr><th>Wersja</th><th>Druk (szerokość)</th><th>Ekran (szerokość)</th><th>Uwagi</th></tr>{minima}</table>
   <div class="min">{minima_fig}</div>
-  <p style="font-size:9.5pt;max-width:none;margin-top:5mm">Progi ustalono testem ekranowym: pliki SVG wyświetlone w przeglądarce w skali 1:1 (96 dpi) w malejących rozmiarach. Kryteria: fale migotania nie zlewają się w jedną linię, a hasło ma co najmniej 9 px. Rozmiary do druku przeliczono z pikseli z zaokrągleniem w górę; przed drukiem nakładu warto potwierdzić je wydrukiem próbnym. Rysunki powyżej mają rozmiar minimalny przy wydruku księgi w skali 100%. Poniżej progu znaku stosujemy sygnet. Próbki z testu (znak 120, 64 i 40 px, sygnet 32 i 16 px):</p>
+  <p style="font-size:9.5pt;max-width:none;margin-top:5mm">Progi ustalono testem ekranowym: pliki SVG wyświetlone w przeglądarce w skali 1:1 (96 dpi) w malejących rozmiarach. Kryteria: fale migotania nie zlewają się w jedną linię, a hasło ma co najmniej 9 px. Rozmiary do druku przeliczono z pikseli z zaokrągleniem w górę; przed drukiem nakładu potwierdź je wydrukiem próbnym. Rysunki powyżej mają rozmiar minimalny przy wydruku księgi w skali 100%. Poniżej progu znaku stosujemy sygnet. Próbki z testu (znak 120, 64 i 40 px, sygnet 32 i 16 px):</p>
   <div class="test">{test_px}</div>
   {stopka(8)}
 </section>
@@ -683,7 +683,7 @@ th{{font-weight:700}}
 </section>
 
 <section class="strona">
-  <h2><small>10 · Zastosowania</small>Znak w działaniu</h2>
+  <h2><small>10 · Zastosowania</small>Znak na materiałach akcji</h2>
   <div class="zast">
     <figure>{inline(W["naklejka_A6"], w=390, label="Naklejka A6 na szafkę AED")}<figcaption><strong>Naklejka A6 na szafkę AED.</strong> Informuje, że urządzenie jest w Wykazie AED, podaje jego identyfikator i datę sprawdzenia. Kod QR prowadzi do zgłoszenia „nie działa / zamknięty” (na makiecie kod jest nieprawdziwy).</figcaption></figure>
     <figure>{inline(W["odznaka_dysponenta"], w=220, label="Odznaka dysponenta")}<figcaption><strong>Odznaka dysponenta.</strong> Dla instytucji, która opublikowała dane według wzorcowego zakresu. Na stronę www, do stopki e-maila i przy wejściu do budynku.</figcaption></figure>
