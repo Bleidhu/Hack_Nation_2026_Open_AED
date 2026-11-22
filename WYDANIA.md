@@ -1,5 +1,24 @@
 # Wydania
 
+## v2.0.0 (22.11.2026): integrator danych (dodatek), ukończona faza 2
+
+Zakończona faza 2 planu (`.scratch/integrator-faza2/`): integrator danych dla dostawców bez wzorcowego formatu, cały w `integrator/`. **Kod portalu bez zmian względem v1.5.0** – integrator celowo nie dotyka `portal/`, bo oceniany jest główny rezultat, a nie dodatki.
+
+### Co dochodzi względem v1.5.0
+
+- **Rdzeń integratora na wzorcu v2** (`integrator/rdzen/`): mapowanie kolumn (presety `wzorzec`, `osm`, `warszawa`, `gdansk`), normalizacja, walidacja z raportem; licencje jawnie i blokada ODbL dla celu „portal”.
+- **Adaptery** (`integrator/adaptery/`): OSM (Overpass, GeoJSON, XML), odpowiedź API Warszawy zapisana w pliku (bez tokenów i sieci), baza pojazdów ZTM Gdańska (statystyka i powód zamiast wierszy – dane flotowe).
+- **Kandydaci na duplikaty** (tylko flagowanie, bez scalania) i **porównanie wykazu z OSM** (raport lokalny z oznaczeniem ODbL).
+- **Util `dodaj`**: dopisywanie pojedynczych rekordów z walidacją, propozycją identyfikatora i kontrolą duplikatów (zapis po `--tak`).
+- **Lokalne UI** (`integrator/ui/`): serwer tylko na 127.0.0.1, strona offline (czcionka osadzona, zero CDN), WCAG 2.1 AA, nic nie zapisuje na dysku.
+- **Testy: 87, bez Dockera** (`python -m unittest discover -s integrator/testy -t .`).
+- **Wyniki demo**: `demo/integrator/` generuje jedno polecenie (`python integrator/generuj_demo.py`).
+- **Materiały zgłoszeniowe zaktualizowane**: instrukcja (krok 14), prototyp (krok 8), prezentacja (slajd 14; teraz 15 slajdów), `ZGLOSZENIE/prototyp/integrator/`.
+
+### Czego nie zawiera
+
+- **Zmian w `portal/`** względem v1.5.0. Jedyna rozważana zmiana (schemat źródła wg Table Schema) została świadomie odłożona; deduplikacja w portalu pozostała pomysłem na przyszłość (opisane w `integrator/README.md`).
+
 ## v1.5.0 (22.11.2026): wstępne materiały do zgłoszenia, z księgą znaku
 
 Wersja wstępna. Zawiera komplet materiałów, które zamierzamy przesłać, razem z księgą znaku akcji „Dane (prze)życie”. To jeszcze nie wersja ostateczna: lista autorów, licencja kodu portalu i kolizje nazwy akcji (UPRP, EUIPO, domeny) czekają na decyzję zespołu. Kod portalu jest taki sam jak w v1.0.0.
