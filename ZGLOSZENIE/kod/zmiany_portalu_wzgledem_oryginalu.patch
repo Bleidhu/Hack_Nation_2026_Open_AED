@@ -40,13 +40,13 @@ index 7120eb2..6d1d1f4 100644
  ## 2.63.0 - (2026-10-28)
 diff --git a/portal/backend/data/test_samples/aed/README.md b/portal/backend/data/test_samples/aed/README.md
 new file mode 100644
-index 0000000..c46e416
+index 0000000..2dc6748
 --- /dev/null
 +++ b/portal/backend/data/test_samples/aed/README.md
 @@ -0,0 +1,14 @@
 +# Próbki testowe Zestawienia AED
 +
-+Pobrane 21.11.2026 przez publiczne API dane.gov.pl (`https://api.dane.gov.pl/1.4/resources/<id>` → `download_url`), poza dwoma przykładami wzorca. Używają ich testy `mcod/resources/tests/test_aed_*.py` (plan: `.scratch/zestawienie-aed/` w katalogu głównym repozytorium).
++Pobrane 21.11.2026 przez publiczne API dane.gov.pl (`https://api.dane.gov.pl/1.4/resources/<id>` → `download_url`), poza dwoma przykładami wzorca. Używają ich testy `mcod/resources/tests/test_aed_*.py`.
 +
 +| Plik | Źródło | Licencja | Oczekiwane zachowanie w agregacji |
 +|---|---|---|---|
@@ -2794,7 +2794,7 @@ index 1c2468c..909fac3 100644
      ("/resources/{id:int}/incr_download_count", res_views.ResourceDownloadCounter()),
      (
 diff --git a/portal/backend/mcod/settings/base.py b/portal/backend/mcod/settings/base.py
-index a88e90b..e852bdf 100644
+index a88e90b..8df7417 100644
 --- a/portal/backend/mcod/settings/base.py
 +++ b/portal/backend/mcod/settings/base.py
 @@ -970,6 +970,7 @@ CELERY_TASK_ROUTES = {
@@ -2809,7 +2809,7 @@ index a88e90b..e852bdf 100644
      "chronione dane",
  ]
  
-+# Wykaz AED – dodatek na wzór zbiorczego wykazu DGA (docs/06, docs/07).
++# Wykaz AED – dodatek na wzór zbiorczego wykazu DGA.
 +# Przy AED_AGGREGATION_ENABLED = False zadanie nic nie robi, harmonogram nie ma wpisu, a endpoint zwraca 404.
 +AED_AGGREGATION_ENABLED = env.bool("AED_AGGREGATION_ENABLED", default=True)
 +MAIN_AED_DATASET_OWNER_ORGANIZATION_PK = int(
