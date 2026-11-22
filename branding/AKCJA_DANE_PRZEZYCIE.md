@@ -83,7 +83,7 @@ Opis kroków z prawdziwymi zrzutami z portalu: [`../INSTRUKCJA_DLA_JURY.md`](../
 
 ## 8. Uwagi prawne
 
-- Znak akcji **nie naśladuje** oznakowania urządzenia AED (ILCOR, ISO 7010): nie ma serca z błyskawicą ani krzyża.
+- Znak akcji nie naśladuje oznakowania urządzenia AED (ILCOR, ISO 7010): nie ma serca z błyskawicą ani krzyża.
 - Logotypy MC i dane.gov.pl wolno umieścić w materiałach dopiero za zgodą tych instytucji. W makietach jest tylko tekstowa nazwa portalu.
 - Kod QR na makiecie naklejki jest nieprawdziwy i służy tylko do pokazania układu.
 - Kolizje nazwy (UPRP, EUIPO, domeny) nie zostały sprawdzone; lista kontrolna jest w [`NAZWY_KAMPANII.md`](NAZWY_KAMPANII.md) §7.
