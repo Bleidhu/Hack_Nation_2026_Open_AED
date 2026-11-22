@@ -41,6 +41,8 @@ SYNONYMS = {
 PRESETS = {
     "wzorzec": {"opis": "Plik już we wzorcu v2 (nagłówki = nazwy kolumn)", "kolumny": {f: {"z": f} for f in FIELDS}},
     "osm": json.loads((Path(__file__).resolve().parent.parent / "adaptery" / "osm_mapowanie.json").read_text("utf-8")),
+    "warszawa": json.loads((Path(__file__).resolve().parent.parent / "adaptery" / "warszawa_mapowanie.json").read_text("utf-8")),
+    "gdansk": json.loads((Path(__file__).resolve().parent.parent / "adaptery" / "gdansk_mapowanie.json").read_text("utf-8")),
 }
 
 

@@ -5,7 +5,7 @@ Integrator danych AED do wzorca v2 (41 kolumn). Cienka powłoka CLI nad `rdzen/`
     python integrator/importer.py plik.csv --licencja "CC0 1.0" --mapowanie mapowanie.json --wyjscie wynik.csv --raport raport.json
     python integrator/importer.py plik.csv --podpowiedz       # propozycja mapowania kolumn
 
-Wejście: CSV/TSV (UTF-8, CP1250), XLSX, GeoJSON, Overpass JSON. Presety: wzorzec, osm.
+Wejście: CSV/TSV (UTF-8, CP1250), XLSX, GeoJSON, Overpass JSON. Presety: wzorzec, osm, warszawa (odpowiedź API um.warszawa.pl z pliku), gdansk (baza pojazdów ZTM – tylko statystyka).
 Licencja źródła jest jawna (--licencja); ODbL (preset osm) tylko z --cel lokalny.
 Wersja dla wzorca v1: wzorzec_v1/importer_v1.py (archiwum).
 """
@@ -18,7 +18,9 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
+from adaptery.gdansk import wczytaj as gdansk_wczytaj  # noqa: E402
 from adaptery.osm import tagi_bez_odpowiednika, wczytaj as osm_wczytaj  # noqa: E402
+from adaptery.warszawa import wczytaj as warszawa_wczytaj  # noqa: E402
 from rdzen.duplikaty import PROMIEN_DOMYSLNY, znajdz_kandydatow  # noqa: E402
 from rdzen.licencje import LicencjaBlad, sprawdz, wczytaj_konfiguracje  # noqa: E402
 from rdzen.mapowanie import PRESETS, apply_mapping, suggest_mapping  # noqa: E402
@@ -27,22 +29,26 @@ from rdzen.walidacja import validate  # noqa: E402
 from rdzen.wejscie import read_input  # noqa: E402
 from rdzen.zapis import to_csv, to_geojson  # noqa: E402,F401
 
+ADAPTERY = {"osm": osm_wczytaj, "warszawa": warszawa_wczytaj, "gdansk": gdansk_wczytaj}
+
 
 def run(data: bytes, filename: str, mapping: dict = None, *, preset: str = None, defaults: dict = None,
         licencja: str = None, cel: str = "portal", konfiguracja: dict = None) -> dict:
     """cel=portal: wymaga jawnej, dozwolonej licencji (inaczej LicencjaBlad); cel=lokalny: licencja spoza listy to ostrzeżenie."""
-    osm = preset == "osm" or (mapping or {}).get("typ_zrodla") == "osm"
-    if osm:
-        mapping = mapping or PRESETS["osm"]
-        rows, meta = osm_wczytaj(data, filename)
+    typ = preset or (mapping or {}).get("typ_zrodla") or ""
+    adapter = ADAPTERY.get(typ)
+    osm = typ == "osm" or (mapping or {}).get("typ_zrodla") == "osm"
+    if adapter:
+        mapping = mapping or PRESETS[typ]
+        rows, meta = adapter(data, filename)
         headers, fmt = sorted({k for r in rows for k in r}), meta["format"]
     else:
         headers, rows, fmt = read_input(data, filename)
         if mapping is None:
             mapping = PRESETS[preset] if preset else (PRESETS["osm"] if fmt == "osm" else suggest_mapping(headers))
-            osm = fmt == "osm"
-            if osm:
-                rows, meta = osm_wczytaj(data, filename)
+        osm = osm or fmt == "osm" or (mapping or {}).get("typ_zrodla") == "osm"
+        if osm:
+            rows, meta = osm_wczytaj(data, filename)
     pochodzenie = sprawdz(licencja or mapping.get("licencja_zrodla", ""), cel, konfiguracja or wczytaj_konfiguracje())
     recs = apply_mapping(rows, mapping, defaults=defaults)
     raport = validate(recs, luzna=cel == "lokalny" and mapping.get("walidacja") == "luzna")
@@ -50,6 +56,9 @@ def run(data: bytes, filename: str, mapping: dict = None, *, preset: str = None,
         raport["osm"] = {"format": meta["format"], "elementy": len(rows) + len(meta["pominiete"]), "przyjete": len(rows),
                          "timestamp_osm_base": meta["timestamp_osm_base"], "pominiete": meta["pominiete"],
                          "tagi_bez_odpowiednika": tagi_bez_odpowiednika(rows, mapping)}
+    if fmt == "gdansk-ztm-pojazdy":
+        raport["gdansk"] = {"pojazdy": meta["pojazdy"], "pojazdy_z_aed": meta["pojazdy_z_aed"],
+                            "rozbicie_typow": meta["rozbicie_typow"], "powod": meta["powod"]}
     raport["pochodzenie"] = {**pochodzenie, "cel": cel, "zrodlo_danych": sorted({r["zrodlo_danych"] for r in recs if r["zrodlo_danych"]})}
     return {"format": fmt, "kolumny_zrodla": headers, "mapowanie": mapping, "rekordy": recs, "raport": raport,
             "licencja_zrodla": pochodzenie["licencja"], "pochodzenie": raport["pochodzenie"]}
@@ -110,6 +119,11 @@ def main():
         o = r["osm"]
         print(f"  OSM: elementy {o['elementy']}, przyjęte {o['przyjete']}, pominięte {len(o['pominiete'])}, "
               f"tagi bez odpowiednika: {sum(o['tagi_bez_odpowiednika'].values())} ({len(o['tagi_bez_odpowiednika'])} rodzajów)")
+    if "gdansk" in r:
+        g = r["gdansk"]
+        rozbicie = ", ".join(f"{k}: {v}" for k, v in g["rozbicie_typow"].items())
+        print(f"  Gdańsk ZTM: pojazdy {g['pojazdy']}, z AED {g['pojazdy_z_aed']} ({rozbicie}); wierszy punktowych: 0")
+        print(f"  ! {g['powod']}")
     for e in r["bledy"][:15]:
         print(f"  ✗ wiersz {e['wiersz']}: {e['pole']} – {e['komunikat']} ({e['wartosc']!r})")
     if a.wyjscie:

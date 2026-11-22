@@ -1,0 +1,7 @@
+{
+  "wersja": "2.0",
+  "typ_zrodla": "gdansk",
+  "opis": "Baza pojazdów ZTM w Gdańsku (zasób 31843, zbiór 1803, licencja CC BY 4.0): dane flotowe, nie punkty. Adapter zwraca statystykę i powód zamiast wierszy, bo wzorzec v2 nie ma kolumny pojazdu (docs/06).",
+  "licencja_zrodla": "CC BY 4.0",
+  "kolumny": {}
+}

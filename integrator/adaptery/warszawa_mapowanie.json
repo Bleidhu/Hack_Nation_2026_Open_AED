@@ -1,0 +1,25 @@
+{
+  "wersja": "2.0",
+  "typ_zrodla": "warszawa",
+  "opis": "Odpowiedź API dane.um.warszawa.pl (get_scb_lokalizacja_defibrylatorow) wg opisu pól z references/dane_gov_pl_aed/warszawa_api/parametry_api.json. Licencja zbioru 39512: CC BY 4.0, dysponent Urząd m.st. Warszawy. Pola bez odpowiednika we wzorcu (np. zdjęcie Base64) są pomijane.",
+  "licencja_zrodla": "CC BY 4.0",
+  "kolumny": {
+    "id_zrodlowe": {"z": "defibrillator_id"},
+    "nazwa_lokalizacji": {"z": "location_object_name"},
+    "opis_lokalizacji": {"z": "location_description"},
+    "miejscowosc": {"z": "location_city"},
+    "kod_pocztowy": {"z": "location_postcode"},
+    "nazwa_ulicy": {"z": "location_street"},
+    "numer_budynku": {"z": "location_building"},
+    "szerokosc_geograficzna": {"z": "__lat"},
+    "dlugosc_geograficzna": {"z": "__lon"},
+    "wewnatrz_budynku": {"z": "device_location", "mapa": {"wewnątrz budynku": "true", "na zewnątrz budynku": "false", "*": ""}},
+    "typ_dostepu": {"z": "device_public_access", "mapa": {"publiczny": "publiczny", "ograniczony": "ograniczony", "prywatny": "prywatny", "*": ""}},
+    "dostepny_24_7": {"z": "device_availability", "mapa": {"całodobowa": "true", "*": "false"}},
+    "godziny_dostepnosci": {"z": "device_access_description"},
+    "producent": {"z": "device_manufacturer"},
+    "dysponent_nazwa": {"stala": "Urząd m.st. Warszawy"},
+    "zrodlo_danych": {"stala": "rejestr_publiczny"},
+    "zrodlo_url": {"stala": "https://dane.um.warszawa.pl/api/action/get_scb_lokalizacja_defibrylatorow"}
+  }
+}
