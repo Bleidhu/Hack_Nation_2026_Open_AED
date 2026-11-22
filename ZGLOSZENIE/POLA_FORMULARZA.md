@@ -160,9 +160,9 @@ Długość: 85 znaków (limit: brak w formularzu).
 
 Wariant B (wersja live, tylko jeśli tunel będzie włączony w czasie oceny):
 ```
-https://<ADRES-TUNELU-PROTOTYPU>.ngrok-free.app
+https://thumb-abrasive-bovine.ngrok-free.dev/live/
 ```
-**[DO ZROBIENIA]** Adres jest dziś placeholderem (`WERSJA_LIVE.md`: „nieaktywna”). Najpierw uruchomić tunele według `demo/NGROK.md`, potem wpisać adresy poleceniem `python demo/ustaw_link_live.py --prototyp https://… --dostawca https://… --sprawdz`, a dopiero wtedy skopiować adres prototypu z `WERSJA_LIVE.md`.
+Adres działa, gdy tunel jest włączony (`powershell -ExecutionPolicy Bypass -File demo/uruchom_live.ps1`); lista adresów w `WERSJA_LIVE.md`.
 
 ## 15. [Obowiązkowe] Link do repozytorium z kodem
 

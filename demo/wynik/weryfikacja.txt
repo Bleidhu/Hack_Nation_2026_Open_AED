@@ -25,7 +25,7 @@ Weryfikacja maszynowa Wykazu AED: 20/20 PASS
        wierszy przed: 15, po: 14; zachowany CT-01 (Gmina Przykładowa (dane fikcyjne)), pominięty BYD-HALA-A (Miejski Zakład Przykład (PRZYKŁAD)), powód: numer_seryjny FRX-2026-0001
        dowód: portal/backend/mcod/resources/aed_dedup.py, format_danych/przyklady/opis/aed_dostawcy.csv
 [PASS] Serwer dostawcy odpowiada 200 w < 1 s, a md5 z opisu = md5 pobranego CSV
-       /opis.xml 200 w 4 ms; /aed.csv 200 w 2 ms; /opis_bledny_md5.xml 200 w 2 ms; /opis_bledny_xsd.xml 200 w 2 ms; md5 z opisu = md5 CSV: True; błędne opisy odrzucone: True
+       /opis.xml 200 w 3 ms; /aed.csv 200 w 15 ms; /opis_bledny_md5.xml 200 w 4 ms; /opis_bledny_xsd.xml 200 w 3 ms; md5 z opisu = md5 CSV: True; błędne opisy odrzucone: True
        dowód: demo/serwer_zewnetrzny.py (make_server)
 [PASS] Dane dwóch dostawców i dwóch formatów (XML i CSV) scalone w jeden wykaz
        XML: 6, CSV: 8, w wykazie: 14, pominiętych wierszy: 0

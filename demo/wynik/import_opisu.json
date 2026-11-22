@@ -142,26 +142,26 @@
       {
         "sciezka": "/opis.xml",
         "kod": 200,
-        "czas_ms": 3.5,
-        "bajty": 851
+        "czas_ms": 2.7,
+        "bajty": 850
       },
       {
         "sciezka": "/aed.csv",
         "kod": 200,
-        "czas_ms": 2.1,
+        "czas_ms": 15.0,
         "bajty": 2919
       },
       {
         "sciezka": "/opis_bledny_md5.xml",
         "kod": 200,
-        "czas_ms": 2.1,
-        "bajty": 851
+        "czas_ms": 3.5,
+        "bajty": 850
       },
       {
         "sciezka": "/opis_bledny_xsd.xml",
         "kod": 200,
-        "czas_ms": 2.1,
-        "bajty": 776
+        "czas_ms": 2.6,
+        "bajty": 775
       }
     ],
     "link_csv_z_opisu": "https://127.0.0.1:<port>/aed.csv",
