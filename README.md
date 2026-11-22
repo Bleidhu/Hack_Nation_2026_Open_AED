@@ -7,7 +7,7 @@
 - Kampania promocyjna z logotypem, hasłem i księgą znaku jest niezakończona; w `branding/` są materiały robocze.
 - Integrator nie wchodzi w zakres tej wersji.
 
-Pliki do zgłoszenia są w [`ZGLOSZENIE/`](ZGLOSZENIE/README.md).
+Pliki do zgłoszenia są w [`ZGLOSZENIE/`](ZGLOSZENIE/README.md). Co zawiera każda wersja: [`WYDANIA.md`](WYDANIA.md).
 
 **Zacznij tutaj:**
 - [`INSTRUKCJA_DLA_JURY.md`](INSTRUKCJA_DLA_JURY.md): każde wymaganie zadania w ponumerowanych krokach;
