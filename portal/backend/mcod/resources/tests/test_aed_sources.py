@@ -91,7 +91,8 @@ def test_get_aed_source_resources_filters(aed_resource_factory):
     aed_resource_factory(
         dataset=DatasetFactory.create(status="published", customfields={"standard": "AED", "zestawienie": "AED-krajowe"})
     )
-    aed_resource_factory(data_tasks_last_status="FAILURE")
+    aed_resource_factory(file_tasks_last_status="FAILURE")
+    aed_resource_factory(link_tasks_last_status="FAILURE")
     aed_resource_factory(status="draft")
     aed_resource_factory(
         dataset=DatasetFactory.create(
@@ -101,6 +102,16 @@ def test_get_aed_source_resources_filters(aed_resource_factory):
     aed_resource_factory(format="json")
 
     assert get_aed_source_resources() == [selected]
+
+
+@pytest.mark.feat_main_aed
+def test_get_aed_source_resources_ignores_portal_data_validation(aed_resource_factory):
+    # Plik zgodny ze wzorcem może nie przejść walidacji typów zgadywanych przez portal
+    # (np. "5A" w numer_budynku, puste pole w kolumnie uznanej za liczbę); zgodność sprawdza agregacja.
+    failed_type_inference = aed_resource_factory("aed_punkty_przyklad.csv", data_tasks_last_status="FAILURE")
+    pending = aed_resource_factory(data_tasks_last_status="PENDING")
+
+    assert get_aed_source_resources() == [failed_type_inference, pending]
 
 
 @pytest.mark.feat_main_aed
@@ -161,6 +172,7 @@ def test_create_main_aed_df_with_mocks():
 def test_missing_tabular_data_is_skipped():
     resource = make_resource(1)
     resource.tabular_data = None
+    resource.main_file = ""
     _, stats = create_main_aed_df([resource], AGGREGATED_AT)
     assert stats["zasoby_pominiete"] == [{"resource_id": 1, "powod": "zasób nie ma danych tabelarycznych w portalu"}]
 
@@ -200,6 +212,21 @@ def test_ckan_csv_read_as_text():
     assert stats["zasoby_przyjete"] == 1
     assert len(df) == LEGIONOWO_ROWS
     assert df.loc[0, "kod_simc"] == "0920806"
+
+
+@pytest.mark.elasticsearch
+@pytest.mark.feat_main_aed
+def test_template_file_read_without_portal_tabular_data(aed_resource_factory):
+    # Walidacja danych portalu odrzuca "5A" w numer_budynku, więc portal nie ma danych tabelarycznych;
+    # wykaz czyta wtedy plik zasobu wprost, jako tekst.
+    resource = aed_resource_factory("aed_punkty_przyklad.csv", data_tasks_last_status="FAILURE")
+    assert resource.tabular_data is None
+
+    df = get_aed_source_df(resource)
+
+    assert len(df) == 8
+    assert "5A" in df["numer_budynku"].tolist()
+    assert df.loc[0, "kod_terc"] == "0461011"
 
 
 @pytest.mark.elasticsearch

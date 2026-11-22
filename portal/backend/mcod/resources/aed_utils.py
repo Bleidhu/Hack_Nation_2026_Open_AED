@@ -74,15 +74,18 @@ def is_main_aed_dataset(dataset: "Dataset") -> bool:
 
 def get_aed_source_resources() -> List["Resource"]:
     """
-    Zasoby źródłowe wykazu AED: opublikowane, po udanej walidacji portalu, ze zbiorów oznaczonych
+    Zasoby źródłowe wykazu AED: opublikowane, z poprawnym plikiem i linkiem, ze zbiorów oznaczonych
     `standard = AED` (poza zbiorem zbiorczym), z licencją CC0 lub CC BY 4.0 i w formacie tabelarycznym.
+
+    W odróżnieniu od DGA nie wymagamy `data_tasks_last_status = SUCCESS`: walidacja danych portalu sprawdza
+    typy zgadywane z pierwszych wierszy (np. "5A" w `numer_budynku` po wierszach z liczbami), więc odrzuca
+    pliki zgodne ze wzorcem. Zgodność ze wzorcem sprawdza agregacja (kolumny, wartości, powód pominięcia).
     """
     Resource = apps.get_model("resources", "Resource")
     candidates = (
         Resource.objects.filter(
             status="published",
             dataset__status="published",
-            data_tasks_last_status="SUCCESS",
             file_tasks_last_status="SUCCESS",
             link_tasks_last_status="SUCCESS",
             dataset__customfields__isnull=False,
@@ -141,13 +144,27 @@ def _get_ckan_aed_source_df(resource: "Resource") -> pd.DataFrame:
         raise AEDSourceReadError(f"nie można odczytać pliku {extension}: {exc}") from exc
 
 
+def _get_local_file_aed_source_df(resource: "Resource") -> pd.DataFrame:
+    extension = (resource.format or "").lower()
+    if not resource.main_file or extension not in TABULAR_EXTENSIONS:
+        raise AEDSourceReadError("zasób nie ma danych tabelarycznych w portalu")
+    try:
+        with open(resource.main_file.path, "rb") as source_file:
+            return read_tabular_bytes(source_file.read(), extension)
+    except Exception as exc:
+        raise AEDSourceReadError(f"nie można odczytać pliku {extension}: {exc}") from exc
+
+
 def get_aed_source_df(resource: "Resource") -> pd.DataFrame:
-    """Dane zasobu jako tekst; zasoby z CKAN pobierane spod `resource.link`, pozostałe z danych tabelarycznych portalu."""
+    """
+    Dane zasobu jako tekst; zasoby z CKAN pobierane spod `resource.link`, pozostałe z danych tabelarycznych
+    portalu, a gdy ich brak (np. walidacja danych portalu odrzuciła zgadnięte typy), wprost z pliku zasobu.
+    """
     if resource.is_imported_from_ckan:
         return _get_ckan_aed_source_df(resource)
     tabular_data = resource.tabular_data
     if tabular_data is None:
-        raise AEDSourceReadError("zasób nie ma danych tabelarycznych w portalu")
+        return _get_local_file_aed_source_df(resource)
     try:
         rows = tabular_data.table.read(keyed=True, cast=False)
     except Exception as exc:

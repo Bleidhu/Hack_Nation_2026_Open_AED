@@ -165,12 +165,15 @@ def test_command_eager(csv_with_two_rows):
         f"{COMMAND_MODULE}.create_main_aed_resource_with_dataset", return_value=(77, None)
     ) as create_resource, mock.patch(f"{COMMAND_MODULE}.Resource.objects.get", return_value=resource) as get, mock.patch(
         f"{COMMAND_MODULE}.clean_up_after_main_aed_resource_creation"
-    ) as clean_up:
+    ) as clean_up, mock.patch(
+        f"{COMMAND_MODULE}.replace_old_main_aed_resource"
+    ) as replace:
         output = run_command("--eager")
 
     create_resource.assert_called_once_with(file_path=csv_with_two_rows)
     get.assert_called_once_with(pk=77)
     clean_up.assert_called_once_with(exception_occurred=False)
+    replace.assert_called_once_with(resource)
     assert "Zbiór: 5\n" in output
     assert "Zasób: 77" in output
     assert "Wiersze: 2" in output
@@ -180,11 +183,14 @@ def test_command_eager(csv_with_two_rows):
 def test_command_eager_cleans_up_on_error(csv_with_two_rows):
     with mock.patch(f"{COMMAND_MODULE}.create_main_aed_file", return_value=csv_with_two_rows), mock.patch(
         f"{COMMAND_MODULE}.create_main_aed_resource_with_dataset", side_effect=RuntimeError("błąd")
-    ), mock.patch(f"{COMMAND_MODULE}.clean_up_after_main_aed_resource_creation") as clean_up:
+    ), mock.patch(f"{COMMAND_MODULE}.clean_up_after_main_aed_resource_creation") as clean_up, mock.patch(
+        f"{COMMAND_MODULE}.replace_old_main_aed_resource"
+    ) as replace:
         with pytest.raises(RuntimeError):
             run_command("--eager")
 
     clean_up.assert_called_once_with(exception_occurred=True)
+    replace.assert_not_called()
 
 
 @pytest.mark.feat_main_aed

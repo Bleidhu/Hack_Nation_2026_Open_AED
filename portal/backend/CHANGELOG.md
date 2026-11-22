@@ -32,6 +32,9 @@ ______________________________________________________________________
 
 ### Fixes
 
+- Naprawiono pomijanie w Wykazie AED zasobów zgodnych ze wzorcem, które nie przeszły walidacji typów zgadywanych przez portal (wybór źródeł nie wymaga już `data_tasks_last_status = SUCCESS`, a gdy portal nie ma danych tabelarycznych zasobu, wykaz odczytuje plik zasobu wprost) - AED-10
+- Naprawiono pozostawianie poprzedniego opublikowanego zasobu zbiorczego Wykazu AED przez komendę `create_main_aed_resource --eager` - AED-10
+
 ### Breaks
 
 ## 2.63.0 - (2026-10-28)

@@ -9,6 +9,7 @@ from mcod.resources.aed_utils import (
     create_main_aed_file,
     create_main_aed_resource_with_dataset,
     key_generator_for_create_main_aed_file,
+    replace_old_main_aed_resource,
 )
 from mcod.resources.models import Resource
 from mcod.resources.tasks import create_main_aed_resource_task
@@ -22,7 +23,8 @@ def count_csv_rows(file_path) -> int:
 class Command(BaseCommand):
     help = (
         "Buduje zasób zbiorczy Wykazu AED. Bez opcji zleca zadanie Celery; --eager tworzy plik i zasób od razu "
-        "(walidację dokończą workery portalu); --dry-run tylko zapisuje CSV, bez obiektów w bazie."
+        "i wycofuje poprzedni zasób zbiorczy (walidację dokończą workery portalu); --dry-run tylko zapisuje CSV, "
+        "bez obiektów w bazie."
     )
 
     def add_arguments(self, parser):
@@ -53,6 +55,7 @@ class Command(BaseCommand):
                 raise
             clean_up_after_main_aed_resource_creation(exception_occurred=False)
             resource = Resource.objects.get(pk=resource_pk)
+            replace_old_main_aed_resource(resource)
             self.stdout.write(f"Zbiór: {resource.dataset_id}{' (utworzony)' if created_dataset_pk else ''}")
             self.stdout.write(f"Zasób: {resource_pk}")
             self.stdout.write(f"Wiersze: {rows}")
