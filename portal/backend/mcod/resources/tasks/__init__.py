@@ -1,4 +1,4 @@
-from mcod.resources.tasks.aed import create_main_aed_resource_task
+from mcod.resources.tasks.aed import create_main_aed_resource_task, refresh_aed_opis_task
 from mcod.resources.tasks.dga import clean_dga_temp_directory, create_main_dga_resource_task
 from mcod.resources.tasks.entrypoint_res import entrypoint_process_resource_validation_task
 from mcod.resources.tasks.entrypoint_res_file import (
@@ -35,6 +35,7 @@ if is_enabled("S69_resource_link_validation_chunk"):
         "clean_dga_temp_directory",
         "create_main_dga_resource_task",
         "create_main_aed_resource_task",
+        "refresh_aed_opis_task",
         "entrypoint_process_resource_validation_task",
         "entrypoint_process_resource_file_validation_task",
         "process_resource_res_file_task",
@@ -63,6 +64,7 @@ else:
         "clean_dga_temp_directory",
         "create_main_dga_resource_task",
         "create_main_aed_resource_task",
+        "refresh_aed_opis_task",
         "entrypoint_process_resource_validation_task",
         "entrypoint_process_resource_file_validation_task",
         "process_resource_res_file_task",

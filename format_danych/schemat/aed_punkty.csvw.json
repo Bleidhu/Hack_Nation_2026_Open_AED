@@ -210,6 +210,13 @@
         "required": false
       },
       {
+        "name": "numer_seryjny",
+        "titles": "numer_seryjny",
+        "datatype": "string",
+        "dc:description": "Numer seryjny urządzenia (z tabliczki znamionowej). Służy do zwrotu AED właścicielowi i do deduplikacji w zasobie zbiorczym (producent + numer seryjny). To numer urządzenia, a nie osoby",
+        "required": false
+      },
+      {
         "name": "elektrody_pediatryczne",
         "titles": "elektrody_pediatryczne",
         "datatype": "boolean",

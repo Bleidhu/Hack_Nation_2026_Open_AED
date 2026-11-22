@@ -35,6 +35,7 @@ from mcod.resources.aed_constants import (
     AED_CUSTOMFIELD_STANDARD_VALUE,
     MAIN_AED_COLUMNS,
 )
+from mcod.resources.aed_dedup import deduplicate_rows
 from mcod.resources.aed_xml import AEDXmlInvalid, aed_xml_to_df
 from mcod.resources.dga_utils import request_remote_dga
 
@@ -214,7 +215,14 @@ def create_main_aed_df(resources: Iterable["Resource"], aggregated_at: str) -> T
     Buduje ramkę zasobu zbiorczego AED. Zasób, którego nie da się odczytać lub który nie ma kolumn minimum,
     jest pomijany z powodem w `stats` i nie przerywa agregacji.
     """
-    stats: Dict[str, Any] = {"zasoby_przyjete": 0, "zasoby_pominiete": [], "wiersze": 0, "wiersze_pominiete": 0}
+    stats: Dict[str, Any] = {
+        "zasoby_przyjete": 0,
+        "zasoby_pominiete": [],
+        "wiersze": 0,
+        "wiersze_pominiete": 0,
+        "wiersze_zdeduplikowane": 0,
+        "duplikaty": [],
+    }
     parts: List[pd.DataFrame] = []
     for resource in resources:
         try:
@@ -240,13 +248,24 @@ def create_main_aed_df(resources: Iterable["Resource"], aggregated_at: str) -> T
         parts.append(rows)
 
     main_df = pd.concat(parts, ignore_index=True) if parts else pd.DataFrame(columns=MAIN_AED_COLUMNS)
+    main_df, duplicates = deduplicate_rows(main_df)
+    for duplicate in duplicates:
+        logger.info(
+            "Duplikat w Wykazie AED: %s pominięty, bo to samo urządzenie co %s (%s).",
+            duplicate["pominiety"],
+            duplicate["zachowany"],
+            duplicate["powod"],
+        )
+    stats["duplikaty"] = duplicates
+    stats["wiersze_zdeduplikowane"] = len(duplicates)
     stats["wiersze"] = len(main_df)
     logger.info(
-        "Wykaz AED: przyjęte zasoby %s, pominięte %s, wiersze %s, pominięte wiersze %s.",
+        "Wykaz AED: przyjęte zasoby %s, pominięte %s, wiersze %s, pominięte wiersze %s, zdeduplikowane wiersze %s.",
         stats["zasoby_przyjete"],
         len(stats["zasoby_pominiete"]),
         stats["wiersze"],
         stats["wiersze_pominiete"],
+        stats["wiersze_zdeduplikowane"],
     )
     return main_df, stats
 
@@ -285,7 +304,7 @@ def get_or_create_main_aed_path() -> Path:
     key_generator_callable=key_generator_for_create_main_aed_file,
 )
 def create_main_aed_file() -> Path:
-    """Zapisuje CSV zasobu zbiorczego AED (51 kolumn, RFC 4180) i zwraca ścieżkę pliku."""
+    """Zapisuje CSV zasobu zbiorczego AED (52 kolumny, RFC 4180) i zwraca ścieżkę pliku."""
     aggregated_at = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
     main_df, stats = create_main_aed_df(get_aed_source_resources(), aggregated_at)
     file_path = get_or_create_main_aed_path()

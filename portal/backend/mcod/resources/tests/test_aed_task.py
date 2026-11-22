@@ -11,7 +11,8 @@ from django.test import override_settings
 import mcod.resources.tasks as resources_tasks
 from mcod.celeryapp import get_beat_schedule
 from mcod.resources.dga_utils import FailedValidationException, PendingValidationException
-from mcod.resources.tasks import create_main_aed_resource_task
+from mcod.resources.tasks import create_main_aed_resource_task, refresh_aed_opis_task
+from mcod.settings import base as base_settings
 
 COMMAND_MODULE = "mcod.resources.management.commands.create_main_aed_resource"
 
@@ -123,10 +124,50 @@ def test_beat_schedule_without_aed_entry_when_disabled():
     enabled = get_beat_schedule(enable_monthly_reports=False, enable_create_xml_metadata_report=True, enable_aed_aggregation=True)
     disabled = get_beat_schedule(enable_monthly_reports=False, enable_create_xml_metadata_report=True)
 
-    assert "aed_main_resource_creation" not in disabled
+    assert "aed_main_resource_creation" not in disabled and "aed_opis_refresh" not in disabled
     enabled.pop("aed_main_resource_creation")
+    enabled.pop("aed_opis_refresh")
     assert enabled == disabled
     assert disabled["dga_main_resource_creation"]["schedule"] == crontab(minute=30, hour=3)
+
+
+@pytest.mark.feat_main_aed
+def test_beat_schedule_refreshes_opis_before_building_wykaz():
+    schedule = get_beat_schedule(
+        enable_monthly_reports=False, enable_create_xml_metadata_report=True, enable_aed_aggregation=True
+    )
+
+    entry = schedule["aed_opis_refresh"]
+    assert entry["task"] == "mcod.resources.tasks.refresh_aed_opis_task"
+    assert entry["options"] == {"queue": "periodic"}
+    assert entry["schedule"] == crontab(minute=5, hour=4)
+
+
+@pytest.mark.feat_main_aed
+def test_refresh_aed_opis_task_exported_and_routed():
+    assert resources_tasks.refresh_aed_opis_task is refresh_aed_opis_task
+    assert "refresh_aed_opis_task" in resources_tasks.__all__
+    assert refresh_aed_opis_task.name == "mcod.resources.tasks.refresh_aed_opis_task"
+    # test.py nadpisuje CELERY_TASK_ROUTES pustym słownikiem, więc trasę sprawdzamy w ustawieniach bazowych.
+    assert base_settings.CELERY_TASK_ROUTES["mcod.resources.tasks.refresh_aed_opis_task"] == {"queue": "resources"}
+
+
+@pytest.mark.feat_main_aed
+def test_refresh_aed_opis_task_uses_import_logic():
+    results = [{"url": "https://dostawca.example.pl/opis.xml", "status": "bez_zmian", "zbior": 1, "zasob": 2}]
+    with mock.patch("mcod.resources.tasks.aed.refresh_imported_datasets", return_value=results) as refresh:
+        assert refresh_aed_opis_task() == results
+
+    refresh.assert_called_once_with()
+
+
+@pytest.mark.feat_main_aed
+@override_settings(AED_AGGREGATION_ENABLED=False)
+def test_refresh_aed_opis_task_disabled_does_nothing():
+    with mock.patch("mcod.resources.tasks.aed.refresh_imported_datasets") as refresh:
+        assert refresh_aed_opis_task() == []
+
+    refresh.assert_not_called()
 
 
 @pytest.mark.feat_main_aed

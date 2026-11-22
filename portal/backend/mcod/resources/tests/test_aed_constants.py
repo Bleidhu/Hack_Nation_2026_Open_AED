@@ -12,19 +12,19 @@ from mcod.resources.aed_constants import (
 
 @pytest.mark.feat_main_aed
 def test_template_columns_count_and_unique():
-    assert len(AED_TEMPLATE_COLUMNS) == 41
-    assert len(set(AED_TEMPLATE_COLUMNS)) == 41
+    assert len(AED_TEMPLATE_COLUMNS) == 42
+    assert len(set(AED_TEMPLATE_COLUMNS)) == 42
     assert AED_TEMPLATE_COLUMNS[0] == "id_zrodlowe"
     assert AED_TEMPLATE_COLUMNS[-1] == "data_aktualizacji"
 
 
 @pytest.mark.feat_main_aed
 def test_main_columns_count_order():
-    assert len(MAIN_AED_COLUMNS) == 51
-    assert len(set(MAIN_AED_COLUMNS)) == 51
+    assert len(MAIN_AED_COLUMNS) == 52
+    assert len(set(MAIN_AED_COLUMNS)) == 52
     assert MAIN_AED_COLUMNS[0] == "id_aed"
     assert MAIN_AED_COLUMNS[-1] == "data_agregacji"
-    assert MAIN_AED_COLUMNS[1:42] == AED_TEMPLATE_COLUMNS
+    assert MAIN_AED_COLUMNS[1:43] == AED_TEMPLATE_COLUMNS
 
 
 @pytest.mark.feat_main_aed

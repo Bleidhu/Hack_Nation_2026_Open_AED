@@ -179,8 +179,8 @@ def main():
         ("5_Zasady", ZASADY),
     ])
 
-    assert naglowek == przyklad[0] == czytaj_csv("aed_wzorzec_szablon.csv")[0] and len(naglowek) == 41
-    assert len(zest) - 1 == 51
+    assert naglowek == przyklad[0] == czytaj_csv("aed_wzorzec_szablon.csv")[0] and len(naglowek) == 42
+    assert len(zest) - 1 == 52
     print("Wygenerowano:", ", ".join(sorted(str(p.relative_to(D)) for p in D.rglob("*")
                                              if p.is_file() and not {"narzedzia", "zrodla_wzorca"} & set(p.parts))))
 

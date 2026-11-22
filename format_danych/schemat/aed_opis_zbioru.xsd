@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+  <!-- Opis zbioru AED wystawiany przez dostawcę (struktura opisu datasetu: metadane zbioru i link do CSV z sumą md5).
+       Dane (rekordy AED) są w pliku CSV zgodnym ze wzorcem (aed_punkty.tableschema.json), a nie w tym XML.
+       Portal pobiera opis, waliduje go tym schematem, pobiera CSV, porównuje md5 i dopiero wtedy zaciąga dane. -->
+  <xs:simpleType name="tekst">
+    <xs:restriction base="xs:string"><xs:minLength value="1"/><xs:maxLength value="2000"/></xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="adres_https">
+    <xs:restriction base="xs:string"><xs:pattern value="https://[^\s]+"/></xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="suma_md5">
+    <xs:restriction base="xs:string"><xs:pattern value="[0-9a-fA-F]{32}"/></xs:restriction>
+  </xs:simpleType>
+  <xs:element name="opis_zbioru">
+    <xs:complexType>
+      <xs:all>
+        <xs:element name="tytul" type="tekst"/>
+        <xs:element name="opis" type="tekst"/>
+        <xs:element name="dysponent_nazwa" type="tekst"/>
+        <xs:element name="dysponent_regon" minOccurs="0">
+          <xs:simpleType><xs:restriction base="xs:string"><xs:pattern value="(\d{9}|\d{14})"/></xs:restriction></xs:simpleType>
+        </xs:element>
+        <xs:element name="kontakt_email" type="tekst" minOccurs="0"/>
+        <xs:element name="licencja">
+          <xs:simpleType><xs:restriction base="xs:string">
+            <xs:enumeration value="CC0 1.0"/><xs:enumeration value="CC BY 4.0"/>
+          </xs:restriction></xs:simpleType>
+        </xs:element>
+        <xs:element name="czestotliwosc_aktualizacji">
+          <xs:simpleType><xs:restriction base="xs:string">
+            <xs:enumeration value="daily"/><xs:enumeration value="weekly"/><xs:enumeration value="monthly"/>
+            <xs:enumeration value="quarterly"/><xs:enumeration value="everyHalfYear"/><xs:enumeration value="yearly"/>
+            <xs:enumeration value="irregular"/>
+          </xs:restriction></xs:simpleType>
+        </xs:element>
+        <xs:element name="data_aktualizacji">
+          <xs:simpleType><xs:restriction base="xs:string"><xs:pattern value="\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}"/></xs:restriction></xs:simpleType>
+        </xs:element>
+        <xs:element name="zasob">
+          <xs:complexType>
+            <xs:all>
+              <xs:element name="tytul" type="tekst"/>
+              <xs:element name="link_csv" type="adres_https"/>
+              <xs:element name="format">
+                <xs:simpleType><xs:restriction base="xs:string"><xs:enumeration value="csv"/></xs:restriction></xs:simpleType>
+              </xs:element>
+              <xs:element name="md5" type="suma_md5"/>
+              <xs:element name="liczba_rekordow" type="xs:nonNegativeInteger" minOccurs="0"/>
+            </xs:all>
+          </xs:complexType>
+        </xs:element>
+      </xs:all>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

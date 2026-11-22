@@ -2,7 +2,7 @@
   "$comment": "Table Schema zasobu zbiorczego AED budowanego przez portal (decyzje projektu). Pola wzorca bez wymagalności dostawcy.",
   "name": "aed-zestawienie",
   "title": "Wykaz defibrylatorów AED – wykaz zbiorczy",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "fields": [
     {
       "name": "id_aed",
@@ -266,6 +266,12 @@
       "name": "model",
       "type": "string",
       "description": "Model urządzenia",
+      "x-grupa": "Urządzenie i stan"
+    },
+    {
+      "name": "numer_seryjny",
+      "type": "string",
+      "description": "Numer seryjny urządzenia (z tabliczki znamionowej). Służy do zwrotu AED właścicielowi i do deduplikacji w zasobie zbiorczym (producent + numer seryjny). To numer urządzenia, a nie osoby",
       "x-grupa": "Urządzenie i stan"
     },
     {

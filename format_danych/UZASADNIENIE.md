@@ -28,11 +28,11 @@ Z zasobów zbioru oznaczonego `AED` do wykazu trafiają tylko tabelaryczne z wym
 
 ## 2. Dlaczego wzorzec wygląda tak
 
-**Dwie warstwy.** Wzorzec dostawcy (41 kolumn) to plik, który publikuje dostawca. Zasób zbiorczy (51 kolumn) buduje co noc portal: kolumny wzorca, 3 wyliczane i 6 kolumn pochodzenia. Dostawca nie wypełnia kolumn wyliczanych ani pochodzenia.
+**Dwie warstwy.** Wzorzec dostawcy (42 kolumny, wersja 2.1.0) to plik, który publikuje dostawca. Zasób zbiorczy (52 kolumny) buduje co noc portal: kolumny wzorca, 3 wyliczane i 6 kolumn pochodzenia. Dostawca nie wypełnia kolumn wyliczanych ani pochodzenia.
 
 **Zakres.** Stałe punkty AED i ich stan. AED w pojazdach i flotach (np. ZTM Gdańsk) nie są punktami: baza ZTM ma 503 pojazdy, z czego 278 z AED, ale bez lokalizacji punktowej. To ograniczenie opisane w prezentacji.
 
-**Jednostka rekordu.** Jeden wiersz to jedno fizyczne urządzenie. Wiele AED w jednym miejscu to osobne wiersze z własnym `id_zrodlowe`, rozróżnione `opis_lokalizacji` lub `kondygnacja`; te same współrzędne są dopuszczalne i agregacja ich nie scala. Gdy źródło nie rozróżnia urządzeń, liczymy jedno (możliwe niedoszacowanie).
+**Jednostka rekordu.** Jeden wiersz to jedno fizyczne urządzenie. Wiele AED w jednym miejscu to osobne wiersze z własnym `id_zrodlowe`, rozróżnione `opis_lokalizacji` lub `kondygnacja`; te same współrzędne są dopuszczalne i agregacja ich nie scala. Deduplikacja w portalu łączy wiersze jednego pliku tylko przy tym samym numerze seryjnym; zgodność producenta lub modelu i odległość do 30 m bierze pod uwagę wyłącznie między różnymi zasobami. Gdy źródło nie rozróżnia urządzeń, liczymy jedno (możliwe niedoszacowanie).
 
 **Identyfikatory.** Dostawca podaje `id_zrodlowe`. `id_aed` nadaje portal deterministycznie: `PL-AED-` plus 12 znaków szesnastkowych SHA-1 z (id instytucji wydawcy + `id_zrodlowe`), a gdy `id_zrodlowe` jest puste, z (instytucja + znormalizowana nazwa + współrzędne zaokrąglone do 5 miejsc). Powód: 7 cyfr przy ok. 20 tys. urządzeń daje praktycznie pewną kolizję (paradoks urodzin, n²/2N ≈ 20) [W]. Zmiana `id_zrodlowe` (lub, przy jego braku, nazwy albo współrzędnych) daje nowy `id_aed`.
 

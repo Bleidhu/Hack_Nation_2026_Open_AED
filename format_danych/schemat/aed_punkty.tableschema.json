@@ -2,7 +2,7 @@
   "$comment": "Frictionless Table Schema wzorca dostawcy AED v2 (decyzje projektu). Pola x-* to rozszerzenia projektu.",
   "name": "aed-wzorzec-dostawcy",
   "title": "Wzorcowy zakres danych o defibrylatorach AED – plik dostawcy",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "fields": [
     {
       "name": "id_zrodlowe",
@@ -319,6 +319,14 @@
       "name": "model",
       "type": "string",
       "description": "Model urządzenia",
+      "x-wymagalnosc": "O",
+      "x-grupa": "Urządzenie i stan",
+      "x-minimum-agregacji": false
+    },
+    {
+      "name": "numer_seryjny",
+      "type": "string",
+      "description": "Numer seryjny urządzenia (z tabliczki znamionowej). Służy do zwrotu AED właścicielowi i do deduplikacji w zasobie zbiorczym (producent + numer seryjny). To numer urządzenia, a nie osoby",
       "x-wymagalnosc": "O",
       "x-grupa": "Urządzenie i stan",
       "x-minimum-agregacji": false

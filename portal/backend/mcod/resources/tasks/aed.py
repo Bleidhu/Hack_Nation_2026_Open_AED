@@ -5,6 +5,7 @@ from django.apps import apps
 from django.conf import settings
 
 from mcod.core.tasks import extended_shared_task
+from mcod.resources.aed_import import refresh_imported_datasets
 from mcod.resources.aed_utils import (
     clean_up_after_main_aed_resource_creation,
     create_main_aed_file,
@@ -78,3 +79,20 @@ def create_main_aed_resource_task(self) -> None:
         logger.error(f"Cleaning after main AED resource creation task due to unexpected error: {exc}")
         clean_up_after_main_aed_resource_creation(exception_occurred=True)
         raise
+
+
+@extended_shared_task(atomic=False, name="mcod.resources.tasks.refresh_aed_opis_task")
+def refresh_aed_opis_task() -> list:
+    """
+    Nocne odświeżenie zbiorów AED zaczytanych z opisu XML (harmonogram 4:05, przed budową wykazu o 4:15).
+
+    Dla każdego zbioru z `customfields.opis_xml`: pobranie opisu, XSD, pobranie CSV i porównanie md5. Ta sama suma nic
+    nie zmienia, nowa zastępuje zasób (potok portalu waliduje nowy plik), a odrzucony import zostawia zbiór bez zmian.
+    Ta sama logika co `import_aed_xml --odswiez`. Przy `AED_AGGREGATION_ENABLED = False` zadanie nic nie robi.
+    """
+    if not settings.AED_AGGREGATION_ENABLED:
+        logger.info("Wykaz AED wyłączony (AED_AGGREGATION_ENABLED=False), opisy XML nie są odświeżane.")
+        return []
+    results = refresh_imported_datasets()
+    logger.info("Odświeżenie opisów AED: %s", ", ".join(f"{r['zbior']}={r['status']}" for r in results) or "brak zbiorów")
+    return results

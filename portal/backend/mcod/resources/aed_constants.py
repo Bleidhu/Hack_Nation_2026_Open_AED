@@ -3,7 +3,7 @@ from typing import Dict, List, Tuple
 # Stałe dodatku „Zestawienie AED”. Plik importuje wyłącznie `typing`, bo korzysta z niego
 # również czysta logika agregacji (`aed_aggregation.py`) uruchamiana poza Django.
 #
-# Kolejność kolumn jest kontraktem: wzorzec dostawcy v2 (41 kolumn) i zasób zbiorczy (51 kolumn)
+# Kolejność kolumn jest kontraktem: wzorzec dostawcy v2 (42 kolumny) i zasób zbiorczy (52 kolumny)
 # muszą odpowiadać schematom `format_danych/schemat/aed_punkty.tableschema.json`
 # i `format_danych/schemat/aed_zestawienie.tableschema.json`.
 
@@ -36,6 +36,7 @@ AED_TEMPLATE_COLUMNS: List[str] = [
     "status_urzadzenia",
     "producent",
     "model",
+    "numer_seryjny",
     "elektrody_pediatryczne",
     "data_waznosci_elektrod",
     "data_waznosci_baterii",
@@ -95,6 +96,10 @@ AED_HEADER_ALIASES: Dict[str, str] = {
     "e_mail": "email_kontaktowy",
     "id": "id_zrodlowe",
     "numer_id": "id_zrodlowe",
+    "nr_seryjny": "numer_seryjny",
+    "serial": "numer_seryjny",
+    "serial_number": "numer_seryjny",
+    "sn": "numer_seryjny",
 }
 
 # Wartości zwracane przez `Dataset.license_name`. ODbL i licencje „share-alike” nie wchodzą do zestawienia.

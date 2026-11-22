@@ -37,13 +37,15 @@ def _parse(content: bytes) -> etree._ElementTree:
     return etree.fromstring(content, parser).getroottree()
 
 
-def _required_fields(xsd_path: Optional[str] = None) -> List[str]:
+def _required_fields(node_tag: str, xsd_path: Optional[str] = None) -> List[str]:
+    """Nazwy elementów wymaganych (minOccurs=1 albo bez minOccurs) w typie złożonym elementu `node_tag`."""
     ns = {"xs": "http://www.w3.org/2001/XMLSchema"}
     tree = etree.parse(str(xsd_path or XSD_PATH))
-    return tree.xpath("//xs:all/xs:element[@minOccurs='1']/@name", namespaces=ns)
+    query = "//xs:element[@name=$n]/xs:complexType/xs:all/xs:element[not(@minOccurs) or @minOccurs!='0']/@name"
+    return tree.xpath(query, namespaces=ns, n=node_tag)
 
 
-def _describe(error, tree) -> Dict[str, Any]:
+def _describe(error, tree, xsd_path: Optional[str] = None) -> Dict[str, Any]:
     path = error.path or ""
     message = error.message
     field = path.rsplit("/", 1)[-1]
@@ -51,7 +53,7 @@ def _describe(error, tree) -> Dict[str, Any]:
         # xs:all wymienia w komunikacie pola opcjonalne, więc wskazujemy brakujące pole wymagane.
         record = tree.xpath(path)
         present = {child.tag for child in record[0]} if record else set()
-        missing = [name for name in _required_fields() if name not in present]
+        missing = [name for name in _required_fields(record[0].tag, xsd_path) if name not in present] if record else []
         if missing:
             message = f"brak wymaganego pola: {', '.join(missing)}"
             field = missing[0]
@@ -83,7 +85,7 @@ def validate_aed_xml(content: bytes, xsd_path: Optional[str] = None) -> Dict[str
         valid = schema.validate(tree)
     except etree.XMLSchemaValidateError as exc:
         return {"valid": False, "records": 0, "errors": [{"line": 0, "field": "", "message": f"błąd walidacji: {exc}"}]}
-    errors = [_describe(e, tree) for e in schema.error_log]
+    errors = [_describe(e, tree, xsd_path) for e in schema.error_log]
     return {"valid": bool(valid), "records": len(tree.getroot().findall("aed")), "errors": errors}
 
 

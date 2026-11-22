@@ -165,6 +165,8 @@ def test_create_main_aed_df_with_mocks():
         ],
         "wiersze": 1,
         "wiersze_pominiete": 1,
+        "wiersze_zdeduplikowane": 0,
+        "duplikaty": [],
     }
 
 

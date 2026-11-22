@@ -1,4 +1,4 @@
-# Wzorcowy zakres danych AED, wersja 2
+# Wzorcowy zakres danych AED, wersja 2 (2.1.0)
 
 Specyfikacją jest `schemat/aed_punkty.tableschema.json` (reguły dodatkowe w `x-reguly-dodatkowe`), a zasady portalu, ochrony danych i licencji zbiera arkusz `5_Zasady` w `wzorcowy_zakres_danych.xlsx`. Uzasadnienie decyzji (z powodami i źródłami) jest w [`UZASADNIENIE.md`](UZASADNIENIE.md). Wszystkie pliki poniżej generuje jedno źródło prawdy, a przykłady są **fikcyjne**.
 
@@ -6,8 +6,8 @@ Specyfikacją jest `schemat/aed_punkty.tableschema.json` (reguły dodatkowe w `x
 
 | Warstwa | Kto wypełnia | Kolumny | Schemat |
 |---|---|---|---|
-| **Wzorzec dostawcy** (plik publikowany przez gminę, instytucję lub firmę) | dostawca | 41 | `schemat/aed_punkty.tableschema.json` |
-| **Zasób zbiorczy** (budowany co noc przez portal) | portal | 51 = `id_aed` + 41 kolumn wzorca + 3 wyliczane + 6 pochodzenia | `schemat/aed_zestawienie.tableschema.json` |
+| **Wzorzec dostawcy** (plik publikowany przez gminę, instytucję lub firmę) | dostawca | 42 | `schemat/aed_punkty.tableschema.json` |
+| **Zasób zbiorczy** (budowany co noc przez portal) | portal | 52 = `id_aed` + 42 kolumny wzorca + 3 wyliczane + 6 pochodzenia | `schemat/aed_zestawienie.tableschema.json` |
 
 Jeden wiersz to jedno urządzenie. Kilka AED w jednym miejscu to kilka wierszy z różnym `id_zrodlowe`; te same współrzędne są dopuszczalne.
 
@@ -18,6 +18,7 @@ Pełny opis kolumn (typ, wymagalność, minimum agregacji, przykład, słownik) 
 - **Wymagane we wzorcu (W, 9):** `id_zrodlowe`, `nazwa_lokalizacji`, `miejscowosc`, `szerokosc_geograficzna`, `dlugosc_geograficzna`, `opis_lokalizacji`, `typ_dostepu`, `dostepny_24_7`, `data_aktualizacji`.
 - **Minimum agregacji (4):** `nazwa_lokalizacji`, `miejscowosc`, `szerokosc_geograficzna`, `dlugosc_geograficzna`. Bez tych kolumn portal pomija zasób, a wiersz z pustą wartością pomija z podaniem powodu.
 - **Grupy kolumn:** identyfikacja, lokalizacja (adres wg TERYT, WGS84), dostęp, urządzenie i stan, dysponent i kontakt (tylko instytucjonalny), źródło i aktualność.
+- **Dodane w 2.1.0:** `numer_seryjny` (opcjonalna, po `model`): numer z tabliczki znamionowej urządzenia, a nie dane osoby. Portal używa go jako klucza deduplikacji: ten sam numer seryjny to to samo urządzenie, chyba że wiersze podają różnych producentów. Aliasy nagłówka: `nr_seryjny`, `serial`, `serial_number`, `sn`.
 - **Usunięte względem v1:** `id_aed` (nadaje portal), `uwagi`, `zdjecie_url`, `organizacja_id`, `id_obszaru`, `id_pojazdu`.
 
 ## Kolumny dopisywane przez portal (zasób zbiorczy)
@@ -29,6 +30,8 @@ Pełny opis kolumn (typ, wymagalność, minimum agregacji, przykład, słownik) 
 | `dysponent_z_wydawcy` | `true`, gdy dysponenta zastąpiono nazwą wydawcy |
 | `przetworzenie` | kody `naglowki`, `osie`, `domyslne`, `dysponent_z_wydawcy`, `kontakt_usuniety` (art. 15 ust. 1 pkt 2 ustawy) |
 | `wydawca_zasobu`, `licencja_zasobu`, `id_zasobu_zrodlowego`, `url_zasobu_zrodlowego`, `data_danych_zasobu`, `data_agregacji` | pochodzenie i atrybucja (art. 15 ust. 1 pkt 1) |
+
+Przy budowie wykazu portal usuwa też duplikaty tego samego urządzenia (numer seryjny; między różnymi zasobami także producent lub model i odległość do 30 m albo nazwa i odległość do 10 m). Reguły: `portal/backend/mcod/resources/aed_dedup.py` i [`../ZMIANY_W_PORTALU.md`](../ZMIANY_W_PORTALU.md).
 
 Reguły agregacji mają implementację referencyjną (z samokontrolą) w `zrodla_wzorca/generuj_dane.py`, funkcje `zestaw`, `id_aed`, `wymaga_przegladu` i `powod_pominiecia`. Portal ma dawać ten sam wynik.
 
@@ -55,7 +58,11 @@ Reguły agregacji mają implementację referencyjną (z samokontrolą) w `zrodla
 | `schemat/aed_punkty.csvw.json`, `schemat/kontekst.jsonld` | opis CSVW (★★★★) i kontekst JSON-LD (schema.org) |
 | `schemat/slowniki.json` | słowniki wartości (w tym `przetworzenie`, `licencja_zasobu`) |
 | `schemat/metadane_zbioru_dcat.json` | metadane zbioru zbiorczego (DCAT-AP), w tym `customfields` `standard = AED` |
+| `schemat/aed_opis_zbioru.xsd` | schemat XSD opisu zbioru dostawcy spoza dane.gov.pl: metadane zbioru (tytuł, opis, dysponent, licencja CC0 1.0 lub CC BY 4.0, częstotliwość i data aktualizacji) oraz element `zasob` z linkiem https do CSV, formatem `csv` i sumą md5. Rekordy AED są w CSV, nie w opisie. Kopia w portalu: `portal/backend/mcod/resources/aed_opis_zbioru.xsd` |
+| `schemat/aed_punkty.xsd` | schemat XSD wariantu dodatkowego: rekordy AED wprost w XML (`<wykaz><aed>…</aed></wykaz>`), generowany z Table Schema wzorca |
 | `przyklady/` | przykład pliku dostawcy (CSV, GeoJSON) i wynikowego zasobu zbiorczego (CSV, JSON:API) |
+| `przyklady/opis/` | przykład dostawcy z opisem zbioru (dane fikcyjne): `opis_poprawny.xml` (zgodny z XSD, md5 zgodne z CSV), `opis_bledny_md5.xml` (zgodny z XSD, md5 niezgodne, import odrzucony), `opis_bledny_xsd.xml` (brak tytułu, link http, licencja spoza listy) i `aed_dostawcy.csv` (42 kolumny, 7 rekordów; jeden to urządzenie zgłaszane też przez innego dostawcę, co pokazuje deduplikację). Generator: `narzedzia/generuj_opis.py` |
+| `przyklady/xml/` | rekordy AED w XML (wariant dodatkowy): `aed_poprawny.xml` i `aed_bledny.xml` |
 | `zrodla_wzorca/` | źródło prawdy (`generuj_dane.py`), słowniki kolumn i mapowanie nagłówków realnych źródeł (`mapowanie_zrodel.csv`) |
 
 ## Regeneracja i walidacja
@@ -63,10 +70,13 @@ Reguły agregacji mają implementację referencyjną (z samokontrolą) w `zrodla
 ```bash
 python format_danych/zrodla_wzorca/generuj_dane.py   # źródło prawdy + samokontrola reguł agregacji
 python format_danych/narzedzia/generuj.py            # schemat/, szablony/, przyklady/, XLSX
+python format_danych/narzedzia/generuj_xsd.py        # schemat/aed_punkty.xsd z Table Schema wzorca
+python format_danych/narzedzia/generuj_xml.py        # przyklady/xml/
+python format_danych/narzedzia/generuj_opis.py       # przyklady/opis/ (opisy zbioru XML i CSV z sumą md5)
 # walidacja przykładów (opcjonalnie):
 cd format_danych && uv run --with "frictionless==5.18.0" python -c "from frictionless import Resource, Schema; print(Resource(path='przyklady/aed_punkty_przyklad.csv', schema=Schema('schemat/aed_punkty.tableschema.json')).validate().valid)"
 ```
 
 Generatory używają tylko biblioteki standardowej. Wynik jest deterministyczny; pliki XLSX różnią się między uruchomieniami jedynie znacznikami czasu w archiwum.
 
-Materiał integratora (krok 2, dodatek) jest w `../integrator/`: próbki dostawców z mapowaniami, lokalne UI i testy – wszystko już na wzorcu v2 (41 kolumn, czyli `schemat/aed_punkty.tableschema.json`). Tabele obszarowe, organizacji i aktualizacji oraz opis wzorca v1 są w `../archive/integrator/`.
+Materiał integratora (krok 2, dodatek) jest w `../integrator/`: próbki dostawców z mapowaniami, lokalne UI i testy – wszystko już na wzorcu v2 (42 kolumny, czyli `schemat/aed_punkty.tableschema.json`). Tabele obszarowe, organizacji i aktualizacji oraz opis wzorca v1 są w `../archive/integrator/`.

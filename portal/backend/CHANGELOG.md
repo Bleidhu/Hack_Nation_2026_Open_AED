@@ -23,6 +23,15 @@ ______________________________________________________________________
 - Dodano źródło XML w Wykazie AED: zasób z linkiem do zewnętrznego serwera dostawcy (format `xml`, typ `api`) jest pobierany przy budowie wykazu, walidowany XSD i scalany z pozostałymi źródłami; plik niezgodny z XSD jest pomijany z powodem w statystykach - AED-12
 - Dodano komendę `import_aed_xml` zaczytującą zewnętrzne dane AED w XML (walidacja XSD, utworzenie zbioru `standard = AED` i zasobu z linkiem, opcja `--dry-run`) - AED-13
 - Dodano testy `test_aed_xml`, `test_aed_xml_source` i `test_aed_import_xml_command` - AED-11, AED-12, AED-13
+- Dodano opcjonalną kolumnę `numer_seryjny` (po `model`) do wzorca dostawcy (42 kolumny) i zasobu zbiorczego Wykazu AED (52 kolumny), z aliasami nagłówków `nr_seryjny`, `serial`, `serial_number`, `sn` (wzorzec 2.1.0) - AED-14
+- Dodano moduł `aed_dedup` (bez Django i ORM) usuwający duplikaty urządzeń przy budowie Wykazu AED: klucz mocny to numer seryjny (o ile producenci się nie wykluczają), klucz słaby tylko między różnymi zasobami to producent lub model i odległość do 30 m albo, gdy brakuje producenta, ta sama nazwa lokalizacji i odległość do 10 m; różne numery seryjne, producenci, modele lub kondygnacje wykluczają połączenie - AED-14
+- Dodano statystyki `wiersze_zdeduplikowane` i `duplikaty` (pary zachowany, pominięty, powód) oraz wpis w logu dla każdego duplikatu w `create_main_aed_df` - AED-14
+- Dodano testy `test_aed_dedup` - AED-14
+- Dodano schemat `aed_opis_zbioru.xsd` (opis zbioru: metadane, link https do CSV, suma md5) i moduł `aed_opis` (walidacja opisu XSD, odczyt, kontrola md5, kontrola kolumn i duplikatów w CSV, bez Django) - AED-15
+- Dodano moduł `aed_import`: import zbioru z opisu XML (kod 200, tylko https, walidacja XSD, pobranie CSV, zgodność md5, kontrola kolumn) do zbioru z polami niestandardowymi `standard`, `opis_xml` i `md5` oraz zasobu CSV z linkiem; ta sama suma md5 nic nie zmienia, nowa suma zastępuje zasób; przy błędzie nic nie jest zapisywane - AED-15
+- Dodano testy `test_aed_opis` - AED-15
+- Dodano funkcję `aed_import.refresh_imported_datasets` (ponowny import wszystkich zbiorów z polem niestandardowym `opis_xml`; odrzucony import zostawia zbiór bez zmian), wspólną dla `import_aed_xml --odswiez` i zadania nocnego - AED-16
+- Dodano zadanie Celery `refresh_aed_opis_task` odświeżające co noc zbiory AED zaczytane z opisu XML (opis, XSD, CSV, md5; nowa suma md5 zastępuje zasób), wyłączane przez `AED_AGGREGATION_ENABLED` - AED-16
 
 ### Changes
 
@@ -33,6 +42,11 @@ ______________________________________________________________________
 - Zarejestrowano schemat `AggregatedAEDInfo` i ścieżkę `/aed-aggregated` w specyfikacji OpenAPI - AED-08
 - Dodano serializer `AggregatedAEDInfoApiResponse`, widok `AggregatedAEDInfoView` i trasę `/aed-aggregated` - AED-08
 - Dodano podpowiedź (help_text) przy polu „Pola niestandardowe” formularza zbioru opisującą oznaczenie zbioru do Wykazu AED (`standard` = `AED`) - AED-09
+- Zmieniono komendę `import_aed_xml`: przyjmuje adres opisu zbioru w XML zamiast pliku z rekordami, tworzy lub aktualizuje zbiór i zasób CSV przez `aed_import`; nowe opcje `--odswiez` (ponowny import wszystkich zbiorów z polem `opis_xml`) i raport duplikatów w `--dry-run`; zasób z linkiem do XML z rekordami nadal można dodać w panelu - AED-15
+- Uogólniono `aed_xml._required_fields` (pola wymagane dla podanego elementu), żeby komunikaty walidacji działały także dla schematu opisu zbioru - AED-15
+- Zaktualizowano testy `test_aed_import_xml_command`, `test_aed_constants`, `test_aed_sources` i `test_main_aed_resource` (opis zbioru, md5, 42 i 52 kolumny) - AED-14, AED-15
+- Dodano do harmonogramu Celery Beat wpis `aed_opis_refresh` (codziennie 4:05, przed budową Wykazu AED o 4:15, tylko gdy `AED_AGGREGATION_ENABLED`), trasę kolejki `resources` dla `refresh_aed_opis_task` i eksport zadania w `mcod.resources.tasks` - AED-16
+- Zaktualizowano testy `test_aed_task` (harmonogram, eksport, routing, wyłącznik zadania odświeżania) i `test_aed_import_xml_command` (`refresh_imported_datasets`, `--odswiez` bez zbiorów) - AED-16
 
 ### Fixes
 

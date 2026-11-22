@@ -171,6 +171,11 @@ def get_beat_schedule(
     if enable_aed_aggregation:
         beat_schedule.update(
             {
+                "aed_opis_refresh": {
+                    "task": "mcod.resources.tasks.refresh_aed_opis_task",
+                    "options": default_options,
+                    "schedule": crontab(minute=5, hour=4),
+                },
                 "aed_main_resource_creation": {
                     "task": "mcod.resources.tasks.create_main_aed_resource_task",
                     "options": default_options,

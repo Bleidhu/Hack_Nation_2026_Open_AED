@@ -27,16 +27,17 @@ lp,kolumna,typ,wymagalnosc,minimum_agregacji,grupa,opis,przyklad,slownik,regula_
 26,status_urzadzenia,enum,Z,,Urządzenie i stan,Stan urządzenia – słownik status_urzadzenia. Puste w pliku dostawcy = 'nieznany' w zasobie zbiorczym (nigdy domyślnie 'sprawny'),sprawny,status_urzadzenia,,tekst
 27,producent,string,O,,Urządzenie i stan,Producent urządzenia,,,,tekst
 28,model,string,O,,Urządzenie i stan,Model urządzenia,,,,tekst
-29,elektrody_pediatryczne,boolean,Z,,Urządzenie i stan,Czy dostępne elektrody lub tryb pediatryczny,true,,Pole wartości logicznych,wartość logiczna
-30,data_waznosci_elektrod,date,Z,,Urządzenie i stan,Data ważności elektrod (yyyy-mm-dd),2027-05-31,,,data
-31,data_waznosci_baterii,date,Z,,Urządzenie i stan,Data ważności baterii (yyyy-mm-dd),2029-01-31,,,data
-32,data_ostatniego_przegladu,date,Z,,Urządzenie i stan,Data ostatniego przeglądu lub autotestu potwierdzonego przez opiekuna (yyyy-mm-dd),2026-10-02,,,data
-33,poziom_weryfikacji,enum,Z,,Urządzenie i stan,Jak potwierdzono dane – słownik poziom_weryfikacji. Puste = 'niezweryfikowany' w zasobie zbiorczym,zweryfikowany_przez_dysponenta,poziom_weryfikacji,,tekst
-34,data_weryfikacji,date,Z,,Urządzenie i stan,"Kiedy ostatnio potwierdzono obecność i sprawność AED (yyyy-mm-dd). Puste, jeśli nikt nie weryfikował – data importu nie jest datą weryfikacji",2026-11-15,,,data
-35,dysponent_nazwa,string,Z,,Dysponent i kontakt,Właściciel lub opiekun AED. Osoba fizyczna (np. jednoosobowa działalność): wpisz rodzaj podmiotu (np. 'gabinet lekarski') albo zostaw puste. Puste = nazwa wydawcy zasobu w zasobie zbiorczym,Gmina Przykładowa,,,tekst
-36,dysponent_regon,string,Z,,Dysponent i kontakt,"REGON dysponenta: 9 lub 14 cyfr, TEKST; tylko dla osób prawnych i instytucji",,,REGON,tekst
-37,telefon_kontaktowy,string,Z,,Dysponent i kontakt,"Telefon WYŁĄCZNIE instytucjonalny lub funkcyjny (centrala, recepcja), nigdy imienny: 9 cyfr lub + i prefiks",,,Numer telefonu,tekst
-38,email_kontaktowy,string,O,,Dysponent i kontakt,"E-mail WYŁĄCZNIE instytucjonalny lub funkcyjny (np. aed@, sekretariat@), nigdy imienny",,,,tekst
-39,zrodlo_danych,enum,Z,,Źródło i aktualność,Pochodzenie rekordu – słownik zrodlo_danych. Wiersze 'openstreetmap' nie trafiają do zasobu zbiorczego (ODbL),dysponent,zrodlo_danych,,tekst
-40,zrodlo_url,string,Z,,Źródło i aktualność,Link do źródła rekordu u dostawcy (https),,,,tekst
-41,data_aktualizacji,datetime,W,,Źródło i aktualność,Ostatnia zmiana rekordu (yyyy-mm-ddThh:mm:ss),2026-11-21T10:15:00,,,data i czas
+29,numer_seryjny,string,O,,Urządzenie i stan,"Numer seryjny urządzenia (z tabliczki znamionowej). Służy do zwrotu AED właścicielowi i do deduplikacji w zasobie zbiorczym (producent + numer seryjny). To numer urządzenia, a nie osoby",,,,tekst
+30,elektrody_pediatryczne,boolean,Z,,Urządzenie i stan,Czy dostępne elektrody lub tryb pediatryczny,true,,Pole wartości logicznych,wartość logiczna
+31,data_waznosci_elektrod,date,Z,,Urządzenie i stan,Data ważności elektrod (yyyy-mm-dd),2027-05-31,,,data
+32,data_waznosci_baterii,date,Z,,Urządzenie i stan,Data ważności baterii (yyyy-mm-dd),2029-01-31,,,data
+33,data_ostatniego_przegladu,date,Z,,Urządzenie i stan,Data ostatniego przeglądu lub autotestu potwierdzonego przez opiekuna (yyyy-mm-dd),2026-10-02,,,data
+34,poziom_weryfikacji,enum,Z,,Urządzenie i stan,Jak potwierdzono dane – słownik poziom_weryfikacji. Puste = 'niezweryfikowany' w zasobie zbiorczym,zweryfikowany_przez_dysponenta,poziom_weryfikacji,,tekst
+35,data_weryfikacji,date,Z,,Urządzenie i stan,"Kiedy ostatnio potwierdzono obecność i sprawność AED (yyyy-mm-dd). Puste, jeśli nikt nie weryfikował – data importu nie jest datą weryfikacji",2026-11-15,,,data
+36,dysponent_nazwa,string,Z,,Dysponent i kontakt,Właściciel lub opiekun AED. Osoba fizyczna (np. jednoosobowa działalność): wpisz rodzaj podmiotu (np. 'gabinet lekarski') albo zostaw puste. Puste = nazwa wydawcy zasobu w zasobie zbiorczym,Gmina Przykładowa,,,tekst
+37,dysponent_regon,string,Z,,Dysponent i kontakt,"REGON dysponenta: 9 lub 14 cyfr, TEKST; tylko dla osób prawnych i instytucji",,,REGON,tekst
+38,telefon_kontaktowy,string,Z,,Dysponent i kontakt,"Telefon WYŁĄCZNIE instytucjonalny lub funkcyjny (centrala, recepcja), nigdy imienny: 9 cyfr lub + i prefiks",,,Numer telefonu,tekst
+39,email_kontaktowy,string,O,,Dysponent i kontakt,"E-mail WYŁĄCZNIE instytucjonalny lub funkcyjny (np. aed@, sekretariat@), nigdy imienny",,,,tekst
+40,zrodlo_danych,enum,Z,,Źródło i aktualność,Pochodzenie rekordu – słownik zrodlo_danych. Wiersze 'openstreetmap' nie trafiają do zasobu zbiorczego (ODbL),dysponent,zrodlo_danych,,tekst
+41,zrodlo_url,string,Z,,Źródło i aktualność,Link do źródła rekordu u dostawcy (https),,,,tekst
+42,data_aktualizacji,datetime,W,,Źródło i aktualność,Ostatnia zmiana rekordu (yyyy-mm-ddThh:mm:ss),2026-11-21T10:15:00,,,data i czas

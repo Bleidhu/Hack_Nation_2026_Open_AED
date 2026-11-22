@@ -7,7 +7,7 @@ Tylko biblioteka standardowa (Python 3.8+). Uruchomienie:
     python format_danych/zrodla_wzorca/generuj_dane.py
 
 Wyniki (w tym samym folderze):
-  Wzorzec dostawcy (41 kolumn)
+  Wzorzec dostawcy (42 kolumny)
     schemat_tableschema.json        – Table Schema wzorca dostawcy (walidator)
     slownik_kolumn.csv              – opis kolumn: typ, wymagalność W/Z/O, minimum agregacji, reguły
     slowniki_wartosci.json          – zamknięte słowniki wartości
@@ -15,7 +15,7 @@ Wyniki (w tym samym folderze):
     aed_wzorzec_przyklad.csv        – 8 przykładowych rekordów dostawcy (FIKCYJNE)
     aed_wzorzec_przyklad.geojson    – te same rekordy jako GeoJSON
     mapowanie_zrodel.csv            – jak nagłówki realnych źródeł odpowiadają kolumnom wzorca
-  Zasób zbiorczy budowany przez portal (51 kolumn)
+  Zasób zbiorczy budowany przez portal (52 kolumny)
     schemat_zestawienia_tableschema.json
     slownik_kolumn_zestawienia.csv
     aed_zestawienie_przyklad.csv    – wynik reguł agregacji dla przykładów (referencyjna implementacja niżej)
@@ -35,7 +35,7 @@ import unicodedata
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-WERSJA = "2.0.0"
+WERSJA = "2.1.0"
 
 # ---------------------------------------------------------------------------
 # 1. WZORZEC DOSTAWCY: kolumny (kolejność = kolejność w CSV/XLSX)
@@ -75,6 +75,7 @@ KOLUMNY = [
     ("status_urzadzenia", "enum", "Z", "Urządzenie i stan", "Stan urządzenia – słownik status_urzadzenia. Puste w pliku dostawcy = 'nieznany' w zasobie zbiorczym (nigdy domyślnie 'sprawny')", "sprawny", ""),
     ("producent", "string", "O", "Urządzenie i stan", "Producent urządzenia", "", ""),
     ("model", "string", "O", "Urządzenie i stan", "Model urządzenia", "", ""),
+    ("numer_seryjny", "string", "O", "Urządzenie i stan", "Numer seryjny urządzenia (z tabliczki znamionowej). Służy do zwrotu AED właścicielowi i do deduplikacji w zasobie zbiorczym (producent + numer seryjny). To numer urządzenia, a nie osoby", "", ""),
     ("elektrody_pediatryczne", "boolean", "Z", "Urządzenie i stan", "Czy dostępne elektrody lub tryb pediatryczny", "true", "Pole wartości logicznych"),
     ("data_waznosci_elektrod", "date", "Z", "Urządzenie i stan", "Data ważności elektrod (yyyy-mm-dd)", "2027-05-31", ""),
     ("data_waznosci_baterii", "date", "Z", "Urządzenie i stan", "Data ważności baterii (yyyy-mm-dd)", "2029-01-31", ""),
@@ -92,7 +93,7 @@ KOLUMNY = [
     ("data_aktualizacji", "datetime", "W", "Źródło i aktualność", "Ostatnia zmiana rekordu (yyyy-mm-ddThh:mm:ss)", "2026-11-21T10:15:00", ""),
 ]
 NAZWY = [k[0] for k in KOLUMNY]
-assert len(NAZWY) == 41 and len(set(NAZWY)) == 41, len(NAZWY)
+assert len(NAZWY) == 42 and len(set(NAZWY)) == 42, len(NAZWY)
 WYMAGANE = [k[0] for k in KOLUMNY if k[2] == "W"]
 assert WYMAGANE == ["id_zrodlowe", "nazwa_lokalizacji", "miejscowosc", "szerokosc_geograficzna", "dlugosc_geograficzna",
                     "opis_lokalizacji", "typ_dostepu", "dostepny_24_7", "data_aktualizacji"], WYMAGANE
@@ -187,18 +188,18 @@ KOLUMNY_ZESTAWIENIA_DODATKOWE = [
     ("data_agregacji", "datetime", "Pochodzenie", "Data i czas zbudowania zasobu zbiorczego (yyyy-mm-ddThh:mm:ss)", "2026-11-22T04:15:00"),
 ]
 NAZWY_ZESTAWIENIA = [k[0] for k in KOLUMNY_ZESTAWIENIA_ID] + NAZWY + [k[0] for k in KOLUMNY_ZESTAWIENIA_DODATKOWE]
-assert len(NAZWY_ZESTAWIENIA) == 51 and len(set(NAZWY_ZESTAWIENIA)) == 51, len(NAZWY_ZESTAWIENIA)
+assert len(NAZWY_ZESTAWIENIA) == 52 and len(set(NAZWY_ZESTAWIENIA)) == 52, len(NAZWY_ZESTAWIENIA)
 
 # ---------------------------------------------------------------------------
 # 4. PRZYKŁADOWE REKORDY DOSTAWCY (FIKCYJNE). Każdy pokazuje inny przypadek z praktyki.
 # ---------------------------------------------------------------------------
 BAZA = dict(wojewodztwo="kujawsko-pomorskie", powiat="Bydgoszcz", gmina="Bydgoszcz",
             kod_terc="0461011", miejscowosc="Bydgoszcz", kod_simc="", kod_ulic="",
-            numer_lokalu="", adres_uniwersalny="", producent="", model="", dysponent_regon="",
+            numer_lokalu="", adres_uniwersalny="", producent="", model="", numer_seryjny="", dysponent_regon="",
             telefon_kontaktowy="", email_kontaktowy="", zrodlo_url="")
 
 REKORDY = [
-    dict(BAZA, id_zrodlowe="CT-01", nazwa_lokalizacji="Centrum targowe – hala A, wejście główne",
+    dict(BAZA, id_zrodlowe="CT-01", producent="Philips", model="HeartStart FRx", numer_seryjny="FRX-2026-0001", nazwa_lokalizacji="Centrum targowe – hala A, wejście główne",
          kod_pocztowy="85-001", cecha_ulicy="ul.", nazwa_ulicy="Przykładowa", numer_budynku="187",
          szerokosc_geograficzna=53.150120, dlugosc_geograficzna=18.017350,
          opis_lokalizacji="Parter, ściana po lewej od wejścia głównego, zielona szafka z alarmem",
@@ -211,7 +212,7 @@ REKORDY = [
          email_kontaktowy="aed@centrum-przyklad.example", zrodlo_danych="dysponent",
          poziom_weryfikacji="zweryfikowany_przez_dysponenta", data_weryfikacji="2026-11-15",
          data_aktualizacji="2026-11-21T10:15:00"),
-    dict(BAZA, id_zrodlowe="UM-RYN-1", nazwa_lokalizacji="Stary Rynek – ratusz, wejście od rynku",
+    dict(BAZA, id_zrodlowe="UM-RYN-1", producent="Zoll", model="AED Plus", numer_seryjny="ZP-2026-0002", nazwa_lokalizacji="Stary Rynek – ratusz, wejście od rynku",
          kod_pocztowy="85-002", cecha_ulicy="rynek", nazwa_ulicy="Stary Rynek", numer_budynku="1",
          szerokosc_geograficzna=53.122640, dlugosc_geograficzna=17.999870,
          opis_lokalizacji="Na zewnątrz, elewacja przy drzwiach głównych, podświetlana szafka",
@@ -223,7 +224,7 @@ REKORDY = [
          zrodlo_danych="dysponent", zrodlo_url="https://gmina-przyklad.example/aed",
          poziom_weryfikacji="zweryfikowany_w_terenie", data_weryfikacji="2026-11-10",
          data_aktualizacji="2026-11-20T08:00:00"),
-    dict(BAZA, id_zrodlowe="SP99-1", nazwa_lokalizacji="Szkoła Podstawowa nr 99 – sala gimnastyczna",
+    dict(BAZA, id_zrodlowe="SP99-1", producent="Defibtech", model="Lifeline AED", numer_seryjny="DL-2026-0003", nazwa_lokalizacji="Szkoła Podstawowa nr 99 – sala gimnastyczna",
          kod_pocztowy="85-003", cecha_ulicy="ul.", nazwa_ulicy="Szkolna", numer_budynku="5A",
          szerokosc_geograficzna=53.131870, dlugosc_geograficzna=18.034410,
          opis_lokalizacji="Parter, korytarz przy wejściu do sali gimnastycznej",
@@ -236,7 +237,7 @@ REKORDY = [
          poziom_weryfikacji="zweryfikowany_przez_dysponenta", data_weryfikacji="2026-09-01",
          data_aktualizacji="2026-09-01T12:00:00"),
     # Dwa AED w jednym budynku = dwa wiersze z różnym id_zrodlowe (ten sam punkt, inna kondygnacja).
-    dict(BAZA, id_zrodlowe="SP99-2", nazwa_lokalizacji="Szkoła Podstawowa nr 99 – pokój nauczycielski",
+    dict(BAZA, id_zrodlowe="SP99-2", producent="Defibtech", model="Lifeline AED", numer_seryjny="DL-2026-0004", nazwa_lokalizacji="Szkoła Podstawowa nr 99 – pokój nauczycielski",
          kod_pocztowy="85-003", cecha_ulicy="ul.", nazwa_ulicy="Szkolna", numer_budynku="5A",
          szerokosc_geograficzna=53.131870, dlugosc_geograficzna=18.034410,
          opis_lokalizacji="I piętro, pokój nauczycielski, szafka przy drzwiach",
@@ -247,7 +248,7 @@ REKORDY = [
          dysponent_nazwa="Szkoła Podstawowa nr 99 (przykład)", zrodlo_danych="dysponent",
          poziom_weryfikacji="zweryfikowany_przez_dysponenta", data_weryfikacji="2026-09-01",
          data_aktualizacji="2026-09-01T12:00:00"),
-    dict(BAZA, id_zrodlowe="OSP-PRZ-1", nazwa_lokalizacji="OSP Przykładowo – remiza",
+    dict(BAZA, id_zrodlowe="OSP-PRZ-1", producent="Physio-Control", model="LIFEPAK CR2", numer_seryjny="LP-2026-0005", nazwa_lokalizacji="OSP Przykładowo – remiza",
          kod_pocztowy="85-004", cecha_ulicy="ul.", nazwa_ulicy="Strażacka", numer_budynku="12",
          szerokosc_geograficzna=53.105530, dlugosc_geograficzna=18.069920,
          opis_lokalizacji="Na zewnątrz, ściana boczna remizy od strony parkingu",

@@ -1,53 +1,44 @@
-import requests
 from django.core.management.base import BaseCommand, CommandError
 
-from mcod.categories.models import Category
-from mcod.datasets.models import Dataset
 from mcod.organizations.models import Organization
-from mcod.resources.aed_constants import AED_CUSTOMFIELD_STANDARD_KEY, AED_CUSTOMFIELD_STANDARD_VALUE
-from mcod.resources.aed_xml import validate_aed_xml
-from mcod.resources.dga_utils import request_remote_dga
-from mcod.resources.models import Resource
+from mcod.resources.aed_import import (
+    AEDImportError,
+    import_dataset,
+    prepare_import,
+    refresh_imported_datasets,
+)
 from mcod.users.models import User
 
 
 class Command(BaseCommand):
     help = (
-        "Zaczytuje zewnętrzne dane AED w XML: pobiera plik z podanego adresu https, sprawdza go schematem XSD "
-        "i tworzy zbiór z `standard = AED` oraz zasób z linkiem do zewnętrznego serwera. Dalej działa zwykły potok "
-        "portalu, a nocne zadanie Wykazu AED pobiera XML i włącza go do wykazu. --dry-run tylko waliduje."
+        "Zaczytuje zewnętrzne dane AED: pobiera opis zbioru w XML (kod 200), waliduje go schematem XSD, pobiera CSV "
+        "spod linku z opisu, sprawdza sumę md5 i kontroluje kolumny oraz duplikaty. Dopiero potem tworzy zbiór "
+        "(standard = AED) i zasób CSV. Przy niezgodności nic nie zapisuje. --dry-run tylko sprawdza, "
+        "--odswiez ponawia import wszystkich zbiorów zaczytanych wcześniej z opisu XML (to samo robi co noc "
+        "zadanie refresh_aed_opis_task przed budową wykazu)."
     )
 
     def add_arguments(self, parser):
-        parser.add_argument("url", help="Adres https pliku XML dostawcy.")
-        parser.add_argument("--organizacja", type=int, help="Identyfikator instytucji (dostawcy). Wymagany bez --dry-run.")
-        parser.add_argument("--tytul", help="Tytuł zbioru (domyślnie: Defibrylatory AED – <instytucja>).")
+        parser.add_argument("url", nargs="?", help="Adres https opisu zbioru (XML).")
+        parser.add_argument("--organizacja", type=int, help="Identyfikator instytucji dostawcy (wymagany bez --dry-run).")
         parser.add_argument("--uzytkownik", help="E-mail użytkownika zapisanego jako autor (opcjonalnie).")
-        parser.add_argument("--dry-run", action="store_true", help="Tylko pobierz i zwaliduj plik, bez zapisu w bazie.")
-
-    def fetch_valid_xml(self, url):
-        if not url.startswith("https://"):
-            raise CommandError("Portal przyjmuje tylko adresy https.")
-        try:
-            response = request_remote_dga(url)
-        except requests.exceptions.RequestException as exc:
-            raise CommandError(f"Serwer dostawcy nie odpowiada: {exc}")
-        if response.status_code != 200:
-            raise CommandError(f"Serwer dostawcy zwrócił kod {response.status_code}.")
-        report = validate_aed_xml(response.content)
-        if not report["valid"]:
-            for error in report["errors"]:
-                self.stderr.write(f"linia {error['line']}, pole {error['field'] or '-'}: {error['message']}")
-            raise CommandError(f"Plik XML jest niezgodny ze schematem XSD ({len(report['errors'])} błędów). Nic nie zapisano.")
-        return report
+        parser.add_argument("--dry-run", action="store_true", help="Tylko pobierz i sprawdź, bez zapisu w bazie.")
+        parser.add_argument("--odswiez", action="store_true", help="Ponów import wszystkich zbiorów z polem opis_xml.")
 
     def handle(self, *args, **options):
+        if options["odswiez"]:
+            return self.refresh_all()
+        if not options["url"]:
+            raise CommandError("Podaj adres opisu zbioru (XML) albo użyj --odswiez.")
         url = options["url"]
-        report = self.fetch_valid_xml(url)
-        self.stdout.write(f"XML zgodny z XSD, rekordów: {report['records']}.")
+        try:
+            prepared = prepare_import(url)
+        except AEDImportError as exc:
+            raise CommandError(f"Import odrzucony, nic nie zapisano: {exc}")
+        self.report(prepared["md5"], prepared["kontrola"])
         if options["dry_run"]:
             return
-
         if not options["organizacja"]:
             raise CommandError("Podaj --organizacja (identyfikator instytucji dostawcy).")
         try:
@@ -55,33 +46,23 @@ class Command(BaseCommand):
         except Organization.DoesNotExist:
             raise CommandError(f"Nie ma instytucji o identyfikatorze {options['organizacja']}.")
         user = User.objects.filter(email=options["uzytkownik"]).first() if options["uzytkownik"] else None
+        result = import_dataset(url, organization, user)
+        self.stdout.write(f"Wynik: {result['status']}, zbiór: {result['zbior']}, zasób: {result['zasob']}")
 
-        title = options["tytul"] or f"Defibrylatory AED – {organization.title}"
-        category = Category.objects.filter(title="Zdrowie").first()
-        dataset = Dataset.objects.create(
-            title=title,
-            notes=f"{title}. Dane zaczytane z zewnętrznego serwera dostawcy w formacie XML (schemat XSD wzorca AED).",
-            organization=organization,
-            customfields={AED_CUSTOMFIELD_STANDARD_KEY: AED_CUSTOMFIELD_STANDARD_VALUE},
-            license_chosen=Dataset.LICENSE_CC_BY,
-            update_frequency="daily",
-            status="published",
-            created_by=user,
+    def report(self, md5, control):
+        self.stdout.write("Opis zbioru: zgodny z XSD.")
+        self.stdout.write(f"Suma md5 pliku CSV zgodna z opisem: {md5}.")
+        self.stdout.write(
+            f"CSV: wiersze {control['wiersze']}, do wykazu {control['przyjete']}, pominięte {control['pominiete']}, "
+            f"duplikaty w pliku {len(control['duplikaty'])}."
         )
-        if category:
-            dataset.categories.add(category)
-        resource = Resource.objects.create(
-            title="Wykaz AED (XML, link do serwera dostawcy)",
-            description="Plik XML zgodny ze schematem XSD wzorca AED, pobierany z serwera dostawcy.",
-            dataset=dataset,
-            link=url,
-            type="file",
-            status="published",
-            has_dynamic_data=False,
-            has_high_value_data=False,
-            has_high_value_data_from_ec_list=False,
-            has_research_data=False,
-            created_by=user,
-        )
-        self.stdout.write(f"Zbiór: {dataset.pk}")
-        self.stdout.write(f"Zasób: {resource.pk} (link sprawdzi i pobierze potok portalu)")
+
+    def refresh_all(self):
+        results = refresh_imported_datasets()
+        for result in results:
+            if result["status"] == "odrzucono":
+                self.stderr.write(f"{result['url']}: odrzucono, zbiór {result['zbior']} bez zmian ({result['blad']})")
+            else:
+                self.stdout.write(f"{result['url']}: {result['status']}, zbiór: {result['zbior']}, zasób: {result['zasob']}")
+        if not results:
+            self.stdout.write("Brak zbiorów zaczytanych z opisu XML (pole opis_xml).")

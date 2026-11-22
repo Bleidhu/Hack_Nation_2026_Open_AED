@@ -46,7 +46,7 @@ def small_main_aed_csv(tmp_path: Path) -> Path:
 def test_build_aed_tabular_schema():
     schema = build_aed_tabular_schema(MAIN_AED_COLUMNS)
 
-    assert len(schema["fields"]) == 51
+    assert len(schema["fields"]) == 52
     assert all(field["type"] == "string" for field in schema["fields"])
     assert schema["missingValues"] == []
     for geo_type, column in (("b", "szerokosc_geograficzna"), ("l", "dlugosc_geograficzna"), ("label", "nazwa_lokalizacji")):

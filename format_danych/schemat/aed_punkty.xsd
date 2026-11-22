@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
-  <!-- Wzorcowy zakres danych o defibrylatorach AED – plik dostawcy, wersja 2.0.0. Plik generowany z aed_punkty.tableschema.json przez format_danych/narzedzia/generuj_xsd.py. -->
+  <!-- Wzorcowy zakres danych o defibrylatorach AED – plik dostawcy, wersja 2.1.0. Plik generowany z aed_punkty.tableschema.json przez format_danych/narzedzia/generuj_xsd.py. -->
   <xs:element name="wykaz">
     <xs:complexType><xs:sequence>
       <xs:element name="aed" minOccurs="1" maxOccurs="unbounded">
@@ -33,6 +33,7 @@
           <xs:element name="status_urzadzenia" minOccurs="0"><xs:simpleType><xs:restriction base="xs:string"><xs:enumeration value="sprawny"/><xs:enumeration value="niesprawny"/><xs:enumeration value="w_serwisie"/><xs:enumeration value="wycofany"/><xs:enumeration value="nieznany"/></xs:restriction></xs:simpleType></xs:element>
           <xs:element name="producent" minOccurs="0"><xs:simpleType><xs:restriction base="xs:string"></xs:restriction></xs:simpleType></xs:element>
           <xs:element name="model" minOccurs="0"><xs:simpleType><xs:restriction base="xs:string"></xs:restriction></xs:simpleType></xs:element>
+          <xs:element name="numer_seryjny" minOccurs="0"><xs:simpleType><xs:restriction base="xs:string"></xs:restriction></xs:simpleType></xs:element>
           <xs:element name="elektrody_pediatryczne" minOccurs="0"><xs:simpleType><xs:restriction base="xs:boolean"/></xs:simpleType></xs:element>
           <xs:element name="data_waznosci_elektrod" minOccurs="0"><xs:simpleType><xs:restriction base="xs:date"/></xs:simpleType></xs:element>
           <xs:element name="data_waznosci_baterii" minOccurs="0"><xs:simpleType><xs:restriction base="xs:date"/></xs:simpleType></xs:element>
