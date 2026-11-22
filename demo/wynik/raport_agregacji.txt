@@ -1,0 +1,29 @@
+Wykaz AED: weryfikacja agregacji bez bazy (data agregacji 2026-11-22T01:00:14)
+
+   zasób  format   przyjęte pominięte  zbiór / powód pominięcia zasobu
+   54632  csv             0         0  3624 Defibrylatory zlokalizowane w Mieście Krosno
+                                       POMINIĘTY: brak kolumn: miejscowosc
+   62092  xml             0         0  4581 Lokalizacje AED – Automatycznych Defibrylatorów Zewnętrznych w Przemyślu
+                                       POMINIĘTY: format nietabelaryczny (xml)
+   62093  geojson         0         0  4581 Lokalizacje AED – Automatycznych Defibrylatorów Zewnętrznych w Przemyślu
+                                       POMINIĘTY: format nietabelaryczny (geojson)
+   62094  json            0         0  4581 Lokalizacje AED – Automatycznych Defibrylatorów Zewnętrznych w Przemyślu
+                                       POMINIĘTY: format nietabelaryczny (json)
+   62095  csv             0         0  4581 Lokalizacje AED – Automatycznych Defibrylatorów Zewnętrznych w Przemyślu
+                                       POMINIĘTY: brak kolumn: szerokosc_geograficzna, dlugosc_geograficzna
+   62424  xml             0         0  4581 Lokalizacje AED – Automatycznych Defibrylatorów Zewnętrznych w Przemyślu
+                                       POMINIĘTY: format nietabelaryczny (xml)
+   68353  csv             0         0  4955 Defibrylatory zlokalizowane na terenie Miasta Marki
+                                       POMINIĘTY: brak kolumn: nazwa_lokalizacji, miejscowosc, szerokosc_geograficzna, dlugosc_geograficzna
+   68355  xlsx            0         0  4955 Defibrylatory zlokalizowane na terenie Miasta Marki
+                                       POMINIĘTY: brak kolumn: nazwa_lokalizacji, miejscowosc, szerokosc_geograficzna, dlugosc_geograficzna
+ 2512040  json            0         0  39512 Lokalizacja defibrylatorów (AED)
+                                       POMINIĘTY: format nietabelaryczny (json)
+ 2625221  csv            24         0  40593 Zdrowie
+                                       przyjęty
+ 2631129  csv             0         0  40593 Zdrowie
+                                       POMINIĘTY: brak lokalnej kopii pliku w references/dane_gov_pl_aed/
+
+Przykład wzorca (format_danych/przyklady/aed_punkty_przyklad.csv): 8 wierszy, zgodność z aed_zestawienie_przyklad.csv: TAK
+Zasoby realne: przyjęte 1, pominięte 10.
+Wiersze w demo/wynik/zestawienie_aed.csv: 32.
